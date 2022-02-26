@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <cmath>
 using namespace std;
 
 
@@ -11,38 +12,25 @@ int main()
 
 	int T;
 	cin >> T;
-	vector<long> v;
+	vector<int> v;
 	for (int i = 0; i < T; i++)
 	{
-		long x, y;
+		int x, y;
 		cin >> x >> y;
 		v.push_back(y - x);
 	}
 
-	for (int k = 0; k < T; k++)
+	for (int i = 0; i < T; i++)
 	{
-		long i = 1;
-		while (v[k] >= i * i)
-		{
-			i++;
-		}
-
-		int count = --i;
-		v[k] -= i * i;
-
-		if (v[k] == 0)
-		{
-			count = count * 2 - 1;
-		}
-		else if (v[k] > i)
-		{
-			count = count * 2 - 1 + (v[k] / i);
-		}
+		int distance = v[i];
+		int dis = (int)sqrt(distance);
+		
+		if (dis == sqrt(distance)) 
+			cout << dis * 2 - 1 << "\n";
+		else if (distance - dis * dis <= dis)
+			cout << dis * 2 << "\n";
 		else
-		{
-			count = count * 2;
-		}
+			cout << dis * 2 + 1 << "\n";
 
-		cout << count << "\n";
 	}
 }
