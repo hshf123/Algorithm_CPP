@@ -7,13 +7,19 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int sum = 0;
-	for (int i = 0; i < 5; i++)
+	int max = 0;
+	int count = 1;
+
+	for (int i = 0; i < 9; i++)
 	{
 		int n;
 		cin >> n;
-		sum += (n * n);
+		if (n > max)
+		{
+			max = n;
+			count = i + 1;
+		}
 	}
 
-	cout << sum % 10;
+	cout << max << "\n" << count;
 }
