@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
 int main()
@@ -6,13 +7,20 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int a;
-	cin >> a;
+	vector<int> vec;
+	int N, X;
+	cin >> N >> X;
 
-	for (int i = 0; i < a; i++)
+	for (int i = 0; i < N; i++)
 	{
-		int b, c;
-		cin >> b >> c;
-		cout << b + c << "\n";
+		int a;
+		cin >> a;
+		if (a < X)
+			vec.push_back(a);
+	}
+
+	for (int num : vec)
+	{
+		cout << num << " ";
 	}
 }
