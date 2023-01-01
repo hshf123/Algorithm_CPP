@@ -7,8 +7,13 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	long long A, B;
-	cin >> A >> B;
+	int sum = 0;
+	for (int i = 0; i < 5; i++)
+	{
+		int n;
+		cin >> n;
+		sum += (n * n);
+	}
 
-	cout << (A + B) * (A - B);
+	cout << sum % 10;
 }
