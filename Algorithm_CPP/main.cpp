@@ -7,27 +7,22 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int T;
-	cin >> T;
+	int N;
+	cin >> N;
 
-	for (int i = 0; i < T; i++)
+	int max = INT32_MIN;
+	int min = INT32_MAX;
+
+	for (int i = 0; i < N; i++)
 	{
-		string s;
-		cin >> s;
+		int n;
+		cin >> n;
 
-		int sum = 0;
-		int count = 0;
-		for (int j = 0; j < s.length(); j++)
-		{
-			if (s[j] == 'O')
-			{
-				count += 1;
-				sum += count;
-			}
-			else
-				count = 0;
-		}
-
-		cout << sum << "\n";
+		if (n > max)
+			max = n;
+		if (n < min)
+			min = n;
 	}
+
+	cout << min << " " << max;
 }
