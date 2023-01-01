@@ -1,6 +1,11 @@
 #include <iostream>
+using namespace std;
 
 int main()
 {
-	std::cout << 40 << std::endl << "hshf123";
+	cout << "|\\_/|" << endl;
+	cout << "|q p|   /}" << endl;
+	cout << "( 0 )\"\"\"\\" << endl;
+	cout << "|\"^\"`    |" << endl;
+	cout << "||_/=\\\\__|" << endl;
 }
