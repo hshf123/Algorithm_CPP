@@ -7,19 +7,21 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int max = 0;
-	int count = 1;
+	int T;
+	cin >> T;
 
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < T; i++)
 	{
-		int n;
-		cin >> n;
-		if (n > max)
+		int R;
+		string S;
+		cin >> R >> S;
+		for (int j = 0; j < S.length(); j++)
 		{
-			max = n;
-			count = i + 1;
+			for (int k = 0; k < R; k++)
+			{
+				cout << S[j];
+			}
 		}
+		cout << "\n";
 	}
-
-	cout << max << "\n" << count;
 }
