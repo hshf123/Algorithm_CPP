@@ -3,12 +3,14 @@ using namespace std;
 
 int main()
 {
-	int a;
-	cin >> a;
+	int N;
+	cin >> N;
 
-	int f = 1;
-	for (int i = 1; i <= a; i++)
-		f *= i;
-
-	cout << f;
+	for (int testcase = 0; testcase < N; testcase++)
+	{
+		int a;
+		int b;
+		cin >> a >> b;
+		cout << a + b;
+	}
 }
