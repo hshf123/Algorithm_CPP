@@ -7,22 +7,17 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N;
+	int n;
+	cin >> n;
+
+	string N;
 	cin >> N;
 
-	int max = INT32_MIN;
-	int min = INT32_MAX;
-
-	for (int i = 0; i < N; i++)
+	int sum = 0;
+	for (int i = 0; i < N.length(); ++i)
 	{
-		int n;
-		cin >> n;
-
-		if (n > max)
-			max = n;
-		if (n < min)
-			min = n;
+		sum += (int)N[i] - 48;
 	}
 
-	cout << min << " " << max;
+	cout << sum;
 }
