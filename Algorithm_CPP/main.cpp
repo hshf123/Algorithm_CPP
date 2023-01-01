@@ -7,42 +7,27 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int n;
-	int arr[8];
+	int T;
+	cin >> T;
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < T; i++)
 	{
-		cin >> n;
-		arr[i] = n;
-	}
+		string s;
+		cin >> s;
 
-	int prev = arr[0];
-	for (int i = 1; i < 8; i++)
-	{
-		if (arr[i] - prev != 1)
-			break;
-
-		prev = arr[i];
-		if (i==7)
+		int sum = 0;
+		int count = 0;
+		for (int j = 0; j < s.length(); j++)
 		{
-			cout << "ascending";
-			return 0;
+			if (s[j] == 'O')
+			{
+				count += 1;
+				sum += count;
+			}
+			else
+				count = 0;
 		}
-	}
-	prev = arr[0];
-	for (int i = 1; i < 8; i++)
-	{
-		if (prev - arr[i] != 1)
-			break;
 
-		prev = arr[i];
-		if (i == 7)
-		{
-			cout << "descending";
-			return 0;
-		}
+		cout << sum << "\n";
 	}
-
-	cout << "mixed";
-	return 0;
 }
