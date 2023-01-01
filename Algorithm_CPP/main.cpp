@@ -1,15 +1,23 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
 int main()
 {
 	int a;
-	cin >> a;
+	int b;
+	vector<int> vec;
 
-	for (int i = 1; i <= a; ++i)
+	bool end = (cin >> a >> b).eof();
+
+	while (!end)
 	{
-		for (int j = 0; j < i; ++j)
-			cout << "*";
-		cout << "\n";
+		vec.push_back(a + b);
+		end = (cin >> a >> b).eof();
+	}
+
+	for (int sum : vec)
+	{
+		cout << sum << "\n";
 	}
 }
