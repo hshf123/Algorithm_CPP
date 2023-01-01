@@ -3,10 +3,14 @@ using namespace std;
 
 int main()
 {
-	long long a;
-	long long b;
-	long long c;
-	cin >> a >> b >> c;
+	int a;
+	int b;
+	cin >> a >> b;
 
-	cout << a + b + c;
+	if (a < b)
+		cout << "<";
+	else if (a > b)
+		cout << ">";
+	else
+		cout << "==";
 }
