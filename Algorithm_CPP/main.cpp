@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string.h>
+#include <vector>
 using namespace std;
 
 int main()
@@ -7,33 +8,22 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	string str;
-	cin >> str;
-	float i;
+	//97
+	//122
 
-	if (str[0] == 'A')
-		i = 4;
-	else if (str[0] == 'B')
-		i = 3;
-	else if (str[0] == 'C')
-		i = 2;
-	else if (str[0] == 'D')
-		i = 1;
-	else
+	string S;
+	cin >> S;
+	vector<int> vec(26, -1);
+
+	for (int i = 0; i < S.length(); i++)
 	{
-		cout << fixed;
-		cout.precision(1); 
-		cout << 0.0;
-		return 0;
+		int n = (int)S[i] - 97;
+		if(vec[n] == -1)
+			vec[n] = i;
 	}
 
-	if (str[1] == '+')
-		i += 0.3f;
-	else if(str[1] == '-')
-		i -= 0.3f;
-	cout << fixed;
-	cout.precision(1);
-	cout << i;
-
-	return 0;
+	for (int num : vec)
+	{
+		cout << num << " ";
+	}
 }
