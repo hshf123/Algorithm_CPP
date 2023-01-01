@@ -6,8 +6,10 @@ int main()
 	int a;
 	cin >> a;
 
-	for (int i = 1; i <= 9; ++i)
+	for (int i = 1; i <= a; ++i)
 	{
-		cout << a << " * " << i << " = " << a * i << "\n";
+		for (int j = 0; j < i; ++j)
+			cout << "*";
+		cout << "\n";
 	}
 }
