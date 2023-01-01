@@ -8,16 +8,14 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	string s;
-
-	while (true)
+	int T;
+	cin >> T;
+	
+	for (int i = 0; i < T; i++)
 	{
-		getline(cin, s);
-		if (s == "")
-			break;
+		string s;
+		cin >> s;
 
-		cout << s << endl;
+		cout << s[0] << s[s.length() - 1] << "\n";
 	}
-
-	return 0;
 }
