@@ -4,16 +4,15 @@ using namespace std;
 int main()
 {
 	int a;
-	cin >> a;
+	int b;
+	cin >> a >> b;
 
-	if (a >= 90)
-		cout << "A";
-	else if (a >= 80)
-		cout << "B";
-	else if (a >= 70)
-		cout << "C";
-	else if (a >= 60)
-		cout << "D";
+	if (a > 0 && b > 0)
+		cout << "1";
+	else if (a < 0 && b > 0)
+		cout << "2";
+	else if (a < 0 && b < 0)
+		cout << "3";
 	else
-		cout << "F";
+		cout << "4";
 }
