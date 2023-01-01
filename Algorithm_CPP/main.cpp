@@ -3,9 +3,10 @@ using namespace std;
 
 int main()
 {
-	cout << "|\\_/|" << endl;
-	cout << "|q p|   /}" << endl;
-	cout << "( 0 )\"\"\"\\" << endl;
-	cout << "|\"^\"`    |" << endl;
-	cout << "||_/=\\\\__|" << endl;
+	cout << "         ,r\'\"7" << endl;
+	cout << "r`-_   ,'  ,/" << endl;
+	cout << " \\. \". L_r\'" << endl;
+	cout << "   `~\\/" << endl;
+	cout << "      |" << endl;
+	cout << "      |" << endl;
 }
