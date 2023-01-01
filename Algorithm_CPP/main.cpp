@@ -8,19 +8,22 @@ int main()
 	ios::sync_with_stdio(false);
 
 	vector<int> vec;
-	int N, X;
-	cin >> N >> X;
-
+	int N, v;
+	cin >> N;
 	for (int i = 0; i < N; i++)
 	{
 		int a;
 		cin >> a;
-		if (a < X)
-			vec.push_back(a);
+		vec.push_back(a);
 	}
+	cin >> v;
 
+	int count = 0;
 	for (int num : vec)
 	{
-		cout << num << " ";
+		if (num == v)
+			++count;
 	}
+
+	cout << count;
 }
