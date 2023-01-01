@@ -7,19 +7,29 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	vector<bool> vec(30, false);
-	for (int i = 0; i < 28; i++)
-	{
-		int n;
-		cin >> n;
-		vec[n - 1] = true;
-	}
+	int N, M;
+	cin >> N >> M;
 
-	int count = 1;
-	for (bool n : vec)
+	vector<int> A;
+
+	for (int i = 0; i < N * M; i++)
 	{
-		if (n == false)
-			cout << count << "\n";
+		int a;
+		cin >> a;
+		A.push_back(a);
+	}
+	for (int i = 0; i < N * M; i++)
+	{
+		int a;
+		cin >> a;
+		A[i] += a;
+	}
+	int count = 1;
+	for (int i = 0; i < N * M; i++)
+	{
+		cout << A[i] << " ";
+		if (count % M == 0)
+			cout << "\n";
 		++count;
 	}
 }
