@@ -1,23 +1,18 @@
 #include <iostream>
-#include <vector>
 using namespace std;
 
 int main()
 {
+	cin.tie(NULL);
+	ios::sync_with_stdio(false);
+
 	int a;
-	int b;
-	vector<int> vec;
+	cin >> a;
 
-	bool end = (cin >> a >> b).eof();
-
-	while (!end)
+	for (int i = 0; i < a; i++)
 	{
-		vec.push_back(a + b);
-		end = (cin >> a >> b).eof();
-	}
-
-	for (int sum : vec)
-	{
-		cout << sum << "\n";
+		int b, c;
+		cin >> b >> c;
+		cout << b + c << "\n";
 	}
 }
