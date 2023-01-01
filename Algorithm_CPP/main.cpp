@@ -10,5 +10,15 @@ int main()
 	string str;
 	cin >> str;
 
-	cout << str.length();
+	for (int i = 0; i < str.length(); i++)
+	{
+		if (str[i] == tolower(str[i]))
+			str[i] = toupper(str[i]);
+		else
+			str[i] = tolower(str[i]);
+	}
+
+	cout << str;
+
+	return 0;
 }
