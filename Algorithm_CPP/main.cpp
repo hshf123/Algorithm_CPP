@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string.h>
 using namespace std;
 
 int main()
@@ -6,8 +7,8 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	char c;
-	cin >> c;
+	string str;
+	cin >> str;
 
-	cout << (int)c;
+	cout << str.length();
 }
