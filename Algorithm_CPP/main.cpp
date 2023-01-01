@@ -1,6 +1,6 @@
 #include <iostream>
-#include <string.h>
-#include <vector>
+#include <string>
+
 using namespace std;
 
 int main()
@@ -8,22 +8,16 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	//97
-	//122
+	string s;
 
-	string S;
-	cin >> S;
-	vector<int> vec(26, -1);
-
-	for (int i = 0; i < S.length(); i++)
+	while (true)
 	{
-		int n = (int)S[i] - 97;
-		if(vec[n] == -1)
-			vec[n] = i;
+		getline(cin, s);
+		if (s == "")
+			break;
+
+		cout << s << endl;
 	}
 
-	for (int num : vec)
-	{
-		cout << num << " ";
-	}
+	return 0;
 }
