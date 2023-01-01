@@ -1,16 +1,23 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
 int main()
 {
-	int N;
-	cin >> N;
+	int a;
+	int b;
+	vector<int> vec;
 
-	for (int testcase = 0; testcase < N; testcase++)
+	cin >> a >> b;
+
+	while (a != 0 && b != 0)
 	{
-		int a;
-		int b;
+		vec.push_back(a + b);
 		cin >> a >> b;
-		cout << a + b;
+	}
+
+	for(int sum : vec)
+	{
+		cout << sum << "\n";
 	}
 }
