@@ -1,7 +1,6 @@
-#include <iostream>
+#include	 <iostream>
 #include <string>
-#include <sstream>
-#include <vector>
+#include <map>
 using namespace std;
 
 int main()
@@ -12,17 +11,41 @@ int main()
 	string str;
 
 	getline(cin, str);
+	for (int i = 0; i < str.length(); i++)
+	{
+		str[i] = toupper(str[i]);
+	}
 
-	vector<string> answer;
-	stringstream ss(str);
-	string temp;
+	map<char, int> dic;
 
+	for (int i = 0; i < str.length(); i++)
+	{
+		auto findIt = dic.find(str[i]);
+		if (findIt == dic.end())
+			dic.insert(make_pair(str[i], 1));
+		else
+			findIt->second++;
+	}
+	
+	int max = 0;
+	for (auto findIt = dic.begin(); findIt != dic.end(); ++findIt)
+	{
+		if (findIt->second > max)
+			max = findIt->second;
+	}
 	int count = 0;
-	while (getline(ss, temp, ' '))
-		count++;
+	char findChar;
+	for (auto findIt = dic.begin(); findIt != dic.end(); ++findIt)
+	{
+		if (findIt->second == max)
+		{
+			count++;
+			findChar = findIt->first;
+		}
+	}
 
-	if (str[0] == ' ')
-		count--;
-
-	cout << count;
+	if (count > 1)
+		cout << "?";
+	else
+		cout << findChar;
 }
