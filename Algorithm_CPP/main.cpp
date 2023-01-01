@@ -3,10 +3,10 @@ using namespace std;
 
 int main()
 {
-	double a;
-	double b;
-	cin >> a >> b;
+	long long a;
+	long long b;
+	long long c;
+	cin >> a >> b >> c;
 
-	cout.precision(10);
-	cout << a / b << endl;
+	cout << a + b + c;
 }
