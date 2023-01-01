@@ -4,15 +4,10 @@ using namespace std;
 int main()
 {
 	int a;
-	int b;
-	cin >> a >> b;
+	cin >> a;
 
-	if (a > 0 && b > 0)
-		cout << "1";
-	else if (a < 0 && b > 0)
-		cout << "2";
-	else if (a < 0 && b < 0)
-		cout << "3";
+	if (a % 4 == 0 && a % 100 != 0 || a % 400 == 0)
+		cout << 1;
 	else
-		cout << "4";
+		cout << 0;
 }
