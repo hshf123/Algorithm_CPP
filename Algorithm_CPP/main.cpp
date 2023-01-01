@@ -1,6 +1,4 @@
-#include	 <iostream>
-#include <string>
-#include <map>
+#include <iostream>
 using namespace std;
 
 int main()
@@ -8,44 +6,29 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	string str;
+	int N;
+	cin >> N;
+	double arr[1000];
 
-	getline(cin, str);
-	for (int i = 0; i < str.length(); i++)
-	{
-		str[i] = toupper(str[i]);
-	}
-
-	map<char, int> dic;
-
-	for (int i = 0; i < str.length(); i++)
-	{
-		auto findIt = dic.find(str[i]);
-		if (findIt == dic.end())
-			dic.insert(make_pair(str[i], 1));
-		else
-			findIt->second++;
-	}
-	
 	int max = 0;
-	for (auto findIt = dic.begin(); findIt != dic.end(); ++findIt)
+	for (int i = 0; i < N; i++)
 	{
-		if (findIt->second > max)
-			max = findIt->second;
-	}
-	int count = 0;
-	char findChar;
-	for (auto findIt = dic.begin(); findIt != dic.end(); ++findIt)
-	{
-		if (findIt->second == max)
-		{
-			count++;
-			findChar = findIt->first;
-		}
+		int num;
+		cin >> num;
+
+		arr[i] = num;
+		if (num > max)
+			max = num;
 	}
 
-	if (count > 1)
-		cout << "?";
-	else
-		cout << findChar;
+	double sum = 0;
+	for (int i = 0; i < N; i++)
+	{
+		arr[i] = arr[i] / max * 100;
+		sum += arr[i];
+	}
+
+	cout << fixed;
+	cout.precision(3);
+	cout << sum / (double)N;
 }
