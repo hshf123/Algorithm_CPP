@@ -1,5 +1,7 @@
 #include <iostream>
-
+#include <string>
+#include <sstream>
+#include <vector>
 using namespace std;
 
 int main()
@@ -7,17 +9,20 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int n;
-	cin >> n;
+	string str;
 
-	string N;
-	cin >> N;
+	getline(cin, str);
 
-	int sum = 0;
-	for (int i = 0; i < N.length(); ++i)
-	{
-		sum += (int)N[i] - 48;
-	}
+	vector<string> answer;
+	stringstream ss(str);
+	string temp;
 
-	cout << sum;
+	int count = 0;
+	while (getline(ss, temp, ' '))
+		count++;
+
+	if (str[0] == ' ')
+		count--;
+
+	cout << count;
 }
