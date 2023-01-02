@@ -6,24 +6,15 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int arr[42] = {};
-	int count = 0;
+	int x, y, w, h;
+	cin >> x >> y >> w >> h;
 
-	for (int i = 0; i < 10; i++)
-	{
-		int N;
-		cin >> N;
+	int right, left, up, down;
 
-		arr[N % 42]++;
-	}
+	right = w - x;
+	left = x - 0;
+	up = h - y;
+	down = y - 0;
 
-	for (int i = 0; i < 42; i++)
-	{
-		if (arr[i] != 0)
-			count++;
-	}
-
-	if (count == 0)
-		count++;
-	cout << count;
+	cout << min(min(min(right, left), up), down);
 }
