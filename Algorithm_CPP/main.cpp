@@ -1,7 +1,4 @@
 #include <iostream>
-#include <algorithm>
-#include <string>
-#include <vector>
 using namespace std;
 
 int main()
@@ -9,26 +6,30 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	vector<string> res;
-	int pal;
-	cin >> pal;
+	int N;
+	cin >> N;
 
-	while (pal != 0)
+	int ans = 0;
+	int count = 665;
+
+	while (N != ans)
 	{
-		string str = to_string(pal);
-		string str_r = str;
-		reverse(str_r.begin(), str_r.end());
+		count++;
+		int temp = count;
 
-		if (str == str_r)
-			res.push_back("yes");
-		else
-			res.push_back("no");
-
-		cin >> pal;
+		while(temp != 0)
+		{
+			if (temp % 1000 == 666)
+			{
+				ans++;
+				break;
+			}
+			else
+			{
+				temp /= 10;
+			}
+		}
 	}
 
-	for (string r : res)
-	{
-		cout << r << "\n";
-	}
+	cout << count;
 }
