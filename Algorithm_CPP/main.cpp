@@ -1,6 +1,4 @@
 #include <iostream>
-#include <algorithm>
-#include <string>
 using namespace std;
 
 int main()
@@ -8,20 +6,24 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int A, B;
-	cin >> A >> B;
+	int arr[42] = {};
+	int count = 0;
 
-	string a_str = to_string(A);
-	string b_str = to_string(B);
+	for (int i = 0; i < 10; i++)
+	{
+		int N;
+		cin >> N;
 
-	reverse(a_str.begin(), a_str.end());
-	reverse(b_str.begin(), b_str.end());
+		arr[N % 42]++;
+	}
 
-	A = stoi(a_str);
-	B = stoi(b_str);
+	for (int i = 0; i < 42; i++)
+	{
+		if (arr[i] != 0)
+			count++;
+	}
 
-	if (A >= B)
-		cout << A;
-	else
-		cout << B;
+	if (count == 0)
+		count++;
+	cout << count;
 }
