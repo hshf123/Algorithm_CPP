@@ -1,4 +1,7 @@
 #include <iostream>
+#include <algorithm>
+#include <string>
+#include <vector>
 using namespace std;
 
 int main()
@@ -6,15 +9,26 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int x, y, w, h;
-	cin >> x >> y >> w >> h;
+	vector<string> res;
+	int pal;
+	cin >> pal;
 
-	int right, left, up, down;
+	while (pal != 0)
+	{
+		string str = to_string(pal);
+		string str_r = str;
+		reverse(str_r.begin(), str_r.end());
 
-	right = w - x;
-	left = x - 0;
-	up = h - y;
-	down = y - 0;
+		if (str == str_r)
+			res.push_back("yes");
+		else
+			res.push_back("no");
 
-	cout << min(min(min(right, left), up), down);
+		cin >> pal;
+	}
+
+	for (string r : res)
+	{
+		cout << r << "\n";
+	}
 }
