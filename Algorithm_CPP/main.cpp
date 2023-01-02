@@ -1,4 +1,6 @@
 #include <iostream>
+#include <algorithm>
+#include <string>
 using namespace std;
 
 int main()
@@ -6,20 +8,20 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int H, M;
-	cin >> H >> M;
+	int A, B;
+	cin >> A >> B;
 
-	M -= 45;
-	if (M < 0)
-	{
-		M += 60;
-		H--;
+	string a_str = to_string(A);
+	string b_str = to_string(B);
 
-		if (H < 0)
-		{
-			H += 24;
-		}
-	}
+	reverse(a_str.begin(), a_str.end());
+	reverse(b_str.begin(), b_str.end());
 
-	cout << H << " " << M;
+	A = stoi(a_str);
+	B = stoi(b_str);
+
+	if (A >= B)
+		cout << A;
+	else
+		cout << B;
 }
