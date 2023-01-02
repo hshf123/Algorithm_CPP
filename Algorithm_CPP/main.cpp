@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 using namespace std;
 
 int main()
@@ -6,21 +7,20 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N;
-	cin >> N;
+	int count[10] = {};
+	int A, B, C;
+	cin >> A >> B >> C;
 
-	for (int i = 0; i < N; i++)
+	int res = A * B * C;
+
+	string str = to_string(res);
+	for (int i = 0; i < str.length(); i++)
 	{
-		for (int j = 0; j < N - i - 1; j++)
-		{
-			cout << " ";
-		}
+		count[(int)str[i] - 48]++;
+	}
 
-		for (int j = 0; j <= i; j++)
-		{
-			cout << "*";
-		}
-
-		cout << "\n";
+	for (int i = 0; i < 10; i++)
+	{
+		cout << count[i] << "\n";
 	}
 }
