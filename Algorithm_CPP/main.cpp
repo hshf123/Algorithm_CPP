@@ -6,11 +6,20 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N;
-	cin >> N;
+	int H, M;
+	cin >> H >> M;
 
-	for (int i = N; i > 0; --i)
+	M -= 45;
+	if (M < 0)
 	{
-		cout << i << "\n";
+		M += 60;
+		H--;
+
+		if (H < 0)
+		{
+			H += 24;
+		}
 	}
+
+	cout << H << " " << M;
 }
