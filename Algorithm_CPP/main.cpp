@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <stack>
 using namespace std;
 
 int main()
@@ -8,12 +9,12 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int K, N;
-	cin >> K >> N;
-
 	vector<int> vec;
 
-	for (int i = 0; i < K; i++)
+	int N;
+	cin >> N;
+
+	for (int i = 0; i < N; i++)
 	{
 		int num;
 		cin >> num;
@@ -21,32 +22,53 @@ int main()
 		vec.push_back(num);
 	}
 
+	vector<int> origin = vec;
 	sort(vec.begin(), vec.end());
+	
+	int curr = 0;
+	int i = 0;
+	stack<int> stack;
+	vector<string> ans;
 
-	int max = vec.back();
-
-	long long left = 1;
-	long long right = max;
-
-	int count;
-	int ans = 0;
-	while (left <= right)
+	while (curr != N)
 	{
-		count = 0;
-		long long mid = (left + right) / 2;
-
-		for (int n : vec)
-			count += (n / mid);
-
-		if (count >= N)
+		if (stack.empty() == false)
 		{
-			if (ans < mid)
-				ans = mid;
-			left = mid + 1;
+			int top = stack.top();
+			if (origin[curr] <= top)
+			{
+				stack.pop();
+				ans.push_back("-");
+				curr++;
+				continue;
+			}
+		}
+
+		if (i >= N)
+		{
+			ans.clear();
+			ans.push_back("NO");
+			break;
+		}
+		
+		if (origin[curr] != vec[i])
+		{
+			ans.push_back("+");
+			stack.push(vec[i]);
 		}
 		else
-			right = mid - 1;
+		{
+			stack.push(vec[i]);
+			ans.push_back("+");
+			stack.pop();
+			ans.push_back("-");
+			curr++;
+		}
+		i++;
 	}
 
-	cout << ans;
+	for (string str : ans)
+	{
+		cout << str << "\n";
+	}
 }
