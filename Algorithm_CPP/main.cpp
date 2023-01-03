@@ -1,7 +1,6 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
-#include <stack>
 using namespace std;
 
 int main()
@@ -9,66 +8,24 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	vector<int> vec;
+	vector<int> vecN;
 
 	int N;
 	cin >> N;
-
 	for (int i = 0; i < N; i++)
 	{
-		int num;
-		cin >> num;
-
-		vec.push_back(num);
+		int A;
+		cin >> A;
+		vecN.push_back(A);
 	}
+	sort(vecN.begin(), vecN.end());
 
-	vector<int> origin = vec;
-	sort(vec.begin(), vec.end());
-	
-	int curr = 0;
-	int i = 0;
-	stack<int> stack;
-	vector<string> ans;
-
-	while (curr != N)
+	int M;
+	cin >> M;
+	for (int i = 0; i < N; i++)
 	{
-		if (stack.empty() == false)
-		{
-			int top = stack.top();
-			if (origin[curr] <= top)
-			{
-				stack.pop();
-				ans.push_back("-");
-				curr++;
-				continue;
-			}
-		}
-
-		if (i >= N)
-		{
-			ans.clear();
-			ans.push_back("NO");
-			break;
-		}
-		
-		if (origin[curr] != vec[i])
-		{
-			ans.push_back("+");
-			stack.push(vec[i]);
-		}
-		else
-		{
-			stack.push(vec[i]);
-			ans.push_back("+");
-			stack.pop();
-			ans.push_back("-");
-			curr++;
-		}
-		i++;
-	}
-
-	for (string str : ans)
-	{
-		cout << str << "\n";
+		int inA;
+		cin >> inA;
+		cout << binary_search(vecN.begin(), vecN.end(), inA) << "\n";
 	}
 }
