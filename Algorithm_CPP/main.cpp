@@ -1,31 +1,25 @@
 #include <iostream>
-#include <algorithm>
-#include <vector>
 using namespace std;
+
+int arr[1000001] = {};
 
 int main()
 {
-	cin.tie(NULL);
-	ios::sync_with_stdio(false);
+	int M, N;
+	cin >> M >> N;
 
-	vector<int> vecN;
+	for (int i = 2; i <= N; i++)
+		arr[i] = i;
 
-	int N;
-	cin >> N;
-	for (int i = 0; i < N; i++)
+	for (int i = 2; i * i <= N; i++)
 	{
-		int A;
-		cin >> A;
-		vecN.push_back(A);
+		if (arr[i] == 0)
+			continue;
+		for (int j = i * i; j <= N; j += i)
+			arr[j] = 0;
 	}
-	sort(vecN.begin(), vecN.end());
 
-	int M;
-	cin >> M;
-	for (int i = 0; i < N; i++)
-	{
-		int inA;
-		cin >> inA;
-		cout << binary_search(vecN.begin(), vecN.end(), inA) << "\n";
-	}
+	for (int i = M; i <= N; i++)
+		if (arr[i] != 0)
+			cout << arr[i] << '\n';
 }
