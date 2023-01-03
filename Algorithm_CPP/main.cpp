@@ -1,4 +1,6 @@
 #include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;
 
 int main()
@@ -6,30 +8,45 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N;
-	cin >> N;
+	int K, N;
+	cin >> K >> N;
 
-	int ans = 0;
-	int count = 665;
+	vector<int> vec;
 
-	while (N != ans)
+	for (int i = 0; i < K; i++)
 	{
-		count++;
-		int temp = count;
+		int num;
+		cin >> num;
 
-		while(temp != 0)
-		{
-			if (temp % 1000 == 666)
-			{
-				ans++;
-				break;
-			}
-			else
-			{
-				temp /= 10;
-			}
-		}
+		vec.push_back(num);
 	}
 
-	cout << count;
+	sort(vec.begin(), vec.end());
+
+	int max = vec.back();
+
+	long long left = 1;
+	long long right = max;
+
+	int count;
+	int ans = 0;
+	while (left <= right)
+	{
+		count = 0;
+		long long mid = (left + right) / 2;
+
+		for (int n : vec)
+			count += (n / mid);
+
+		if (count >= N)
+		{
+			if (ans < mid)
+				ans = mid;
+			left = mid + 1;
+		}
+		else
+			right = mid - 1;
+	}
+
+	cout << ans;
 }
