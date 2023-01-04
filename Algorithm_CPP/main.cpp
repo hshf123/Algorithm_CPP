@@ -7,6 +7,7 @@ using namespace std;
 #include <map>
 #include <vector>
 #include <algorithm>
+#include <queue>
 
 int main()
 {
@@ -15,61 +16,27 @@ int main()
 
 	int N;
 	cin >> N;
-	map<int, int> _numToCount;
-	vector<vector<int>> _mode(N);
-	vector<int> _mid(N, 0);
-	for (int i = 0; i < N; i++)
+
+	for (int i = 1; i < N; i++)
 	{
-		int num;
-		cin >> num;
-		auto findIt = _numToCount.find(num);
-		if (findIt == _numToCount.end())
+		int now = i;
+		int sum = now;
+		int ten = 10;
+		while (now != 0)
 		{
-			_numToCount.insert(make_pair(num, 1));
-			_mode[0].push_back(num);
-		}
-		else
-		{
-			// 최소 1번 이상 등장한 숫자
-			findIt->second++;
-			_mode[findIt->second - 1].push_back(findIt->first);
+			int plus = (now % ten) / (ten / 10);
+			sum += plus;
+
+			now -= (plus * (ten / 10));
+			ten *= 10;
 		}
 
-		_mid[i] = num;
+		if (sum == N)
+		{
+			cout << i;
+			return 0;
+		}
 	}
 
-
-	double sum = 0;
-	int max = 0;
-	for (auto it = _numToCount.begin(); it != _numToCount.end(); ++it)
-	{
-		sum += it->first * it->second;
-
-		if (it->second > max)
-			max = it->second;
-	}
-
-	double avg = 0;
-	avg = sum / N;
-	avg = floor(avg + 0.5);
-
-	sort(_mid.begin(), _mid.end());
-	int mid = _mid[N / 2];
-
-	int mode = 0;
-	if (_mode[max - 1].size() > 1)
-	{
-		sort(_mode[max - 1].begin(), _mode[max - 1].end());
-		mode = _mode[max - 1][1];
-	}
-	else
-	{
-		mode = _mode[max - 1][0];
-	}
-
-	int range = (--_numToCount.end())->first - _numToCount.begin()->first;
-	cout << avg << endl;
-	cout << mid << endl;
-	cout << mode << endl;
-	cout << range << endl;
+	cout << "0";
 }
