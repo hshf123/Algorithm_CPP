@@ -1,25 +1,44 @@
 #include <iostream>
 using namespace std;
+#define endl "\n"
 
-int arr[1000001] = {};
+#include <vector>
+#include <algorithm>
+
+int arr[1001] = {};
 
 int main()
 {
-	int M, N;
-	cin >> M >> N;
+	int N;
+	cin >> N;
 
-	for (int i = 2; i <= N; i++)
+	vector<int> vec;
+	for (int i = 0; i < N; i++)
+	{
+		int num;
+		cin >> num;
+		vec.push_back(num);
+	}
+	sort(vec.begin(), vec.end());
+	int max = vec.back();
+
+	for (int i = 2; i <= max; i++)
 		arr[i] = i;
 
-	for (int i = 2; i * i <= N; i++)
+	for (int i = 2; i * i <= max; i++)
 	{
 		if (arr[i] == 0)
 			continue;
-		for (int j = i * i; j <= N; j += i)
+		for (int j = i * i; j <= max; j += i)
 			arr[j] = 0;
 	}
 
-	for (int i = M; i <= N; i++)
-		if (arr[i] != 0)
-			cout << arr[i] << '\n';
+	int count = 0;
+	for (int& prime : vec)
+	{
+		if (arr[prime] != 0)
+			count++;
+	}
+
+	cout << count;
 }
