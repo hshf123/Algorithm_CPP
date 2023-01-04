@@ -2,43 +2,48 @@
 using namespace std;
 #define endl "\n"
 
+#include <thread>
+#include <atomic>
+#include <mutex>
 #include <vector>
-#include <algorithm>
 
-int arr[1001] = {};
+mutex m;
+
+bool IsPrime(int number)
+{
+	if (number <= 1)
+		return false;
+	if (number == 2 || number == 3)
+		return true;
+
+	for (int i = 2; i < number; i++)
+		if (number % i == 0)
+			return false;
+
+	return true;
+}
 
 int main()
 {
-	int N;
-	cin >> N;
+	cin.tie(NULL);
+	ios::sync_with_stdio(false);
 
-	vector<int> vec;
-	for (int i = 0; i < N; i++)
-	{
-		int num;
-		cin >> num;
-		vec.push_back(num);
-	}
-	sort(vec.begin(), vec.end());
-	int max = vec.back();
+	const int MAX_NUMBER = 100'0000;
+	atomic<int> num = 0;
+	atomic<int> primeCount = 0;
 
-	for (int i = 2; i <= max; i++)
-		arr[i] = i;
+	vector<thread> threads;
+	int coreCount = thread::hardware_concurrency();
+	for (int i = 0; i < coreCount; i++)
+		threads.push_back(thread([&num, &primeCount]()
+			{
+				while (num <= MAX_NUMBER)
+					if (IsPrime(num++))
+						primeCount++;
+			}));
 
-	for (int i = 2; i * i <= max; i++)
-	{
-		if (arr[i] == 0)
-			continue;
-		for (int j = i * i; j <= max; j += i)
-			arr[j] = 0;
-	}
+	for (int i = 0; i < coreCount; i++)
+		threads[i].join();
 
-	int count = 0;
-	for (int& prime : vec)
-	{
-		if (arr[prime] != 0)
-			count++;
-	}
-
-	cout << count;
+	cout << primeCount << endl;
 }
