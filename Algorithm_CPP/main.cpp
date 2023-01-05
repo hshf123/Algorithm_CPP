@@ -11,30 +11,47 @@ using namespace std;
 #include <set>
 #include <stack>
 
-
-int Factorial(int n)
-{
-	int res = 1;
-	for (int i = 1; i <= n; i++)
-	{
-		res *= i;
-	}
-	return res;
-}
-
 int main()
 {
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N, K;
-	cin >> N >> K;
-	
-	if (K < 0 || K > N)
+	int N;
+	cin >> N;
+
+	map<int, priority_queue<int>> _map;
+	for (int i = 0; i < N; i++)
 	{
-		cout << "0";
-		return 0;
+		int x, y;
+		cin >> x >> y;
+		auto findIt = _map.find(x);
+		if (findIt == _map.end())
+		{
+			priority_queue<int> _queue;
+			_queue.push(y);
+			_map.insert(make_pair(x, _queue));
+		}
+		else
+		{
+			findIt->second.push(y);
+		}
 	}
 
-	cout << Factorial(N) / (Factorial(K) * Factorial(N - K));
+	for (auto it = _map.begin(); it != _map.end(); ++it)
+	{
+		stack<int> _stack;
+		while (it->second.empty() == false)
+		{
+			_stack.push(it->second.top());
+			it->second.pop();
+		}
+
+		while (_stack.empty() == false)
+		{
+			cout << it->first << " " << _stack.top() << endl;
+			_stack.pop();
+		}
+	}
+
+	return 0;
 }
