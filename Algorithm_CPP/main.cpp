@@ -14,36 +14,20 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N;
-	cin >> N;
-	vector<string> vec(N);
-	for (int i = 0; i < N; i++)
+	int floor, room;
+	int T;
+	cin >> T;
+	vector<int> vec(T);
+	for (int i = 0; i < T; i++)
 	{
-		string ps;
-		cin >> ps;
+		int H, W, N;
+		cin >> H >> W >> N;
 
-		int lc = 0;
-		int rc = 0;
-
-		const char* p = ps.c_str();
-		for (int c = 0; c < ps.length(); c++)
-		{
-			if (*p == '(')
-				lc++;
-			else
-				rc++;
-
-			if (lc < rc)
-				break;
-
-			p++;
-		}
-		if (rc == lc)
-			vec[i] = "YES";
-		else
-			vec[i] = "NO";
+		floor = N % H == 0 ? H : N % H;
+		room = (N + H - 1) / H;
+		vec[i] = floor * 100 + room;
 	}
 
-	for (string& str : vec)
-		cout << str << endl;
+	for (int& n : vec)
+		cout << n << endl;
 }
