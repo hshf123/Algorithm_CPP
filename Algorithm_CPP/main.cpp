@@ -10,48 +10,41 @@ using namespace std;
 #include <string>
 #include <set>
 #include <stack>
+#include <list>
+
+
 
 int main()
 {
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N;
-	cin >> N;
+	int N, K;
+	cin >> N >> K;
 
-	map<int, priority_queue<int>> _map;
-	for (int i = 0; i < N; i++)
+	queue<int> _queue;
+	for (int i = 1; i <= N; i++)
+		_queue.push(i);
+
+	cout << "<";
+	int i = 1;
+	while (_queue.empty() == false)
 	{
-		int x, y;
-		cin >> x >> y;
-		auto findIt = _map.find(x);
-		if (findIt == _map.end())
+		if (i % K == 0)
 		{
-			priority_queue<int> _queue;
-			_queue.push(y);
-			_map.insert(make_pair(x, _queue));
+			cout << _queue.front();
+			_queue.pop();
+			if (_queue.empty() == false)
+				cout << ", ";
 		}
 		else
 		{
-			findIt->second.push(y);
+			_queue.push(_queue.front());
+			_queue.pop();
 		}
+		i++;
 	}
-
-	for (auto it = _map.begin(); it != _map.end(); ++it)
-	{
-		stack<int> _stack;
-		while (it->second.empty() == false)
-		{
-			_stack.push(it->second.top());
-			it->second.pop();
-		}
-
-		while (_stack.empty() == false)
-		{
-			cout << it->first << " " << _stack.top() << endl;
-			_stack.pop();
-		}
-	}
+	cout << ">";
 
 	return 0;
 }
