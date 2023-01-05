@@ -19,47 +19,54 @@ int main()
 	int N;
 	cin >> N;
 	
-	queue<string> _queue;
+	queue<string> _commands;
 	for (int i = 0; i <= N; i++)
 	{
 		string command;
 		getline(cin, command);
-		_queue.push(command);
+		_commands.push(command);
 	}
 
-	stack<int> _stack;
-	_queue.pop();
-	while (_queue.empty() == false)
+	queue<int> _queue;
+	_commands.pop();
+	while (_commands.empty() == false)
 	{
-		string& str = _queue.front();
+		string& str = _commands.front();
 
 		if (str == "pop")
 		{
-			if (_stack.empty())
+			if (_queue.empty())
 				cout << "-1" << endl;
 			else
 			{
-				cout << _stack.top() << endl;
-				_stack.pop();
+				cout << _queue.front() << endl;
+				_queue.pop();
 			}
 		}
 		else if (str == "size")
 		{
-			cout << _stack.size() << endl;
+			cout << _queue.size() << endl;
 		}
 		else if (str == "empty")
 		{
-			if (_stack.empty())
+			if (_queue.empty())
 				cout << "1" << endl;
 			else
 				cout << "0" << endl;
 		}
-		else if (str == "top")
+		else if (str == "front")
 		{
-			if (_stack.empty())
+			if (_queue.empty())
 				cout << "-1" << endl;
 			else
-				cout << _stack.top() << endl;
+				cout << _queue.front() << endl;
+		}
+		else if (str == "back")
+		{
+			if (_queue.empty())
+				cout << "-1" << endl;
+			else
+				cout << _queue.back() << endl;
 		}
 		else
 		{
@@ -67,9 +74,9 @@ int main()
 			int index = str.find(" ");
 			string s = str.substr(index, str.size() - 1);
 			int n = stoi(s);
-			_stack.push(n);
+			_queue.push(n);
 		}
 
-		_queue.pop();
+		_commands.pop();
 	}
 }
