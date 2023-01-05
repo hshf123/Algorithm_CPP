@@ -14,29 +14,34 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	vector<string> vec;
-	while (true)
+	int N;
+	cin >> N;
+	vector<string> vec(N);
+	for (int i = 0; i < N; i++)
 	{
-		int A, B, C;
-		cin >> A >> B >> C;
-		
-		if (A + B + C == 0)
-			break;
-		priority_queue<int> pq;
-		pq.push(A);
-		pq.push(B);
-		pq.push(C);
+		string ps;
+		cin >> ps;
 
-		int csquare = pq.top() * pq.top();
-		pq.pop();
-		csquare -= (pq.top() * pq.top());
-		pq.pop();
-		csquare -= (pq.top() * pq.top());
+		int lc = 0;
+		int rc = 0;
 
-		if (csquare == 0)
-			vec.push_back("right");
+		const char* p = ps.c_str();
+		for (int c = 0; c < ps.length(); c++)
+		{
+			if (*p == '(')
+				lc++;
+			else
+				rc++;
+
+			if (lc < rc)
+				break;
+
+			p++;
+		}
+		if (rc == lc)
+			vec[i] = "YES";
 		else
-			vec.push_back("wrong");
+			vec[i] = "NO";
 	}
 
 	for (string& str : vec)
