@@ -15,44 +15,31 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int A, B;
-	cin >> A >> B;
+	int N, M;
+	cin >> N >> M;
 
-	int big, small;
-	if (A > B)
+	vector<int> vec(N);
+	for (int i = 0; i < N; i++)
 	{
-		big = A;
-		small = B;
+		int card;
+		cin >> card;
+		vec[i] = card;
 	}
-	else
+
+	sort(vec.begin(), vec.end(), [](int i, int j) {return i > j; });
+	
+	int max = 0;
+	for (int i = 0; i < N - 2; i++)
 	{
-		big = B;
-		small = A;
-	}
-	// 최대 공약수
-	for (int i = small; i > 0; i--)
-	{
-		if (big % i == 0 && small % i == 0)
+		for (int j = i + 1; j < N - 1; j++)
 		{
-			cout << i << endl;
-			break;
+			for (int k = j + 1; k < N; k++)
+			{
+				int sum = vec[i] + vec[j] + vec[k];
+				if (sum > max && M >= sum)
+					max = sum;
+			}
 		}
 	}
-	// 최소 공배수
-	int si = 1;
-	int bi = 1;
-	while (true)
-	{
-		int ss = small * si;
-		int bb = big * bi;
-		if (ss == bb)
-		{
-			cout << ss;
-			break;
-		}
-		else if (ss > bb)
-			bi++;
-		else
-			si++;
-	}
+	cout << max;
 }
