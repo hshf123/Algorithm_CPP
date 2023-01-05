@@ -12,39 +12,33 @@ using namespace std;
 #include <stack>
 #include <list>
 
+int KFloorNRoom(int k, int n)
+{
+	int res = 0;
 
+	if (k == 0)
+		return n;
+
+	for (int i = 1; i <= n; i++)
+	{
+		res += KFloorNRoom(k - 1, i);
+	}
+
+	return res;
+}
 
 int main()
 {
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N, K;
-	cin >> N >> K;
-
-	queue<int> _queue;
-	for (int i = 1; i <= N; i++)
-		_queue.push(i);
-
-	cout << "<";
-	int i = 1;
-	while (_queue.empty() == false)
+	int T;
+	cin >> T;
+	for (int i = 0; i < T; i++)
 	{
-		if (i % K == 0)
-		{
-			cout << _queue.front();
-			_queue.pop();
-			if (_queue.empty() == false)
-				cout << ", ";
-		}
-		else
-		{
-			_queue.push(_queue.front());
-			_queue.pop();
-		}
-		i++;
-	}
-	cout << ">";
+		int k, n;
+		cin >> k >> n;
 
-	return 0;
+		cout << KFloorNRoom(k, n) << endl;
+	}
 }
