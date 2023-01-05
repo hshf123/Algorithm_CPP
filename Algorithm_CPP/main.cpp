@@ -8,6 +8,7 @@ using namespace std;
 #include <vector>
 #include <algorithm>
 #include <queue>
+#include <string>
 
 int main()
 {
@@ -17,26 +18,21 @@ int main()
 	int N;
 	cin >> N;
 
-	for (int i = 1; i < N; i++)
+	if (N == 1)
 	{
-		int now = i;
-		int sum = now;
-		int ten = 10;
-		while (now != 0)
-		{
-			int plus = (now % ten) / (ten / 10);
-			sum += plus;
-
-			now -= (plus * (ten / 10));
-			ten *= 10;
-		}
-
-		if (sum == N)
-		{
-			cout << i;
-			return 0;
-		}
+		cout << 1;
+		return 0;
 	}
 
-	cout << "0";
+	int count = 1;
+	int inc = 7;
+	while (N > inc)
+	{
+		count++;
+		inc += (6 * count);
+	}
+
+	cout << count + 1;
+
+	return 0;
 }
