@@ -3,7 +3,6 @@ using namespace std;
 #define endl "\n"
 #define int64 long long
 
-#include <cmath>
 #include <map>
 #include <vector>
 #include <algorithm>
@@ -15,31 +14,31 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N, M;
-	cin >> N >> M;
-
-	vector<int> vec(N);
-	for (int i = 0; i < N; i++)
+	vector<string> vec;
+	while (true)
 	{
-		int card;
-		cin >> card;
-		vec[i] = card;
+		int A, B, C;
+		cin >> A >> B >> C;
+		
+		if (A + B + C == 0)
+			break;
+		priority_queue<int> pq;
+		pq.push(A);
+		pq.push(B);
+		pq.push(C);
+
+		int csquare = pq.top() * pq.top();
+		pq.pop();
+		csquare -= (pq.top() * pq.top());
+		pq.pop();
+		csquare -= (pq.top() * pq.top());
+
+		if (csquare == 0)
+			vec.push_back("right");
+		else
+			vec.push_back("wrong");
 	}
 
-	sort(vec.begin(), vec.end(), [](int i, int j) {return i > j; });
-	
-	int max = 0;
-	for (int i = 0; i < N - 2; i++)
-	{
-		for (int j = i + 1; j < N - 1; j++)
-		{
-			for (int k = j + 1; k < N; k++)
-			{
-				int sum = vec[i] + vec[j] + vec[k];
-				if (sum > max && M >= sum)
-					max = sum;
-			}
-		}
-	}
-	cout << max;
+	for (string& str : vec)
+		cout << str << endl;
 }
