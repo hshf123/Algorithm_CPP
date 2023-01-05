@@ -8,26 +8,27 @@ using namespace std;
 #include <algorithm>
 #include <queue>
 #include <string>
+#include <set>
 
 int main()
 {
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int floor, room;
-	int T;
-	cin >> T;
-	vector<int> vec(T);
-	for (int i = 0; i < T; i++)
+	multimap<int, string> mm;
+	int N;
+	cin >> N;
+	for (int i = 0; i < N; i++)
 	{
-		int H, W, N;
-		cin >> H >> W >> N;
-
-		floor = N % H == 0 ? H : N % H;
-		room = (N + H - 1) / H;
-		vec[i] = floor * 100 + room;
+		int age;
+		string name;
+		cin >> age >> name;
+		
+		mm.insert(make_pair(age, name));
 	}
 
-	for (int& n : vec)
-		cout << n << endl;
+	for (auto it = mm.begin(); it != mm.end(); ++it)
+	{
+		cout << it->first << " " << it->second << endl;
+	}
 }
