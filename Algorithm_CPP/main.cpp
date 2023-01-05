@@ -15,24 +15,44 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N;
-	cin >> N;
+	int A, B;
+	cin >> A >> B;
 
-	if (N == 1)
+	int big, small;
+	if (A > B)
 	{
-		cout << 1;
-		return 0;
+		big = A;
+		small = B;
 	}
-
-	int count = 1;
-	int inc = 7;
-	while (N > inc)
+	else
 	{
-		count++;
-		inc += (6 * count);
+		big = B;
+		small = A;
 	}
-
-	cout << count + 1;
-
-	return 0;
+	// 최대 공약수
+	for (int i = small; i > 0; i--)
+	{
+		if (big % i == 0 && small % i == 0)
+		{
+			cout << i << endl;
+			break;
+		}
+	}
+	// 최소 공배수
+	int si = 1;
+	int bi = 1;
+	while (true)
+	{
+		int ss = small * si;
+		int bb = big * bi;
+		if (ss == bb)
+		{
+			cout << ss;
+			break;
+		}
+		else if (ss > bb)
+			bi++;
+		else
+			si++;
+	}
 }
