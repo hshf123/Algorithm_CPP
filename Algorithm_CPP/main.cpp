@@ -1,62 +1,47 @@
 #include <iostream>
-//using namespace std;
+using namespace std;
 #define endl "\n"
 using int64 = long long;
 
-#include <map>
 #include <vector>
-#include <algorithm>
-#include <queue>
-#include <string>
-#include <set>
-#include <stack>
 #include <list>
+#include <queue>
+#include <stack>
+#include <map>
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
 
-//int main()
-//{
-//	cin.tie(NULL);
-//	ios::sync_with_stdio(false);
-//
-//	LeafC* leafC = new LeafC();
-//	leafC->number = 100;
-//	leafC->number2 = 100;
-//	delete leafC;
-//	leafC->number = 200;
-//}
-
-#include <windows.h>
-using int64 = long long;
-const __int16 PAGE_SIZE = 0x1000; // 4096
-
-class LeafCParent
+int DP(int N, int fCount)
 {
-public:
-	int parentNumber = 20;
-};
 
-class LeafC : public LeafCParent
-{
-public:
-	int number = 10;
-};
+	int tCount = (N - (5 * fCount)) / 3;
+	if (N == 5 * fCount + 3 * tCount)
+		return fCount + tCount;
 
-void* Alloc(int size)
-{
-	const int64 pageCount = (size + PAGE_SIZE - 1) / PAGE_SIZE;
-	void* ptr = ::VirtualAlloc(NULL, pageCount * PAGE_SIZE, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-	ptr = static_cast<__int8*>(ptr) + (pageCount * PAGE_SIZE - size);
-	return static_cast<void*>(ptr);
-}
-
-template<typename Type, typename... Args>
-Type* x_new(Args&&... args)
-{
-	Type* memory = static_cast<Type*>(Alloc(sizeof(Type)));
-	new(memory)Type(std::forward<Args>(args)...);
-	return memory;
+	return -1;
 }
 
 int main()
 {
-	LeafC* leafC = x_new<LeafC>();
+	cin.tie(NULL);
+	ios::sync_with_stdio(false);
+
+	int N;
+	cin >> N;
+
+	int min = INT32_MAX;
+	for (int i = N / 5; i >= 0; i--)
+	{
+		int res = DP(N, i);
+		if (res == -1)
+			continue;
+
+		if (res < min)
+			min = res;
+	}
+	if (min == INT32_MAX)
+		cout << -1;
+	else
+		cout << min;
 }
