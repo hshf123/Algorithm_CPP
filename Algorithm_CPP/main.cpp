@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
 #define endl "\n"
-#define int64 long long
+using int64 = long long;
 
 #include <map>
 #include <vector>
@@ -12,33 +12,46 @@ using namespace std;
 #include <stack>
 #include <list>
 
-int KFloorNRoom(int k, int n)
-{
-	int res = 0;
-
-	if (k == 0)
-		return n;
-
-	for (int i = 1; i <= n; i++)
-	{
-		res += KFloorNRoom(k - 1, i);
-	}
-
-	return res;
-}
-
 int main()
 {
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int T;
-	cin >> T;
-	for (int i = 0; i < T; i++)
+	int N, M;
+	cin >> N >> M;
+	
+	vector<int> vec(N);
+	for (int i = 0; i < N; i++)
 	{
-		int k, n;
-		cin >> k >> n;
-
-		cout << KFloorNRoom(k, n) << endl;
+		int H;
+		cin >> H;
+		vec[i] = H;
 	}
+	sort(vec.begin(), vec.end());
+
+	int height = 0;
+	int left = 0;
+	int right = vec.back();
+	while (left <= right)
+	{
+		int mid = (left + right) / 2;
+		int64 sum = 0;
+		for (int i = 0; i < N; i++)
+		{
+			int tree = vec[i];
+			sum += (tree - mid > 0 ? tree - mid : 0);
+		}
+		if (sum >= M)
+		{
+			if (height < mid)
+				height = mid;
+			left = mid + 1;
+		}
+		else
+		{
+			right = mid - 1;
+		}
+	}
+
+	cout << height;
 }
