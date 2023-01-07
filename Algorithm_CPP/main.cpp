@@ -12,36 +12,20 @@ using int64 = long long;
 #include <unordered_map>
 #include <unordered_set>
 
-int DP(int N, int fCount)
-{
-
-	int tCount = (N - (5 * fCount)) / 3;
-	if (N == 5 * fCount + 3 * tCount)
-		return fCount + tCount;
-
-	return -1;
-}
-
 int main()
 {
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N;
-	cin >> N;
+	int A, B, V;
+	cin >> A >> B >> V;
 
-	int min = INT32_MAX;
-	for (int i = N / 5; i >= 0; i--)
-	{
-		int res = DP(N, i);
-		if (res == -1)
-			continue;
+	int height = 0;
 
-		if (res < min)
-			min = res;
-	}
-	if (min == INT32_MAX)
-		cout << -1;
-	else
-		cout << min;
+	int day = (V - A) / (A - B);
+	if ((V - A) % (A - B) != 0)
+		day++;
+	day++;
+
+	cout << day;
 }
