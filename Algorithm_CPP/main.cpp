@@ -11,21 +11,53 @@ using int64 = long long;
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
+#include <string>
+#include <algorithm>
 
 int main()
 {
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int A, B, V;
-	cin >> A >> B >> V;
+	string line;
+	while (true)
+	{
+		getline(cin, line);
+		if (line == ".")
+			break;
+		string answer = "yes";
+		stack<char> _lefts;
+		const char* p = line.c_str();
+		for (int i = 0; i < line.length(); i++)
+		{
+			char c = *(p + i);
+			if (c == '(' || c == '[')
+				_lefts.push(c);
+			else if (c == ']')
+			{
+				if (_lefts.empty() == false && _lefts.top() == '[')
+					_lefts.pop();
+				else
+				{
+					answer = "no";
+					break;
+				}
+			}
+			else if (c == ')')
+			{
+				if (_lefts.empty() == false && _lefts.top() == '(')
+					_lefts.pop();
+				else
+				{
+					answer = "no";
+					break;
+				}
+			}
+		}
 
-	int height = 0;
+		if (_lefts.empty() == false)
+			answer = "no";
 
-	int day = (V - A) / (A - B);
-	if ((V - A) % (A - B) != 0)
-		day++;
-	day++;
-
-	cout << day;
+		cout << answer << endl;
+	}
 }
