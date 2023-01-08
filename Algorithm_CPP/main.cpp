@@ -21,27 +21,30 @@ int main()
 
 	int N;
 	cin >> N;
-	vector<pair<int, int>> vec(N);
+	stack<int> _stack;
 	for (int i = 0; i < N; i++)
 	{
-		int kg, cm;
-		cin >> kg >> cm;
-		int rank = i;
-		vec[i] = make_pair(kg, cm);
-	}
+		int K;
+		cin >> K;
 
-	for (int i = 0; i < N; i++)
-	{
-		pair<int, int>& now = vec[i];
-		int rank = 1;
-		for (pair<int, int>& next : vec)
+		if (K != 0)
 		{
-			if (now.first < next.first && now.second < next.second)
-				rank++;
+			_stack.push(K);
 		}
-
-		cout << rank << " ";
+		else
+		{
+			_stack.pop();
+		}
 	}
+
+	int sum = 0;
+	while (_stack.empty() == false)
+	{
+		sum += _stack.top();
+		_stack.pop();
+	}
+
+	cout << sum;
 
 	return 0;
 }
