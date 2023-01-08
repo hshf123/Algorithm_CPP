@@ -21,30 +21,25 @@ int main()
 
 	int N;
 	cin >> N;
-	stack<int> _stack;
+	// y, x
+	map<int, priority_queue<int, vector<int>, greater<int>>> _map;
 	for (int i = 0; i < N; i++)
 	{
-		int K;
-		cin >> K;
-
-		if (K != 0)
-		{
-			_stack.push(K);
-		}
-		else
-		{
-			_stack.pop();
-		}
+		int x, y;
+		cin >> x >> y;
+		_map[y].push(x);
 	}
 
-	int sum = 0;
-	while (_stack.empty() == false)
+	for (auto it = _map.begin(); it != _map.end(); ++it)
 	{
-		sum += _stack.top();
-		_stack.pop();
+		int y = it->first;
+		while (it->second.empty() == false)
+		{
+			int x = it->second.top();
+			it->second.pop();
+			cout << x << " " << y << endl;
+		}
 	}
-
-	cout << sum;
 
 	return 0;
 }
