@@ -15,53 +15,92 @@ using int64 = long long;
 #include <algorithm>
 #include <cmath>
 
+vector<vector<bool>> vec;
+vector<vector<bool>> visited;
+vector<vector<pair<int, int>>> parent;
+int xdir[] = { 0, 1, 0, -1 };
+int ydir[] = { -1, 0, 1, 0 };
+int earthworm = 0;
+int T;
+int M, N, K;
+
+void DFS(int x, int y)
+{
+	visited[y][x] = true;
+
+	if (vec[y][x] == true)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			int dx = xdir[i] + x;
+			int dy = ydir[i] + y;
+
+			if (dx >= 0 && dx < M && dy >= 0 && dy < N)
+			{
+				if (vec[dy][dx] == true && visited[dy][dx] == false)
+				{
+					parent[dy][dx] = make_pair(y, x);
+					DFS(dx, dy);
+				}
+			}
+		}
+	}
+}
+
 int main()
 {
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N, M;
-	int B;
-	cin >> N >> M >> B;
-	vector<vector<int>> vec(N, vector<int>(M));
-	for (int y = 0; y < N; y++)
+	cin >> T;
+	
+	for (int testcase = 0; testcase < T; testcase++)
 	{
-		for (int x = 0; x < M; x++)
+		vec.clear();
+		visited.clear();
+		earthworm = 0;
+
+		cin >> M >> N >> K;
+
+		vec = vector<vector<bool>>(N, vector<bool>(M, false));
+		visited = vector<vector<bool>>(N, vector<bool>(M, false));
+		parent = vector<vector<pair<int, int>>>(N, vector<pair<int, int>>(M, make_pair(-1, -1)));
+
+		for (int pos = 0; pos < K; pos++)
 		{
-			int h;
-			cin >> h;
-
-			vec[y][x] = h;
+			int x, y;
+			cin >> x >> y;
+			vec[y][x] = true;
 		}
-	}
 
-	int minTime = INT32_MAX;
-	int ansH;
-	for (short height = 0; height <= 256; height++)
-	{
-		int getBlock = 0; // 얻게될 블럭
-		int useBlock = 0; // 사용할 블럭
 		for (int y = 0; y < N; y++)
 		{
 			for (int x = 0; x < M; x++)
 			{
-				int val = vec[y][x] - height;
-				if (val > 0)
-					getBlock += val;
-				else if (val < 0)
-					useBlock += val;
+				DFS(x, y);
 			}
 		}
 
-		int time = getBlock * 2 - useBlock;
-		if (((B + getBlock) >= useBlock) && (minTime >= time))
-		{
-			minTime = time;
-			ansH = height;
-		}
-	}
+		
 
-	cout << minTime << " " << ansH;
+		for (int y = 0; y < N; y++)
+		{
+			for (int x = 0; x < M; x++)
+			{
+				if (vec[y][x] == true)
+				{
+					int ty = parent[y][x].first;
+					int tx = parent[y][x].second;
+					if (ty == -1 && tx == -1)
+					{
+						earthworm++;
+					}
+
+				}
+			}
+		}
+		cout << earthworm << endl;
+	}
 
 	return 0;
 }
