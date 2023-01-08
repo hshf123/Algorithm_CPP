@@ -20,22 +20,48 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N;
-	cin >> N;
-	string str;
-	cin >> str;
-	const char* p = str.c_str();
-	int64 sum = 0;
-	int64 r = 1;
-	for (int i = 0; i < N; i++)
+	int N, M;
+	int B;
+	cin >> N >> M >> B;
+	vector<vector<int>> vec(N, vector<int>(M));
+	for (int y = 0; y < N; y++)
 	{
-		char c = *(p + i);
-		short number = c - 'a' + 1;
-		sum = (sum + number * r) % 1234567891;
-		r = (r * 31) % 1234567891;
+		for (int x = 0; x < M; x++)
+		{
+			int h;
+			cin >> h;
+
+			vec[y][x] = h;
+		}
 	}
 
-	cout << sum;
+	int minTime = INT32_MAX;
+	int ansH;
+	for (short height = 0; height <= 256; height++)
+	{
+		int getBlock = 0; // 얻게될 블럭
+		int useBlock = 0; // 사용할 블럭
+		for (int y = 0; y < N; y++)
+		{
+			for (int x = 0; x < M; x++)
+			{
+				int val = vec[y][x] - height;
+				if (val > 0)
+					getBlock += val;
+				else if (val < 0)
+					useBlock += val;
+			}
+		}
+
+		int time = getBlock * 2 - useBlock;
+		if (((B + getBlock) >= useBlock) && (minTime >= time))
+		{
+			minTime = time;
+			ansH = height;
+		}
+	}
+
+	cout << minTime << " " << ansH;
 
 	return 0;
 }
