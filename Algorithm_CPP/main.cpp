@@ -19,45 +19,29 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	string line;
-	while (true)
+	int N;
+	cin >> N;
+	vector<pair<int, int>> vec(N);
+	for (int i = 0; i < N; i++)
 	{
-		getline(cin, line);
-		if (line == ".")
-			break;
-		string answer = "yes";
-		stack<char> _lefts;
-		const char* p = line.c_str();
-		for (int i = 0; i < line.length(); i++)
+		int kg, cm;
+		cin >> kg >> cm;
+		int rank = i;
+		vec[i] = make_pair(kg, cm);
+	}
+
+	for (int i = 0; i < N; i++)
+	{
+		pair<int, int>& now = vec[i];
+		int rank = 1;
+		for (pair<int, int>& next : vec)
 		{
-			char c = *(p + i);
-			if (c == '(' || c == '[')
-				_lefts.push(c);
-			else if (c == ']')
-			{
-				if (_lefts.empty() == false && _lefts.top() == '[')
-					_lefts.pop();
-				else
-				{
-					answer = "no";
-					break;
-				}
-			}
-			else if (c == ')')
-			{
-				if (_lefts.empty() == false && _lefts.top() == '(')
-					_lefts.pop();
-				else
-				{
-					answer = "no";
-					break;
-				}
-			}
+			if (now.first < next.first && now.second < next.second)
+				rank++;
 		}
 
-		if (_lefts.empty() == false)
-			answer = "no";
-
-		cout << answer << endl;
+		cout << rank << " ";
 	}
+
+	return 0;
 }
