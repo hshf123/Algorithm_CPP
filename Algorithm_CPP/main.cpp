@@ -15,55 +15,60 @@ using int64 = long long;
 #include <algorithm>
 #include <cmath>
 
-int number = 0;
-int N, r, c;
-
-void DIV(int startx, int starty, int endx, int endy)
-{
-	int n = endx - startx;
-	int divNumber = n / 2; // 2^n-1 * 2^n-1
-
-	if (n == 2)
-	{
-		int y = r - starty;
-		y *= 2;
-		int x = c - startx;
-		number += (x + y);
-		cout << number;
-		return;
-	}
-
-	if (starty <= r && r < endy - divNumber && startx <= c && c < endx - divNumber)
-	{
-		DIV(startx, starty, endx - divNumber, endy - divNumber);
-	}
-	else if (starty <= r && r < endy - divNumber && startx + divNumber <= c && c < endx)
-	{
-		number += divNumber * divNumber;
-		DIV(startx + divNumber, starty, endx, endy - divNumber);
-	}
-	else if (starty + divNumber <= r && r < endy && startx <= c && c < endx - divNumber)
-	{
-		number += divNumber * divNumber * 2;
-		DIV(startx, starty + divNumber, endx - divNumber, endy);
-	}
-	else
-	{
-		number += divNumber * divNumber * 3;
-		DIV(startx + divNumber, starty + divNumber, endx, endy);
-	}
-}
-
 int main()
 {
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	cin >> N >> r >> c;
+	int now = 100;
 
-	int n = pow(2, N);
+	string channel;
+	cin >> channel;
+	int len = channel.length();
+	int N = stoi(channel);
 
-	DIV(0, 0, n, n);
+	int M;
+	cin >> M;
+	vector<bool> bd(10, false);
+	for (int i = 0; i < M; i++)
+	{
+		int m;
+		cin >> m;
+
+		bd[m] = true;
+	}
+
+	int onlyButton = abs(100 - N);
+
+	// 1) 근사치를 찾는다.
+	int count = INT32_MAX;
+	for (int i = 0; i < 99'9999; i++)
+	{
+		bool available = true;
+		string str = to_string(i);
+		for (int j = 0; j < str.length(); j++)
+		{
+			int n = (int)(str[j] - '0');
+			if (bd[n] == true)
+			{
+				available = false;
+				break;
+			}
+		}
+
+		if (available == true)
+		{
+			int c = 0;
+			c += abs(N - i);
+			c += str.length();
+			if (count > c)
+				count = c;
+		}
+	}
+	if (onlyButton < count)
+		cout << onlyButton;
+	else
+		cout << count;
 
 	return 0;
 }
