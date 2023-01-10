@@ -20,39 +20,42 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	string str;
-	cin >> str;
+	int N, M;
+	cin >> N >> M;
 
-	bool hasMinus = false;
-	bool isFirstNumber = false;
-	int minNum;
-	int lastIdx = 0;
-	for (int i = 0; i <= str.length(); i++)
+	unordered_map<int, string> idxToName;
+	unordered_map<string, int> nameToIdx;
+	for (int i = 0; i < N; i++)
 	{
-		if (str[i] == '-' || str[i] == '+' || i == str.length())
+		string name;
+		cin >> name;
+		idxToName.insert(make_pair(i, name));
+		nameToIdx.insert(make_pair(name, i));
+	}
+
+	vector<string> ans(M);
+	for (int i = 0; i < M; i++)
+	{
+		string nameOrNumber;
+		cin >> nameOrNumber;
+
+		if (nameOrNumber[0] > '0' && nameOrNumber[0] <= '9')
 		{
-			int num = stoi(str.substr(lastIdx, i));
-			lastIdx = i + 1;
-
-			if (isFirstNumber == false)
-			{
-				minNum = num;
-				isFirstNumber = true;
-			}
-			else
-			{
-				if (hasMinus == false)
-					minNum += num;
-				else
-					minNum -= num;
-			}
-
-			if (str[i] == '-')
-				hasMinus = true;
+			int idx = stoi(nameOrNumber) - 1;
+			auto findIt = idxToName.find(idx);
+			ans[i] = findIt->second;
+		}
+		else
+		{
+			auto findIt = nameToIdx.find(nameOrNumber);
+			ans[i] = to_string(findIt->second + 1);
 		}
 	}
 
-	cout << minNum;
+	for (string& str : ans)
+	{
+		cout << str << endl;
+	}
 
 	return 0;
 }
