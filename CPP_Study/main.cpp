@@ -15,17 +15,56 @@ using int64 = long long;
 #include <algorithm>
 #include <cmath>
 
+
+
+void BFS(int now)
+{
+	
+}
+
 int main()
 {
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N;
-	cin >> N;
+	int N, K;
+	vector<bool> discovered(100001, false);
+	cin >> N >> K;
 
-	int count = N / 5 + N / 25 + N / 125;
+	discovered[N] = true;
+	queue<int> _queue;
+	_queue.push(N);
+	vector<int>distance(100001, -1);
+	distance[N] = 0;
 
-	cout << count;
+	while (_queue.empty() == false)
+	{
+		int here = _queue.front();
+		_queue.pop();
+		for (int i = 0; i < 3; i++)
+		{
+			if (here == K)
+			{
+				cout << distance[K];
+				return 0;
+			}
+
+			int there = -1;
+			if (i == 0)
+				there = here - 1;
+			else if (i == 1)
+				there = here + 1;
+			else if (i == 2)
+				there = 2 * here;
+
+			if (there > -1 && there <= 100000 && discovered[there] == false)
+			{
+				_queue.push(there);
+				discovered[there] = true;
+				distance[there] = distance[here] + 1;
+			}
+		}
+	}
 
 	return 0;
 }
