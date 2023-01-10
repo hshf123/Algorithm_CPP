@@ -15,56 +15,35 @@ using int64 = long long;
 #include <algorithm>
 #include <cmath>
 
-
-
-void BFS(int now)
-{
-	
-}
-
 int main()
 {
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N, K;
-	vector<bool> discovered(100001, false);
-	cin >> N >> K;
+	int neverHear, neverSeen;
+	cin >> neverHear >> neverSeen;
 
-	discovered[N] = true;
-	queue<int> _queue;
-	_queue.push(N);
-	vector<int>distance(100001, -1);
-	distance[N] = 0;
-
-	while (_queue.empty() == false)
+	unordered_set<string> hashSet;
+	for (int i = 0; i < neverHear; i++)
 	{
-		int here = _queue.front();
-		_queue.pop();
-		for (int i = 0; i < 3; i++)
-		{
-			if (here == K)
-			{
-				cout << distance[K];
-				return 0;
-			}
-
-			int there = -1;
-			if (i == 0)
-				there = here - 1;
-			else if (i == 1)
-				there = here + 1;
-			else if (i == 2)
-				there = 2 * here;
-
-			if (there > -1 && there <= 100000 && discovered[there] == false)
-			{
-				_queue.push(there);
-				discovered[there] = true;
-				distance[there] = distance[here] + 1;
-			}
-		}
+		string name;
+		cin >> name;
+		hashSet.insert(name);
 	}
+
+	set<string> _set;
+	for (int i = 0; i < neverSeen; i++)
+	{
+		string name;
+		cin >> name;
+		auto findIt = hashSet.find(name);
+		if (findIt != hashSet.end())
+			_set.insert(name);
+	}
+
+	cout << _set.size() << endl;
+	for (const string& str : _set)
+		cout << str << endl;
 
 	return 0;
 }
