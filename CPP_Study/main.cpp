@@ -20,42 +20,12 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N, M;
-	cin >> N >> M;
+	int N;
+	cin >> N;
 
-	unordered_map<int, string> idxToName;
-	unordered_map<string, int> nameToIdx;
-	for (int i = 0; i < N; i++)
-	{
-		string name;
-		cin >> name;
-		idxToName.insert(make_pair(i, name));
-		nameToIdx.insert(make_pair(name, i));
-	}
+	int count = N / 5 + N / 25 + N / 125;
 
-	vector<string> ans(M);
-	for (int i = 0; i < M; i++)
-	{
-		string nameOrNumber;
-		cin >> nameOrNumber;
-
-		if (nameOrNumber[0] > '0' && nameOrNumber[0] <= '9')
-		{
-			int idx = stoi(nameOrNumber) - 1;
-			auto findIt = idxToName.find(idx);
-			ans[i] = findIt->second;
-		}
-		else
-		{
-			auto findIt = nameToIdx.find(nameOrNumber);
-			ans[i] = to_string(findIt->second + 1);
-		}
-	}
-
-	for (string& str : ans)
-	{
-		cout << str << endl;
-	}
+	cout << count;
 
 	return 0;
 }
