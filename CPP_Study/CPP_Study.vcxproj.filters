@@ -15,15 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Algorithm_CPP\LockFreeStack.cpp">
+    <ClCompile Include="LockFreeStack.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="..\Algorithm_CPP\main.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Algorithm_CPP\LockFreeStack.h">
+    <ClInclude Include="LockFreeStack.h">
       <Filter>소스 파일</Filter>
     </ClInclude>
   </ItemGroup>

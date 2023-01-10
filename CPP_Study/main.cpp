@@ -15,29 +15,43 @@ using int64 = long long;
 #include <algorithm>
 #include <cmath>
 
-#include "LockFreeStack.h"
-#include <thread>
+int N, M;
+vector<vector<int>> vec;
+vector<bool> discovered;
+vector<int> bacon;
 
-LockFreeStack<int> _stack;
-void Push()
+void BFS(int now)
 {
-	while (true)
-	{
-		int value = rand() % 100;
-		_stack.Push(value);
+	vector<int> distance(N, 0);
 
-		this_thread::sleep_for(10ms);
-	}
-}
+	discovered[now] = true;
+	queue<int> _queue;
+	_queue.push(now);
 
-void Pop()
-{
-	while (true)
+	distance[now] = 0;
+
+	while (_queue.empty() == false)
 	{
-		int value;
-		if (_stack.TryPop(value))
-			cout << value << endl;
+		int here = _queue.front();
+		_queue.pop();
+
+		for (int& there : vec[here])
+		{
+			if (discovered[there] == true)
+				continue;
+
+			_queue.push(there);
+			discovered[there] = true;
+			distance[there] = distance[here] + 1;
+		}
 	}
+
+	int sum = 0;
+	for (int& n : distance)
+		sum += n;
+
+	bacon[now] = sum;
+	discovered = vector<bool>(N, false);
 }
 
 int main()
@@ -45,15 +59,37 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	thread t1(Push);
-	thread t2(Pop);
-	thread t3(Pop);
-	thread t4(Pop);
+	cin >> N >> M;
+	vec = vector<vector<int>>(N);
+	discovered = vector<bool>(N, false);
+	bacon = vector<int>(N, 0);
 
-	t1.join();
-	t2.join();
-	t3.join();
-	t4.join();
+	for (int i = 0; i < M; i++)
+	{
+		int A, B;
+		cin >> A >> B;
+		vec[A - 1].push_back(B - 1);
+		vec[B - 1].push_back(A - 1);
+	}
+
+	for (int i = 0; i < N; i++)
+	{
+		BFS(i);
+	}
+
+	int min = INT32_MAX;
+	int minIdx = 0;
+	for (int i = 0; i < N; i++)
+	{
+		if (bacon[i] < min)
+		{
+			min = bacon[i];
+			minIdx = i;
+		}
+	}
+
+	cout << minIdx + 1;
 
 	return 0;
 }
+
