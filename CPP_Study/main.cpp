@@ -15,80 +15,44 @@ using int64 = long long;
 #include <algorithm>
 #include <cmath>
 
-int N, M;
-vector<vector<int>> vec;
-vector<bool> discovered;
-vector<int> bacon;
-
-void BFS(int now)
-{
-	vector<int> distance(N, 0);
-
-	discovered[now] = true;
-	queue<int> _queue;
-	_queue.push(now);
-
-	distance[now] = 0;
-
-	while (_queue.empty() == false)
-	{
-		int here = _queue.front();
-		_queue.pop();
-
-		for (int& there : vec[here])
-		{
-			if (discovered[there] == true)
-				continue;
-
-			_queue.push(there);
-			discovered[there] = true;
-			distance[there] = distance[here] + 1;
-		}
-	}
-
-	int sum = 0;
-	for (int& n : distance)
-		sum += n;
-
-	bacon[now] = sum;
-	discovered = vector<bool>(N, false);
-}
-
 int main()
 {
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	cin >> N >> M;
-	vec = vector<vector<int>>(N);
-	discovered = vector<bool>(N, false);
-	bacon = vector<int>(N, 0);
+	string str;
+	cin >> str;
 
-	for (int i = 0; i < M; i++)
+	bool hasMinus = false;
+	bool isFirstNumber = false;
+	int minNum;
+	int lastIdx = 0;
+	for (int i = 0; i <= str.length(); i++)
 	{
-		int A, B;
-		cin >> A >> B;
-		vec[A - 1].push_back(B - 1);
-		vec[B - 1].push_back(A - 1);
-	}
-
-	for (int i = 0; i < N; i++)
-	{
-		BFS(i);
-	}
-
-	int min = INT32_MAX;
-	int minIdx = 0;
-	for (int i = 0; i < N; i++)
-	{
-		if (bacon[i] < min)
+		if (str[i] == '-' || str[i] == '+' || i == str.length())
 		{
-			min = bacon[i];
-			minIdx = i;
+			int num = stoi(str.substr(lastIdx, i));
+			lastIdx = i + 1;
+
+			if (isFirstNumber == false)
+			{
+				minNum = num;
+				isFirstNumber = true;
+			}
+			else
+			{
+				if (hasMinus == false)
+					minNum += num;
+				else
+					minNum -= num;
+			}
+
+			if (str[i] == '-')
+				hasMinus = true;
 		}
 	}
 
-	cout << minIdx + 1;
+	cout << minNum;
 
 	return 0;
 }
