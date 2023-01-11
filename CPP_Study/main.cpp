@@ -23,28 +23,37 @@ int main()
 	int N;
 	cin >> N;
 
-	priority_queue<int, vector<int>, greater<int>> pq;
+	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int,int>>> pq;
 	for (int i = 0; i < N; i++)
 	{
-		int x;
-		cin >> x;
+		int startTime, endTime;
+		cin >> startTime >> endTime;
 
-		if (x == 0)
-		{
-			if (pq.empty())
-			{
-				cout << 0 << endl;
-				continue;
-			}
-
-			cout << pq.top() << endl;
-			pq.pop();
-
-			continue;
-		}
-
-		pq.push(x);
+		pq.push(make_pair(endTime, startTime));
 	}
+
+	int count = 1;
+	auto copy = pq;
+	pair<int, int> _pair = pq.top();
+	pq.pop();
+	int startTime = _pair.second;
+	int endTime = _pair.first;
+	while (pq.empty() == false)
+	{
+		_pair = pq.top();
+		pq.pop();
+		int nextStartTime = _pair.second;
+		int nextEndTime = _pair.first;
+
+		if (nextStartTime >= endTime)
+		{
+			count++;
+			startTime = nextStartTime;
+			endTime = nextEndTime;
+		}
+	}
+
+	cout << count;
 
 	return 0;
 }
