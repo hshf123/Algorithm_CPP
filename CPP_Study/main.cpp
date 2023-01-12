@@ -15,73 +15,60 @@ using int64 = long long;
 #include <algorithm>
 #include <cmath>
 
-vector<vector<int>> vec(128, vector<int>(128, -1));
-pair<int, int> _count = make_pair(0, 0);
-
-void Func(int sx, int ex, int sy, int ey)
-{
-	int start = vec[sy][sx];
-	if (ex - sx == 1)
-	{
-		if (start == 0)
-			_count.first++;
-		else
-			_count.second++;
-		return;
-	}
-
-	bool check = true;
-	for (int y = sy; y < ey; y++)
-	{
-		for (int x = sx; x < ex; x++)
-		{
-			if (start != vec[y][x])
-			{
-				check = false;
-				break;
-			}
-		}
-	}
-
-	if (check)
-	{
-		if (start == 0)
-			_count.first++;
-		else
-			_count.second++;
-		return;
-	}
-
-	int n = (ex - sx) / 2;
-
-	Func(sx, sx + n, sy, sy + n);
-
-	Func(sx + n, ex, sy, sy + n);
-
-	Func(sx, sx + n, sy + n, ey);
-
-	Func(sx + n, ex, sy + n, ey);
-}
-
 int main()
 {
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N;
-	cin >> N;
-
-	for (int y = 0; y < N; y++)
+	int T;
+	cin >> T;
+	vector<string> ans(T);
+	for (int i = 0; i < T; i++)
 	{
-		for (int x = 0; x < N; x++)
+		int k;
+		cin >> k;
+
+		multiset<int, greater<int>> _set;
+		for (int j = 0; j < k; j++)
 		{
-			cin >> vec[y][x];
+			char c;
+			int n;
+			cin >> c >> n;
+
+			if (c == 'D')
+			{
+				if (_set.empty())
+					continue;
+
+				multiset<int>::iterator it;
+				if (n == 1)
+					it = _set.begin();
+				else
+					it = --_set.end();
+				int count = _set.count(*it);
+				int number = *it;
+				_set.erase(*it);
+				for (int l = 0; l < count - 1; l++)
+					_set.insert(number);
+			}
+			else
+			{
+				_set.insert(n);
+			}
+		}
+
+		if (_set.empty())
+		{
+			ans[i] = "EMPTY";
+		}
+		else
+		{
+			ans[i] = to_string(*_set.begin()) + " " + to_string(*--_set.end());
 		}
 	}
 
-	Func(0, N, 0, N);
-
-	cout << _count.first << endl << _count.second << endl;
+	for (string& str : ans)
+		cout << str << endl;
 
 	return 0;
 }
