@@ -20,55 +20,31 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int T;
-	cin >> T;
-	vector<string> ans(T);
-	for (int i = 0; i < T; i++)
+	int N;
+	cin >> N;
+
+	priority_queue<int> pq;
+	for (int i = 0; i < N; i++)
 	{
-		int k;
-		cin >> k;
+		int x;
+		cin >> x;
 
-		multiset<int, greater<int>> _set;
-		for (int j = 0; j < k; j++)
+		if (x == 0)
 		{
-			char c;
-			int n;
-			cin >> c >> n;
-
-			if (c == 'D')
+			if (pq.empty())
 			{
-				if (_set.empty())
-					continue;
-
-				multiset<int>::iterator it;
-				if (n == 1)
-					it = _set.begin();
-				else
-					it = --_set.end();
-				int count = _set.count(*it);
-				int number = *it;
-				_set.erase(*it);
-				for (int l = 0; l < count - 1; l++)
-					_set.insert(number);
+				cout << x << endl;
+				continue;
 			}
-			else
-			{
-				_set.insert(n);
-			}
-		}
 
-		if (_set.empty())
-		{
-			ans[i] = "EMPTY";
+			cout << pq.top() << endl;
+			pq.pop();
 		}
 		else
 		{
-			ans[i] = to_string(*_set.begin()) + " " + to_string(*--_set.end());
+			pq.push(x);
 		}
 	}
-
-	for (string& str : ans)
-		cout << str << endl;
 
 	return 0;
 }
