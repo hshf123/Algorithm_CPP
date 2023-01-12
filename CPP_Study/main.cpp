@@ -20,29 +20,63 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N;
-	cin >> N;
+	const int all = 0b1111'1111'1111'1111'1111;
+	int now = 0;
 
-	priority_queue<int> pq;
-	for (int i = 0; i < N; i++)
+	// add remove check toggle all empty
+	int M;
+	cin >> M;
+	string s;
+	getline(cin, s);
+	for (int i = 0; i < M; i++)
 	{
-		int x;
-		cin >> x;
+		getline(cin, s);
+		int idx = s.find(' ');
+		int n;
+		if (idx != -1)
+			n = stoi(s.substr(idx, s.length()));
+		s = s.substr(0, idx);
 
-		if (x == 0)
+		if (s == "add")
 		{
-			if (pq.empty())
-			{
-				cout << x << endl;
-				continue;
-			}
-
-			cout << pq.top() << endl;
-			pq.pop();
+			n = pow(2, n - 1);
+			now |= n;
 		}
-		else
+		else if (s == "remove")
 		{
-			pq.push(x);
+			n = pow(2, n - 1);
+			n = ~(all & n);
+			now &= n;
+		}
+		else if (s == "check")
+		{
+			n = pow(2, n - 1);
+			if ((now & n) > 0)
+				cout << 1 << endl;
+			else
+				cout << 0 << endl;
+		}
+		else if (s == "toggle")
+		{
+			n = pow(2, n - 1);
+			int toggle = now | n;
+			if (toggle == now)
+			{
+				n = ~(all & n);
+				now &= n;
+			}
+			else
+			{
+				now |= n;
+			}
+		}
+		else if (s == "all")
+		{
+			now |= all;
+		}
+		else if (s == "empty")
+		{
+			now &= 0;
 		}
 	}
 
