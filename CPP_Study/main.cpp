@@ -15,6 +15,46 @@ using int64 = long long;
 #include <algorithm>
 #include <cmath>
 
+vector<vector<int>> vec;
+
+void Func(int sx, int ex, int sy, int ey)
+{
+	int firstNum = vec[sy][sx];
+	bool diff = false;
+
+	if (ex - sx == 1)
+	{
+		cout << firstNum;
+		return;
+	}
+
+	for (int y = sy; y < ey; y++)
+	{
+		for (int x = sx; x < ex; x++)
+		{
+			if (vec[y][x] != firstNum)
+			{
+				diff = true;
+				break;
+			}
+		}
+	}
+
+	if (diff == false)
+	{
+		cout << firstNum;
+		return;
+	}
+
+	int n = (ex - sx) / 2;
+	cout << "(";
+	Func(sx, sx + n, sy, sy + n);
+	Func(sx + n, ex, sy, sy + n);
+	Func(sx, sx + n, sy + n, ey);
+	Func(sx + n, ex, sy + n, ey);
+	cout << ")";
+}
+
 int main()
 {
 	cin.tie(NULL);
@@ -22,28 +62,18 @@ int main()
 
 	int N;
 	cin >> N;
-
-	vector<int> vec;
-	vector<int> vec2(N);
-	set<int> _set;
-	for (int i = 0; i < N; i++)
+	vec = vector<vector<int>>(N, vector<int>(N));
+	for (int y = 0; y < N; y++)
 	{
-		int x;
-		cin >> x;
-
-		vec2[i] = x;
-		vec.push_back(vec2[i]);
-		_set.insert(x);
+		string line;
+		cin >> line;
+		for (int x = 0; x < N; x++)
+		{
+			vec[y][x] = (int)(line[x] - '0');
+		}
 	}
 
-	sort(vec.begin(), vec.end());
-	vec.erase(unique(vec.begin(), vec.end()), vec.end());
-
-	for (int i = 0; i < N; i++) 
-	{
-		int idx = lower_bound(vec.begin(), vec.end(), vec2[i]) - vec.begin();
-		cout << idx << " ";
-	}
+	Func(0, N, 0, N);
 
 	return 0;
 }
