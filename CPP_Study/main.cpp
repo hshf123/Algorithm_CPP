@@ -15,44 +15,53 @@ using int64 = long long;
 #include <algorithm>
 #include <cmath>
 
-vector<vector<int>> vec;
+int N, M;
+vector<vector<int>> _map;
+vector<vector<int>> dist;
+vector<vector<bool>> visited;
+int xdir[4] = { 0, 1, 0, -1 };
+int ydir[4] = { -1, 0, 1, 0 };
 
-void Func(int sx, int ex, int sy, int ey)
+bool CheckDir(int nextY, int nextX)
 {
-	int firstNum = vec[sy][sx];
-	bool diff = false;
+	if (nextY < 0 || nextX < 0 || nextY >= N || nextX >= M)
+		return false;
+	if (visited[nextY][nextX] == true)
+		return false;
+	if (_map[nextY][nextX] == 0)
+		return false;
 
-	if (ex - sx == 1)
-	{
-		cout << firstNum;
-		return;
-	}
+	return true;
+}
 
-	for (int y = sy; y < ey; y++)
+void BFS(int y, int x)
+{
+	visited[y][x] = true;
+
+	queue<pair<int, int>> q;
+	q.push(make_pair(y, x));
+
+	while (q.empty() == false)
 	{
-		for (int x = sx; x < ex; x++)
+		auto here = q.front();
+		q.pop();
+
+		if (here.first == N - 1 && here.second == M - 1)
+			return;
+
+		for (int i = 0; i < 4; i++)
 		{
-			if (vec[y][x] != firstNum)
+			int nextY = here.first + ydir[i];
+			int nextX = here.second + xdir[i];
+
+			if (CheckDir(nextY, nextX) == true)
 			{
-				diff = true;
-				break;
+				dist[nextY][nextX] = dist[here.first][here.second] + 1;
+				q.push(make_pair(nextY, nextX));
+				visited[nextY][nextX] = true;
 			}
 		}
 	}
-
-	if (diff == false)
-	{
-		cout << firstNum;
-		return;
-	}
-
-	int n = (ex - sx) / 2;
-	cout << "(";
-	Func(sx, sx + n, sy, sy + n);
-	Func(sx + n, ex, sy, sy + n);
-	Func(sx, sx + n, sy + n, ey);
-	Func(sx + n, ex, sy + n, ey);
-	cout << ")";
 }
 
 int main()
@@ -60,20 +69,23 @@ int main()
 	cin.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N;
-	cin >> N;
-	vec = vector<vector<int>>(N, vector<int>(N));
+	cin >> N >> M;
+
+	_map = vector<vector<int>>(N, vector<int>(M));
+	dist = vector<vector<int>>(N, vector<int>(M, 0));
+	visited = vector<vector<bool>>(N, vector<bool>(M, false));
 	for (int y = 0; y < N; y++)
 	{
 		string line;
 		cin >> line;
-		for (int x = 0; x < N; x++)
+		for (int x = 0; x < M; x++)
 		{
-			vec[y][x] = (int)(line[x] - '0');
+			_map[y][x] = (int)(line[x] - '0');
 		}
 	}
-
-	Func(0, N, 0, N);
+		
+	BFS(0, 0);
+	cout << dist[N - 1][M - 1] + 1;
 
 	return 0;
 }
