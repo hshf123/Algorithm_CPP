@@ -21,34 +21,57 @@ int main()
 	cout.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N ,M;
-	cin >> N >> M;
-	string str;
-	cin >> str;
-	
-	int count = 0;
-	int ans = 0;
-	for (int i = 1; i < M - 1;)
+	int T;
+	cin >> T;
+	for (int t = 0; t < T; t++)
 	{
-		if (str[i] == 'O' && str[i + 1] == 'I')
+		int year = 1;
+		int M, N, x, y;
+		cin >> M >> N >> x >> y;
+
+		if (M < N)
 		{
-			count++;
-			if (count == N)
+			year += (x - 1);
+			int startY = x;
+			int nextY = x;
+			while (y != nextY)
 			{
-				if (str[i - (count * 2 - 1)] == 'I')
-					ans++;
-				count--;
+				nextY -= (N - M);
+				if (nextY <= 0)
+					nextY = N + nextY;
+
+				year += M;
+
+				if (nextY == startY)
+				{
+					year = -1;
+					break;
+				}
 			}
-			i += 2;
 		}
 		else
 		{
-			count = 0;
-			i++;
-		}
-	}
+			year += (y - 1);
+			int startX = y;
+			int nextX = y;
+			while (x != nextX)
+			{
+				nextX -= (M - N);
+				if (nextX <= 0)
+					nextX = M + nextX;
 
-	cout << ans;
+				year += N;
+
+				if (nextX == startX)
+				{
+					year = -1;
+					break;
+				}
+			}
+		}
+
+		cout << year << endl;;
+	}
 
 	return 0;
 }
