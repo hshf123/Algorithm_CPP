@@ -15,63 +15,112 @@ using int64 = long long;
 #include <algorithm>
 #include <cmath>
 
+int X, Y, Z;
+vector<vector<vector<int>>> box;
+				// 위 아래 왼쪽 오른쪽 앞 뒤
+int xdir[6] = { 0, 0, -1, 1, 0, 0 };
+int ydir[6] = { 0, 0, 0, 0, 1, -1 };
+int zdir[6] = { 1, -1, 0, 0, 0, 0 };
+
+bool CheckDir(int z, int y, int x)
+{
+	if (z < 0 || z >= Z || y < 0 || y >= Y || x < 0 || x >= X)
+		return false;
+
+	if (box[z][y][x] == -1 || box[z][y][x] == 1)
+		return false;
+
+	return true;
+}
+
 int main()
 {
 	cin.tie(NULL);
 	cout.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int T;
-	cin >> T;
-	for (int t = 0; t < T; t++)
+	cin >> X >> Y >> Z;
+	box = vector<vector<vector<int>>>(Z, vector<vector<int>>(Y, vector<int>(X)));
+	vector<pair<int, pair<int, int>>> xyz;
+
+	for (int z = 0; z < Z; z++)
 	{
-		int year = 1;
-		int M, N, x, y;
-		cin >> M >> N >> x >> y;
-
-		if (M < N)
+		for (int y = 0; y < Y; y++)
 		{
-			year += (x - 1);
-			int startY = x;
-			int nextY = x;
-			while (y != nextY)
+			for (int x = 0; x < X; x++)
 			{
-				nextY -= (N - M);
-				if (nextY <= 0)
-					nextY = N + nextY;
-
-				year += M;
-
-				if (nextY == startY)
-				{
-					year = -1;
-					break;
-				}
+				int a;
+				cin >> a;
+				box[z][y][x] = a;
+				if (a == 1)
+					xyz.push_back({ z,{y,x} });
 			}
 		}
-		else
-		{
-			year += (y - 1);
-			int startX = y;
-			int nextX = y;
-			while (x != nextX)
-			{
-				nextX -= (M - N);
-				if (nextX <= 0)
-					nextX = M + nextX;
-
-				year += N;
-
-				if (nextX == startX)
-				{
-					year = -1;
-					break;
-				}
-			}
-		}
-
-		cout << year << endl;;
 	}
+
+	queue<pair<int, pair<int, int>>> q;
+	vector<vector<vector<bool>>> discovered = vector<vector<vector<bool>>>(Z, vector<vector<bool>>(Y, vector<bool>(X, false)));
+
+	for (pair<int, pair<int,int>>& p : xyz)
+	{
+		int z = p.first;
+		int y = p.second.first;
+		int x = p.second.second;
+
+		q.push({ z,{y,x} });
+	}
+
+	while (q.empty() == false)
+	{
+		pair<int, pair<int, int>> now = q.front();
+		q.pop();
+
+		int nowZ = now.first;
+		int nowY = now.second.first;
+		int nowX = now.second.second;
+
+		for (int i = 0; i < 6; i++)
+		{
+			int nextZ = nowZ + zdir[i];
+			int nextY = nowY + ydir[i];
+			int nextX = nowX + xdir[i];
+			if (CheckDir(nextZ, nextY, nextX) && discovered[nextZ][nextY][nextX] == false)
+			{
+				q.push({ nextZ, {nextY, nextX} });
+				discovered[nextZ][nextY][nextX] = true;
+				int day = box[nowZ][nowY][nowX] + 1;
+				// 0이 아니어야함. 그 중 최솟값
+				if (box[nextZ][nextY][nextX] != 0)
+				{
+					if (day < box[nextZ][nextY][nextX])
+						box[nextZ][nextY][nextX] = day;
+				}
+				else
+					box[nextZ][nextY][nextX] = day;
+			}
+		}
+	}
+
+	int max = 0;
+	for (int z = 0; z < Z; z++)
+	{
+		for (int y = 0; y < Y; y++)
+		{
+			for (int x = 0; x < X; x++)
+			{
+				if (box[z][y][x] == 0)
+				{
+					cout << -1 << endl;
+					return 0;
+				}
+
+				if (max < box[z][y][x])
+					max = box[z][y][x];
+			}
+		}
+	}
+
+	cout << max - 1 << endl;
 
 	return 0;
 }
