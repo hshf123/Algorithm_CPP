@@ -15,22 +15,96 @@ using int64 = long long;
 #include <algorithm>
 #include <cmath>
 
-int X, Y, Z;
-vector<vector<vector<int>>> box;
-				// 위 아래 왼쪽 오른쪽 앞 뒤
-int xdir[6] = { 0, 0, -1, 1, 0, 0 };
-int ydir[6] = { 0, 0, 0, 0, 1, -1 };
-int zdir[6] = { 1, -1, 0, 0, 0, 0 };
-
-bool CheckDir(int z, int y, int x)
+int D(int n)
 {
-	if (z < 0 || z >= Z || y < 0 || y >= Y || x < 0 || x >= X)
-		return false;
+	return 2 * n % 10000;
+}
 
-	if (box[z][y][x] == -1 || box[z][y][x] == 1)
-		return false;
+int S(int n)
+{
+	return n - 1 < 0 ? 9999 : n - 1;
+}
 
-	return true;
+int L(int n)
+{
+	int n4 = n % 10;
+	n /= 10;
+	int n3 = n % 10;
+	n /= 10;
+	int n2 = n % 10;
+	n /= 10;
+	int n1 = n % 10;
+
+	return n2 * 1000 + n3 * 100 + n4 * 10 + n1;
+}
+
+int R(int n)
+{
+	int n4 = n % 10;
+	n /= 10;
+	int n3 = n % 10;
+	n /= 10;
+	int n2 = n % 10;
+	n /= 10;
+	int n1 = n % 10;
+
+	return n4 * 1000 + n1 * 100 + n2 * 10 + n3;
+}
+
+vector<bool> discovered;
+vector<string> root;
+
+void BFS(int A, int B)
+{
+	discovered[A] = true;
+
+	queue<int> q;
+	q.push(A);
+
+	while (q.empty() == false)
+	{
+		int now = q.front();
+		q.pop();
+
+		if (now == B)
+		{
+			cout << root[now];
+			cout << endl;
+			break;
+		}
+
+		int d = D(now);
+		if (discovered[d] == false)
+		{
+			q.push(d);
+			discovered[d] = true;
+			root[d] = root[now] + "D";
+		}
+
+		int s = S(now);
+		if (discovered[s] == false)
+		{
+			q.push(s);
+			discovered[s] = true;
+			root[s] = root[now] + "S";
+		}
+
+		int l = L(now);
+		if (discovered[l] == false)
+		{
+			q.push(l);
+			discovered[l] = true;
+			root[l] = root[now] + "L";
+		}
+
+		int r = R(now);
+		if (discovered[r] == false)
+		{
+			q.push(r);
+			discovered[r] = true;
+			root[r] = root[now] + "R";
+		}
+	}
 }
 
 int main()
@@ -39,89 +113,23 @@ int main()
 	cout.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	cin >> X >> Y >> Z;
-	box = vector<vector<vector<int>>>(Z, vector<vector<int>>(Y, vector<int>(X)));
-	vector<pair<int, pair<int, int>>> xyz;
+	// D : 2*n % 10000
+	// S : n - 1 if 0 : 9999
+	// L : 1 2 3 4 -> 2 3 4 1
+	// R : 1 2 3 4 -> 4 1 2 3
 
-	for (int z = 0; z < Z; z++)
+	int T;
+	cin >> T;
+	for (int t = 0; t < T; t++)
 	{
-		for (int y = 0; y < Y; y++)
-		{
-			for (int x = 0; x < X; x++)
-			{
-				int a;
-				cin >> a;
-				box[z][y][x] = a;
-				if (a == 1)
-					xyz.push_back({ z,{y,x} });
-			}
-		}
+		int A, B;
+		cin >> A >> B;
+
+		discovered = vector<bool>(10000, false);
+		root = vector<string>(10000);
+
+		BFS(A, B);
 	}
-
-	queue<pair<int, pair<int, int>>> q;
-	vector<vector<vector<bool>>> discovered = vector<vector<vector<bool>>>(Z, vector<vector<bool>>(Y, vector<bool>(X, false)));
-
-	for (pair<int, pair<int,int>>& p : xyz)
-	{
-		int z = p.first;
-		int y = p.second.first;
-		int x = p.second.second;
-
-		q.push({ z,{y,x} });
-	}
-
-	while (q.empty() == false)
-	{
-		pair<int, pair<int, int>> now = q.front();
-		q.pop();
-
-		int nowZ = now.first;
-		int nowY = now.second.first;
-		int nowX = now.second.second;
-
-		for (int i = 0; i < 6; i++)
-		{
-			int nextZ = nowZ + zdir[i];
-			int nextY = nowY + ydir[i];
-			int nextX = nowX + xdir[i];
-			if (CheckDir(nextZ, nextY, nextX) && discovered[nextZ][nextY][nextX] == false)
-			{
-				q.push({ nextZ, {nextY, nextX} });
-				discovered[nextZ][nextY][nextX] = true;
-				int day = box[nowZ][nowY][nowX] + 1;
-				// 0이 아니어야함. 그 중 최솟값
-				if (box[nextZ][nextY][nextX] != 0)
-				{
-					if (day < box[nextZ][nextY][nextX])
-						box[nextZ][nextY][nextX] = day;
-				}
-				else
-					box[nextZ][nextY][nextX] = day;
-			}
-		}
-	}
-
-	int max = 0;
-	for (int z = 0; z < Z; z++)
-	{
-		for (int y = 0; y < Y; y++)
-		{
-			for (int x = 0; x < X; x++)
-			{
-				if (box[z][y][x] == 0)
-				{
-					cout << -1 << endl;
-					return 0;
-				}
-
-				if (max < box[z][y][x])
-					max = box[z][y][x];
-			}
-		}
-	}
-
-	cout << max - 1 << endl;
 
 	return 0;
 }
-
