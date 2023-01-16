@@ -27,31 +27,22 @@ int main()
 	{
 		int N;
 		cin >> N;
-		map<string, int> opts;
-		for (int n = 0; n < N; n++)
+
+		vector<int64> vec(100);
+		vec[0] = 1;
+		vec[1] = 1;
+		vec[2] = 1;
+		vec[3] = 2;
+		vec[4] = 2;
+
+		for (int n = 5; n < N; n++)
 		{
-			string cloth, opt;
-			cin >> cloth >> opt;
-			
-			auto findIt = opts.find(opt);
-			if (findIt != opts.end())
-			{
-				findIt->second++;
-			}
-			else
-			{
-				opts.insert({ opt, 2 });
-			}
+			vec[n] = vec[n - 2] + vec[n - 3];
+			if (n == N - 1)
+				break;
 		}
 
-		int ans = 1;
-		for (auto it = opts.begin(); it != opts.end(); ++it)
-		{
-			int n = it->second;
-			ans *= n;
-		}
-
-		cout << ans - 1 << endl;
+		cout << vec[N - 1] << endl;
 	}
 
 	return 0;
