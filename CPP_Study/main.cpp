@@ -14,7 +14,57 @@ using int64 = long long;
 #include <string>
 #include <algorithm>
 #include <cmath>
-#include <functional>
+
+int N;
+vector<vector<int>>			_vec;
+map<int, set<int>>			_history;
+vector<int>					_visitedOrder;
+vector<vector<int>>			answer;
+int							_visitedCount;
+vector<bool>				_finished;
+vector<int>					_parent;
+
+void DFS(int here)
+{
+	if (_visitedOrder[here] != 0)
+		return;
+
+	if (_visitedCount != 0)
+		_visitedOrder[here] = 1;
+	_visitedCount++;
+
+	auto findIt = _history.find(here);
+	if (findIt == _history.end())
+	{
+		// 연결된 노드들이 없다.
+		_finished[here] = true;
+		return;
+	}
+
+	// 연결된 노드가 있다.
+	set<int>& next = findIt->second;
+	for (int there : next)
+	{
+		if (_visitedOrder[there] == 0)
+		{
+			_parent[there] = here;
+			DFS(there);
+			continue;
+		}
+
+		if (_visitedOrder[here] < _visitedOrder[there])
+			continue;
+	}
+
+	_finished[here] = true;
+}
+
+void Push(int node, int edge)
+{
+	_vec[node].push_back(edge);
+	set<int>& history = _history[node];
+	history.insert(edge);
+}
 
 int main()
 {
@@ -22,45 +72,37 @@ int main()
 	cout.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N;
 	cin >> N;
+	_vec.resize(N);
 
-	map<int, priority_queue<int, vector<int>, greater<int>>> _map;
-
-	for (int n = 0; n < N; n++)
+	for (int y = 0; y < N; y++)
 	{
-		int x;
-		cin >> x;
+		for (int x = 0; x < N; x++)
+		{
+			int n;
+			cin >> n;
+			if (n == 1)
+				Push(y, x);
+		}
+	}
 
-		if (x == 0)
+	for (int y = 0; y < N; y++)
+	{
+		_visitedOrder = vector<int>(N, 0);
+		_visitedCount = 0;
+		_finished = vector<bool>(N, false);
+		_parent = vector<int>(N, -1);
+		DFS(y);
+		answer.push_back(_visitedOrder);
+	}
+
+	for (int y = 0; y < N; y++)
+	{
+		for (int x = 0; x < N; x++)
 		{
-			if (_map.empty())
-				cout << 0 << endl;
-			else
-			{
-				auto it = _map.begin();
-				cout << it->second.top() << endl;
-				it->second.pop();
-				if (it->second.empty())
-				{
-					_map.erase(it);
-				}
-			}
+			cout << answer[y][x] << " ";
 		}
-		else
-		{
-			auto findIt = _map.find(abs(x));
-			if (findIt == _map.end())
-			{
-				priority_queue<int, vector<int>, greater<int>> ms;
-				ms.push(x);
-				_map.insert({ abs(x), ms });
-			}
-			else
-			{
-				findIt->second.push(x);
-			}
-		}
+		cout << endl;
 	}
 
 	return 0;
