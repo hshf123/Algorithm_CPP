@@ -2,6 +2,7 @@
 using namespace std;
 #define endl "\n"
 using int64 = long long;
+using uint64 = unsigned long long;
 
 #include <vector>
 #include <list>
@@ -15,44 +16,26 @@ using int64 = long long;
 #include <algorithm>
 #include <cmath>
 
-
 int main()
 {
 	cin.tie(NULL);
 	cout.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N, M;
-	cin >> N >> M;
+	int n;
+	cin >> n;
 
-	vector<int> vec(N);
-	vector<int> ans(M);
-	int sum = 0;
-	for (int i = 0; i < N; i++)
+	uint64 dp[1001];
+
+	dp[1] = 1;
+	dp[2] = 3;
+
+	for (int i = 3; i <= n; i++)
 	{
-		int n;
-		cin >> n;
-		sum += n;
-		vec[i] = sum;
+		dp[i] = dp[i - 1] + 2 * dp[i - 2];
 	}
 
-	for (int m = 0; m < M; m++)
-	{
-		int i, j;
-		cin >> i >> j;
-
-		if (i == 1)
-		{
-			ans[m] = vec[j - 1];
-		}
-		else
-		{
-			ans[m] = vec[j - 1] - vec[i - 2];
-		}
-	}
-
-	for (int& n : ans)
-		cout << n << endl;
+	cout << dp[n] % 10007;
 
 	return 0;
 }
