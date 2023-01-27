@@ -16,63 +16,110 @@ using uint64 = unsigned long long;
 #include <algorithm>
 #include <cmath>
 
-int N, M;
-vector<vector<int>> vec;
-vector<vector<bool>> bools;
+#include <tchar.h>
 
-int dy[4] = { 1, 0, -1, 0 };
-int dx[4] = { 0, 1, 0, -1 };
+int N;
+vector<vector<int>> _map;
+vector<vector<int>> _dist;
+vector<vector<bool>> visited;
+
+int dx[] = { 0, 1, 0, -1 };
+int dy[] = { 1, 0, -1, 0 };
+
+int level = 2;
+int eatCount = 0;
+pair<int, int> shark;
+pair<int, int> target;
+
+void Init()
+{
+	target = shark;
+
+	for (int y = 0; y < N; y++)
+	{
+		for (int x = 0; x < N; x++)
+		{
+			_dist[y][x] = -1;
+			visited[y][x] = false;
+		}
+	}
+}
 
 bool CheckDir(int y, int x)
 {
-	if (y < 0 || x < 0 || y >= N || x >= M)
+	if (y < 0 || x < 0 || y >= N || x >= N)
+		return false;
+
+	if (_map[y][x] > level)
+		return false;
+
+	if (visited[y][x])
 		return false;
 
 	return true;
 }
 
-int ans = 0;
-void DFS(int y, int x, int depth, int score)
+void BFS(pair<int,int> shark)
 {
-	bools[y][x] = true;
+	int y = shark.first;
+	int x = shark.second;
 
-	if (depth == 3)
-	{
-		ans = max(ans, score);
-		bools[y][x] = false;
-		return;
-	}
+	visited[y][x] = true;
+	_dist[y][x] = 0;
 
-	for (int i = 0; i < 4; i++)
+	queue<pair<int, int>> q;
+	q.push({ y,x });
+
+	while (q.empty() == false)
 	{
-		int nextY = y + dy[i];
-		int nextX = x + dx[i];
-		if (CheckDir(nextY, nextX) && bools[nextY][nextX] == false)
+		pair<int, int> now = q.front();
+		q.pop();
+
+		y = now.first;
+		x = now.second;
+
+		if (_map[y][x] != 0 && _map[y][x] < level)
 		{
-			bools[nextY][nextX] = true;
-			DFS(nextY, nextX, depth + 1, score + vec[nextY][nextX]);
-			bools[nextY][nextX] = false;
+			if (target != shark)
+			{
+				if (_dist[y][x] < _dist[target.first][target.second])
+				{
+					target = { y,x };
+				}
+				else if (_dist[y][x] == _dist[target.first][target.second])
+				{
+					if (y < target.first)
+					{
+						target = { y,x };
+					}
+					else if(y == target.first)
+					{
+						if (x < target.second)
+						{
+							target = { y,x };
+						}
+					}
+				}
+			}
+			else
+			{
+				target = { y,x };
+			}
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			int ny = now.first + dy[i];
+			int nx = now.second + dx[i];
+
+			if (CheckDir(ny, nx))
+			{
+				visited[ny][nx] = true;
+				_dist[ny][nx] = _dist[y][x] + 1;
+				q.push({ ny,nx });
+			}
 		}
 	}
-
-	if (x - 1 >= 0 && y - 1 >= 0 && y + 1 < N) 
-	{ //¤Ã
-		ans = max(ans, (vec[y][x - 1] + vec[y][x] + vec[y + 1][x] + vec[y - 1][x]));
-	}
-	if (y - 1 >= 0 && y + 1 < N && x + 1 < M) 
-	{ //¤¿
-		ans = max(ans, (vec[y][x + 1] + vec[y][x] + vec[y + 1][x] + vec[y - 1][x]));
-	}
-	if (x - 1 >= 0 && x + 1 < M && y + 1 < N) 
-	{ //¤Ç
-		ans = max(ans, (vec[y + 1][x] + vec[y][x] + vec[y][x - 1] + vec[y][x + 1]));
-	}
-	if (y - 1 >= 0 && x - 1 >= 0 && x + 1 < M) 
-	{ //¤Ì
-		ans = max(ans, (vec[y - 1][x] + vec[y][x] + vec[y][x - 1] + vec[y][x + 1]));
-	}
-
-	bools[y][x] = false;
 }
 
 int main()
@@ -81,29 +128,52 @@ int main()
 	cout.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	cin >> N >> M;
+	cin >> N;
 
-	vec = vector<vector<int>>(N, vector<int>(M));
-	bools = vector<vector<bool>>(N, vector<bool>(M, false));
-
-	for (int y = 0; y < N; y++)
-	{
-		for (int x = 0; x < M; x++)
-		{
-			cin >> vec[y][x];
-		}
-	}
+	_map = vector<vector<int>>(N, vector<int>(N));
+	_dist = vector<vector<int>>(N, vector<int>(N));
+	visited = vector<vector<bool>>(N, vector<bool>(N, false));
 
 	for (int y = 0; y < N; y++)
 	{
-		for (int x = 0; x < M; x++)
+		for (int x = 0; x < N; x++)
 		{
-			DFS(y, x, 0, vec[y][x]);
+			cin >> _map[y][x];
+			if (_map[y][x] == 9)
+			{
+				shark = { y,x };
+				_map[y][x] = 0;
+			}
 		}
 	}
 
-	cout << ans;
+	int count = 0;
+	int t = 0;
+	while (true)
+	{
+		Init();
+
+		BFS(shark);
+
+		if (target != shark)
+		{
+			// Å¸°ÙÀÌ ÀÖÀ½
+			count += _dist[target.first][target.second];
+			_map[target.first][target.second] = 0;
+			shark = target;
+			eatCount++;
+			if (eatCount == level)
+			{
+				level++;
+				eatCount = 0;
+			}
+		}
+		else
+		{
+			cout << count;
+			break;
+		}
+	}
 
 	return 0;
 }
-
