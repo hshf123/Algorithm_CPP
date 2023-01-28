@@ -16,107 +16,99 @@ using uint64 = unsigned long long;
 #include <algorithm>
 #include <cmath>
 
-#include <tchar.h>
+map<int, int> ladders;
+map<int, int> snakes;
+vector<int> dice;
+vector<bool> visited;
 
-int N;
-vector<vector<int>> _map;
-vector<vector<int>> _dist;
-vector<vector<bool>> visited;
-
-int dx[] = { 0, 1, 0, -1 };
-int dy[] = { 1, 0, -1, 0 };
-
-int level = 2;
-int eatCount = 0;
-pair<int, int> shark;
-pair<int, int> target;
-
-void Init()
+void BFS(int n)
 {
-	target = shark;
-
-	for (int y = 0; y < N; y++)
-	{
-		for (int x = 0; x < N; x++)
-		{
-			_dist[y][x] = -1;
-			visited[y][x] = false;
-		}
-	}
-}
-
-bool CheckDir(int y, int x)
-{
-	if (y < 0 || x < 0 || y >= N || x >= N)
-		return false;
-
-	if (_map[y][x] > level)
-		return false;
-
-	if (visited[y][x])
-		return false;
-
-	return true;
-}
-
-void BFS(pair<int,int> shark)
-{
-	int y = shark.first;
-	int x = shark.second;
-
-	visited[y][x] = true;
-	_dist[y][x] = 0;
-
-	queue<pair<int, int>> q;
-	q.push({ y,x });
+	dice[n] = 0;
+	visited[n] = true;
+	queue<int> q;
+	q.push(n);
 
 	while (q.empty() == false)
 	{
-		pair<int, int> now = q.front();
+		int now = q.front();
 		q.pop();
 
-		y = now.first;
-		x = now.second;
-
-		if (_map[y][x] != 0 && _map[y][x] < level)
+		for (int i = 1; i <= 6; i++)
 		{
-			if (target != shark)
+			int next = now + i;
+			if (next <= 100 && visited[next] == false)
 			{
-				if (_dist[y][x] < _dist[target.first][target.second])
+				// 다음칸 전진
+				// 만약 사다리라면 탄다.
 				{
-					target = { y,x };
-				}
-				else if (_dist[y][x] == _dist[target.first][target.second])
-				{
-					if (y < target.first)
+					auto it = ladders.find(next);
+					if (it != ladders.end())
 					{
-						target = { y,x };
-					}
-					else if(y == target.first)
-					{
-						if (x < target.second)
+						q.push(it->second);
+						if (dice[it->second] == -1)
 						{
-							target = { y,x };
+							dice[it->second] = dice[now] + 1;
 						}
+						else if (dice[it->second] > dice[now] + 1)
+						{
+							dice[it->second] = dice[now] + 1;
+						}
+						visited[it->second] = true;
+
+						if (dice[next] == -1)
+						{
+							dice[next] = dice[now] + 1;
+						}
+						else if (dice[next] > dice[now] + 1)
+						{
+							dice[next] = dice[now] + 1;
+						}
+						visited[next] = true;
+
+						continue;
 					}
 				}
-			}
-			else
-			{
-				target = { y,x };
-			}
-		}
 
-		for (int i = 0; i < 4; i++)
-		{
-			int ny = now.first + dy[i];
-			int nx = now.second + dx[i];
+				{
+					auto it = snakes.find(next);
+					if (it != snakes.end())
+					{
+						q.push(it->second);
+						if (dice[it->second] == -1)
+						{
+							dice[it->second] = dice[now] + 1;
+						}
+						else if (dice[it->second] > dice[now] + 1)
+						{
+							dice[it->second] = dice[now] + 1;
+						}
+						visited[it->second] = true;
 
-			if (CheckDir(ny, nx))
-			{
-				visited[ny][nx] = true;
-				_dist[ny][nx] = _dist[y][x] + 1;
-				q.push({ ny,nx });
+						if (dice[next] == -1)
+						{
+							dice[next] = dice[now] + 1;
+						}
+						else if (dice[next] > dice[now] + 1)
+						{
+							dice[next] = dice[now] + 1;
+						}
+						visited[next] = true;
+
+						continue;
+					}
+				}
+
+				// 사다리나 뱀이 없다면 그냥 다음칸 가자
+				q.push(next);
+				if (dice[next] == -1)
+				{
+					dice[next] = dice[now] + 1;
+				}
+				else if (dice[next] > dice[now] + 1)
+				{
+					dice[next] = dice[now] + 1;
+				}
+				visited[next] = true;
 			}
 		}
 	}
@@ -128,52 +120,28 @@ int main()
 	cout.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	cin >> N;
+	int N, M;
+	cin >> N >> M;
 
-	_map = vector<vector<int>>(N, vector<int>(N));
-	_dist = vector<vector<int>>(N, vector<int>(N));
-	visited = vector<vector<bool>>(N, vector<bool>(N, false));
+	dice = vector<int>(101, -1);
+	visited = vector<bool>(101, false);
 
-	for (int y = 0; y < N; y++)
+	for (int i = 0; i < N; i++)
 	{
-		for (int x = 0; x < N; x++)
-		{
-			cin >> _map[y][x];
-			if (_map[y][x] == 9)
-			{
-				shark = { y,x };
-				_map[y][x] = 0;
-			}
-		}
+		int x, y;
+		cin >> x >> y;
+		ladders.insert({ x, y });
+	}
+	for (int i = 0; i < M; i++)
+	{
+		int x, y;
+		cin >> x >> y;
+		snakes.insert({ x, y });
 	}
 
-	int count = 0;
-	int t = 0;
-	while (true)
-	{
-		Init();
+	BFS(1);
 
-		BFS(shark);
-
-		if (target != shark)
-		{
-			// 타겟이 있음
-			count += _dist[target.first][target.second];
-			_map[target.first][target.second] = 0;
-			shark = target;
-			eatCount++;
-			if (eatCount == level)
-			{
-				level++;
-				eatCount = 0;
-			}
-		}
-		else
-		{
-			cout << count;
-			break;
-		}
-	}
+	cout << dice[100];
 
 	return 0;
 }
