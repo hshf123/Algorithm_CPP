@@ -16,103 +16,7 @@ using uint64 = unsigned long long;
 #include <algorithm>
 #include <cmath>
 
-map<int, int> ladders;
-map<int, int> snakes;
-vector<int> dice;
-vector<bool> visited;
 
-void BFS(int n)
-{
-	dice[n] = 0;
-	visited[n] = true;
-	queue<int> q;
-	q.push(n);
-
-	while (q.empty() == false)
-	{
-		int now = q.front();
-		q.pop();
-
-		for (int i = 1; i <= 6; i++)
-		{
-			int next = now + i;
-			if (next <= 100 && visited[next] == false)
-			{
-				// 다음칸 전진
-				// 만약 사다리라면 탄다.
-				{
-					auto it = ladders.find(next);
-					if (it != ladders.end())
-					{
-						q.push(it->second);
-						if (dice[it->second] == -1)
-						{
-							dice[it->second] = dice[now] + 1;
-						}
-						else if (dice[it->second] > dice[now] + 1)
-						{
-							dice[it->second] = dice[now] + 1;
-						}
-						visited[it->second] = true;
-
-						if (dice[next] == -1)
-						{
-							dice[next] = dice[now] + 1;
-						}
-						else if (dice[next] > dice[now] + 1)
-						{
-							dice[next] = dice[now] + 1;
-						}
-						visited[next] = true;
-
-						continue;
-					}
-				}
-
-				{
-					auto it = snakes.find(next);
-					if (it != snakes.end())
-					{
-						q.push(it->second);
-						if (dice[it->second] == -1)
-						{
-							dice[it->second] = dice[now] + 1;
-						}
-						else if (dice[it->second] > dice[now] + 1)
-						{
-							dice[it->second] = dice[now] + 1;
-						}
-						visited[it->second] = true;
-
-						if (dice[next] == -1)
-						{
-							dice[next] = dice[now] + 1;
-						}
-						else if (dice[next] > dice[now] + 1)
-						{
-							dice[next] = dice[now] + 1;
-						}
-						visited[next] = true;
-
-						continue;
-					}
-				}
-
-				// 사다리나 뱀이 없다면 그냥 다음칸 가자
-				q.push(next);
-				if (dice[next] == -1)
-				{
-					dice[next] = dice[now] + 1;
-				}
-				else if (dice[next] > dice[now] + 1)
-				{
-					dice[next] = dice[now] + 1;
-				}
-				visited[next] = true;
-			}
-		}
-	}
-}
 
 int main()
 {
@@ -123,25 +27,30 @@ int main()
 	int N, M;
 	cin >> N >> M;
 
-	dice = vector<int>(101, -1);
-	visited = vector<bool>(101, false);
+	unordered_map<string, string> siteToPass;
 
 	for (int i = 0; i < N; i++)
 	{
-		int x, y;
-		cin >> x >> y;
-		ladders.insert({ x, y });
+		string site;
+		string password;
+		cin >> site >> password;
+		siteToPass.insert({ site, password });
 	}
+
+	vector<string> ans(M);
 	for (int i = 0; i < M; i++)
 	{
-		int x, y;
-		cin >> x >> y;
-		snakes.insert({ x, y });
+		string site;
+		cin >> site;
+
+		auto it = siteToPass.find(site);
+		ans[i] = it->second;
 	}
 
-	BFS(1);
-
-	cout << dice[100];
+	for (string& str : ans)
+	{
+		cout << str << endl;
+	}
 
 	return 0;
 }
