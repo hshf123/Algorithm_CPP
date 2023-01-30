@@ -16,33 +16,92 @@ using uint64 = unsigned long long;
 #include <algorithm>
 #include <cmath>
 
+vector<int> truth;
+vector<int> parent;
+vector<int> _rank;
+vector<vector<int>> party;
+
+int Find(int n)
+{
+	if (n == parent[n])
+		return n;
+
+	return Find(parent[n]);
+}
+
+void Union(int u, int v)
+{
+	u = Find(u);
+	v = Find(v);
+
+	if (u == v)
+		return;
+
+	parent[u] = v;
+}
+
 int main()
 {
 	cin.tie(NULL);
 	cout.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int n;
-	cin >> n;
+	int N, M; 
+	cin >> N >> M;
 
-	vector<int> dp(n + 1);
-	dp[1] = 1;
-	dp[2] = 2;
-	dp[3] = 3;
+	parent = vector<int>(N + 1);
+	for (int i = 1; i <= N; i++)
+		parent[i] = i;
 
-	for (int i = 4; i <= n; i++)
+	int truthCount;
+	cin >> truthCount;
+	for (int i = 0; i < truthCount; i++)
 	{
-		int minnum = INT32_MAX;
-		for (int j = 1; j * j <= i; j++)
-		{
-			int idx = i - j * j;
-			minnum = min(dp[idx], minnum);
-		}
-
-		dp[i] = minnum + 1;
+		int num;
+		cin >> num;
+		truth.push_back(num);
 	}
 
-	cout << dp[n];
+	party = vector<vector<int>>(M);
+	for (int i = 0; i < M; i++)
+	{
+		int p;
+		cin >> p;
+		for (int j = 1; j <= p; j++)
+		{
+			int num;
+			cin >> num;
+			party[i].push_back(num);
+		}
+	}
+
+	for (int i = 0; i < M; i++) {
+		int n1 = party[i][0];
+		for (int j = 1; j < party[i].size(); j++) {
+			int n2 = party[i][j];
+			Union(n1, n2);
+		}
+	}
+
+	int ans = 0;
+	for (int i = 0; i < M; i++) {
+		bool flag = false;
+		for (int j = 0; j < party[i].size(); j++) {
+			int n1 = party[i][j];
+			for (int k = 0; k < truth.size(); k++) {
+				if (Find(n1) == Find(truth[k])) {
+					flag = true;
+					break;
+				}
+			}
+			if (flag) break;
+		}
+
+		if (flag == false)
+			ans++;
+	}
+
+	cout << ans;
 
 	return 0;
 }
