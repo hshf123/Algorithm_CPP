@@ -16,29 +16,77 @@ using uint64 = unsigned long long;
 #include <algorithm>
 #include <cmath>
 
+struct Node
+{
+	int edge;
+	int width;
+};
+
+int V;
+vector<vector<Node>> vec;
+vector<bool> visited;
+int _max = 0;
+int maxNode;
+
+void DFS(int n, int width)
+{
+	if (visited[n] == true)
+		return;
+
+	visited[n] = true;
+
+	if (_max < width)
+	{
+		_max = width;
+		maxNode = n;
+	}
+
+	for (Node& node : vec[n])
+	{
+		DFS(node.edge, width + node.width);
+	}
+}
+
 int main()
 {
 	cin.tie(NULL);
 	cout.tie(NULL);
 	ios::sync_with_stdio(false);
 
-	int N;
-	cin >> N;
+	cin >> V;
+	vec.resize(V + 1);
 
-	vector<int> red(N + 1);
-	vector<int> green(N + 1);
-	vector<int> blue(N + 1);
-
-	for (int i = 1; i <= N; i++)
+	for (int i = 1; i < V + 1; i++)
 	{
-		int r, g, b;
-		cin >> r >> g >> b;
-		red[i] = min(green[i - 1], blue[i - 1]) + r;
-		green[i] = min(red[i - 1], blue[i - 1]) + g;
-		blue[i] = min(green[i - 1], red[i - 1]) + b;
-	}
+		visited = vector<bool>(V + 1, false);
 
-	cout << min(red[N], min(green[N], blue[N]));
+		int nodeNumber;
+		cin >> nodeNumber;
+
+		while (true)
+		{
+			int edge;
+			cin >> edge;
+			if (edge == -1)
+				break;
+			int width;
+			cin >> width;
+
+			vec[nodeNumber].push_back({ edge, width });
+		}
+
+		visited.clear();
+	}
 	
+	visited = vector<bool>(V + 1, false);
+	DFS(1, 0);
+
+	_max = 0;
+
+	visited = vector<bool>(V + 1, false);
+	DFS(maxNode, 0);
+
+	cout << _max;
+
 	return 0;
 }
