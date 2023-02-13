@@ -16,74 +16,100 @@
 using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
+using BYTE = unsigned char;
 
-struct Vertex
+vector<string> cache[101];
+
+string Add(string num1, string num2)
 {
-	bool operator<(const Vertex& other) const { return cost < other.cost; }
-	bool operator>(const Vertex& other) const { return cost > other.cost; }
-
-	int edge;
-	int cost;
-};
-
-int V, E, K;
-vector<vector<Vertex>> vec;
-vector<int> best;
-
-void Dijikstra(int now)
-{
-	priority_queue<Vertex, vector<Vertex>, greater<Vertex>> discovered;
-	discovered.push(Vertex{now, 0});
-	best[now] = 0;
-
-	while (discovered.empty() == false)
+	string res = "";
+	
+	if (num1.size() < num2.size())
 	{
-		Vertex vertex = discovered.top();
-		discovered.pop();
-		int bestCost = vertex.cost;
-		now = vertex.edge;
-
-		if (best[now] < bestCost)
-			continue;
-
-		for (auto it = vec[now].begin(); it != vec[now].end(); ++it)
-		{
-			int next = it->edge;
-			int nextCost = best[now] + it->cost;
-			if (nextCost >= best[next])
-				continue;
-
-			best[next] = nextCost;
-			discovered.push(Vertex{ next, nextCost });
-		}
+		string temp = num1;
+		num1 = num2;
+		num2 = temp;
 	}
+
+	int num1Iter = num1.size() - 1;
+	int num2Iter = num2.size() - 1;
+	bool up = false;
+	for (int i = num2Iter; i >= 0; --i)
+	{
+		int n1 = num1[num1Iter] - '0';
+		int n2 = num2[num2Iter] - '0';
+
+		int n = n1 + n2;
+		if (up)
+			n++;
+		if (n >= 10)
+		{
+			up = true;
+			n -= 10;
+		}
+		else
+			up = false;
+
+		char c = n + '0';
+		res += c;
+
+		num1Iter--;
+		num2Iter--;
+	}
+
+	for (int i = num1Iter; i >= 0; --i)
+	{
+		int n = num1[i] - '0';
+
+		if (up)
+			n++;
+
+		if (n >= 10)
+		{
+			up = true;
+			n -= 10;
+		}
+		else
+			up = false;
+
+		char c = n + '0';
+		res += c;
+	}
+
+	if (up)
+		res += "1";
+
+	::reverse(res.begin(), res.end());
+
+	return res;
+}
+
+string Combination(string n, string m)
+{
+	if (m == "0" || m == n)
+		return "1";
+
+	string& ret = cache[stoi(n)][stoi(m)];
+	if (ret != "-1")
+		return ret;
+
+	string n_1 = to_string(stoi(n) - 1);
+	string m_1 = to_string(stoi(m) - 1);
+
+	return ret = Add(Combination(n_1, m_1), Combination(n_1, m));
 }
 
 int main()
 {
 	Init;
 
-	cin >> V >> E >> K;
-	vec = vector<vector<Vertex>>(V + 1);
-	best = vector<int>(V + 1, INT32_MAX);
+	for (int i = 0; i < 101; i++)
+		cache[i] = vector<string>(101, "-1");
 
-	for (int i = 0; i < E; i++)
-	{
-		int u, v, w;
-		cin >> u >> v >> w;
+	string n, m;
+	cin >> n >> m;
 
-		vec[u].push_back(Vertex{ v,w });
-	}
-
-	Dijikstra(K);
-
-	for (int i = 1; i <= V; i++)
-	{
-		if (best[i] == INT32_MAX)
-			cout << "INF" << endl;
-		else
-			cout << best[i] << endl;
-	}
+	cout << Combination(n, m);
 
 	return 0;
 }
