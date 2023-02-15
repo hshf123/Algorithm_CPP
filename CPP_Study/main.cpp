@@ -19,6 +19,7 @@ using uint64 = unsigned long long;
 
 int N, M;
 vector<int> seq;
+vector<int> ans;
 vector<bool> visited;
 
 void BackTracking(int num, int cnt)
@@ -26,16 +27,18 @@ void BackTracking(int num, int cnt)
 	if (cnt == M)
 	{
 		for (int i = 0; i < M; i++)
-			cout << seq[i] << ' ';
-		cout << '\n';
+			cout << ans[i] << " ";
+		cout << endl;
 		return;
 	}
 	for (int i = num; i <= N; i++)
 	{
-		if (!visited[i])
+		if (!visited[seq[i]])
 		{
-			seq[cnt] = i;
-			BackTracking(i, cnt + 1);
+			visited[seq[i]] = true;
+			ans[cnt] = seq[i];
+			BackTracking(1, cnt + 1);
+			visited[seq[i]] = false;
 		}
 	}
 }
@@ -45,8 +48,16 @@ int main()
 	Init;
 
 	cin >> N >> M;
-	seq = vector<int>(9, 0);
-	visited = vector<bool>(9, false);
+	seq.push_back(0);
+	for (int i = 0; i < N; i++)
+	{
+		int n;
+		cin >> n;
+		seq.push_back(n);
+	}
+	::sort(seq.begin(), seq.end());
+	ans = vector<int>(seq.back() + 1, 0);
+	visited = vector<bool>(seq.back() + 1, false);
 	BackTracking(1, 0);
 
 	return 0;
