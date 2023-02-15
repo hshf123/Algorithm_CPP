@@ -34,10 +34,8 @@ void BackTracking(int num, int cnt)
 	{
 		if (!visited[i])
 		{
-			visited[i] = true;
 			seq[cnt] = i;
-			BackTracking(i + 1, cnt + 1);
-			visited[i] = false;
+			BackTracking(i, cnt + 1);
 		}
 	}
 }
