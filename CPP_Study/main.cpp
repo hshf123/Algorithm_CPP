@@ -26,6 +26,16 @@ void BackTracking(int num, int cnt)
 {
 	if (cnt == M)
 	{
+		int prev = ans[0];
+		for (int i = 1; i < M; i++)
+		{
+			const int next = ans[i];
+			if (prev > next)
+				return;
+
+			prev = next;
+		}
+
 		for (int i = 0; i < M; i++)
 			cout << ans[i] << " ";
 		cout << endl;
@@ -33,12 +43,10 @@ void BackTracking(int num, int cnt)
 	}
 	for (int i = num; i <= N; i++)
 	{
-		if (!visited[seq[i]])
+		if (visited[seq[i]] == false)
 		{
-			visited[seq[i]] = true;
 			ans[cnt] = seq[i];
 			BackTracking(1, cnt + 1);
-			visited[seq[i]] = false;
 		}
 	}
 }
