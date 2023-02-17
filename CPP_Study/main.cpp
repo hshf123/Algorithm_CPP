@@ -17,56 +17,45 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int N, M;
+int N;
 vector<int> seq;
-vector<int> ans;
-vector<bool> visited;
+vector<int> cache;
 
-void BackTracking(int num, int cnt)
+int LIS(int n)
 {
-	if (cnt == M)
-	{
-		int prev = ans[0];
-		for (int i = 1; i < M; i++)
-		{
-			const int next = ans[i];
-			if (prev > next)
-				return;
+	int& ret = cache[n];
+	if (ret != -1)
+		return ret;
 
-			prev = next;
-		}
-
-		for (int i = 0; i < M; i++)
-			cout << ans[i] << " ";
-		cout << endl;
-		return;
-	}
-	for (int i = num; i <= N; i++)
+	ret = 1;
+	for (int i = n + 1; i < N; i++)
 	{
-		if (visited[seq[i]] == false)
-		{
-			ans[cnt] = seq[i];
-			BackTracking(1, cnt + 1);
-		}
+		if (seq[i] > seq[n])
+			ret = max(ret, 1 + LIS(i));
 	}
+	return ret;
 }
 
 int main()
 {
 	Init;
 
-	cin >> N >> M;
-	seq.push_back(0);
+	cin >> N;
+	seq = vector<int>(N);
 	for (int i = 0; i < N; i++)
 	{
 		int n;
 		cin >> n;
-		seq.push_back(n);
+		seq[i] = n;
 	}
-	::sort(seq.begin(), seq.end());
-	ans = vector<int>(seq.back() + 1, 0);
-	visited = vector<bool>(seq.back() + 1, false);
-	BackTracking(1, 0);
+	cache = vector<int>(N, -1);
+	int _max = -1;
+	for (int i = 0; i < N; i++)
+	{
+		_max = max(_max, LIS(i));
+	}
+
+	cout << _max;
 
 	return 0;
 }
