@@ -18,22 +18,26 @@ using int64 = long long;
 using uint64 = unsigned long long;
 
 int N;
-vector<int> seq;
-vector<int> cache;
+vector<vector<int>> tree;
+vector<int> parent;
+vector<bool> visited;
 
-int LIS(int n)
+void DFS(int n)
 {
-	int& ret = cache[n];
-	if (ret != -1)
-		return ret;
+	if (visited[n])
+		return;
 
-	ret = 1;
-	for (int i = n + 1; i < N; i++)
+	visited[n] = true;
+
+	for (int v : tree[n])
 	{
-		if (seq[i] > seq[n])
-			ret = max(ret, 1 + LIS(i));
+		if (visited[v] == false)
+		{
+			DFS(v);
+			parent[v] = n;
+		}
 	}
-	return ret;
+
 }
 
 int main()
@@ -41,21 +45,27 @@ int main()
 	Init;
 
 	cin >> N;
-	seq = vector<int>(N);
-	for (int i = 0; i < N; i++)
+	tree = vector<vector<int>>(N + 1);
+	for (int i = 0; i <= N; i++)
+		parent.push_back(i);
+	visited = vector<bool>(N + 1, false);
+	for (int i = 0; i < N - 1; i++)
 	{
-		int n;
-		cin >> n;
-		seq[i] = n;
-	}
-	cache = vector<int>(N, -1);
-	int _max = -1;
-	for (int i = 0; i < N; i++)
-	{
-		_max = max(_max, LIS(i));
-	}
+		int u, v;
+		cin >> u >> v;
 
-	cout << _max;
+		tree[u].push_back(v);
+		tree[v].push_back(u);
+	}
+	for (int i = 1; i <= N; i++)
+	{
+		DFS(i);
+	}
+	for (int i = 2; i < N + 1; i++)
+
+	{
+		cout << parent[i] << endl;
+	}
 
 	return 0;
 }
