@@ -17,55 +17,51 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int N;
-vector<vector<int>> tree;
-vector<int> parent;
+int N, M;
+vector<int> seq;
+vector<int> ans;
 vector<bool> visited;
 
-void DFS(int n)
+void BackTracking(int n, int count)
 {
-	if (visited[n])
-		return;
-
-	visited[n] = true;
-
-	for (int v : tree[n])
+	if (count == M)
 	{
-		if (visited[v] == false)
-		{
-			DFS(v);
-			parent[v] = n;
-		}
+		for (int i = 0; i < M; i++)
+			cout << ans[i] << " ";
+		cout << endl;
+		return;
 	}
 
+	int prevNum = 0;
+	for (int i = n; i < seq.size(); i++)
+	{
+		if (visited[i] == false && seq[i] != prevNum)
+		{
+			visited[i] = true;
+			ans[count] = seq[i];
+			prevNum = seq[i];
+			BackTracking(1, count + 1);
+			visited[i] = false;
+		}
+	}
 }
 
 int main()
 {
 	Init;
 
-	cin >> N;
-	tree = vector<vector<int>>(N + 1);
-	for (int i = 0; i <= N; i++)
-		parent.push_back(i);
-	visited = vector<bool>(N + 1, false);
-	for (int i = 0; i < N - 1; i++)
+	cin >> N >> M;
+	seq.push_back(0);
+	for (int i = 0; i < N; i++)
 	{
-		int u, v;
-		cin >> u >> v;
-
-		tree[u].push_back(v);
-		tree[v].push_back(u);
+		int n;
+		cin >> n;
+		seq.push_back(n);
 	}
-	for (int i = 1; i <= N; i++)
-	{
-		DFS(i);
-	}
-	for (int i = 2; i < N + 1; i++)
-
-	{
-		cout << parent[i] << endl;
-	}
+	::sort(seq.begin(), seq.end());
+	ans = vector<int>(M, -1);
+	visited = vector<bool>(seq.size(), false);
+	BackTracking(1, 0);
 
 	return 0;
 }
