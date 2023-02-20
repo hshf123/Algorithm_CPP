@@ -37,11 +37,9 @@ void BackTracking(int n, int count)
 	{
 		if (visited[i] == false && seq[i] != prevNum)
 		{
-			visited[i] = true;
 			ans[count] = seq[i];
 			prevNum = seq[i];
-			BackTracking(1, count + 1);
-			visited[i] = false;
+			BackTracking(i, count + 1);
 		}
 	}
 }
