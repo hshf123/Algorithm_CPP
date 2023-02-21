@@ -17,52 +17,43 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int A, B;
+int n;
+vector<vector<int>> triangle;
+vector<vector<int>> cache;
 
-int Double(int n)
+int Search(int y, int x)
 {
-	return n * 2;
-}
+	if (y == n || x >= 2 * n - 1)
+		return 0;
 
-int AppendOne(int n)
-{
-	return n * 10 + 1;
-}
+	int& ret = cache[y][x];
+	if (ret != -1)
+		return ret;
 
-void Search(int n)
-{
-	queue<pair<int, int>> q;
-	q.push({ n, 1 });
-
-	while (q.empty() == false)
-	{
-		int now = q.front().first;
-		int count = q.front().second;
-		q.pop();
-
-		if (now > B)
-			continue;
-
-		if (now == B)
-		{
-			cout << count;
-			return;
-		}
-
-		q.push({ Double(now), count + 1 });
-		q.push({ AppendOne(now), count + 1 });
-	}
-
-	cout << -1;
-	return;
+	return ret = triangle[y][x] + max(Search(y + 1, x - 1), Search(y + 1, x + 1));
 }
 
 int main()
 {
 	Init;
 
-	cin >> A >> B;
-	Search(A);
+	cin >> n;
+	triangle = vector<vector<int>>(n, vector<int>(2 * n - 1, -1));
+	cache = vector<vector<int>>(n, vector<int>(2 * n - 1, -1));
+
+	for (int i = 0; i < n; i++)
+	{
+		int idx = n - i - 1;
+		for (int j = 0; j <= i; j++)
+		{
+			int num;
+			cin >> num;
+			triangle[i][idx] = num;
+			idx += 2;
+		}
+	}
+
+	cout << Search(0, n - 1);
 
 	return 0;
 }
