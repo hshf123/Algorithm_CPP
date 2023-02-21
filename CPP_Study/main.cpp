@@ -17,49 +17,52 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int N, M;
-vector<int> seq;
-vector<int> ans;
-vector<bool> visited;
+int A, B;
 
-void BackTracking(int n, int count)
+int Double(int n)
 {
-	if (count == M)
+	return n * 2;
+}
+
+int AppendOne(int n)
+{
+	return n * 10 + 1;
+}
+
+void Search(int n)
+{
+	queue<pair<int, int>> q;
+	q.push({ n, 1 });
+
+	while (q.empty() == false)
 	{
-		for (int i = 0; i < M; i++)
-			cout << ans[i] << " ";
-		cout << endl;
-		return;
+		int now = q.front().first;
+		int count = q.front().second;
+		q.pop();
+
+		if (now > B)
+			continue;
+
+		if (now == B)
+		{
+			cout << count;
+			return;
+		}
+
+		q.push({ Double(now), count + 1 });
+		q.push({ AppendOne(now), count + 1 });
 	}
 
-	int prevNum = 0;
-	for (int i = n; i < seq.size(); i++)
-	{
-		if (visited[i] == false && seq[i] != prevNum)
-		{
-			ans[count] = seq[i];
-			prevNum = seq[i];
-			BackTracking(i, count + 1);
-		}
-	}
+	cout << -1;
+	return;
 }
 
 int main()
 {
 	Init;
 
-	cin >> N >> M;
-	seq.push_back(0);
-	for (int i = 0; i < N; i++)
-	{
-		int n;
-		cin >> n;
-		seq.push_back(n);
-	}
-	::sort(seq.begin(), seq.end());
-	ans = vector<int>(M, -1);
-	visited = vector<bool>(seq.size(), false);
-	BackTracking(1, 0);
+	cin >> A >> B;
+	Search(A);
 
 	return 0;
 }
