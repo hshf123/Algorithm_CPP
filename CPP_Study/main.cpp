@@ -18,19 +18,36 @@ using int64 = long long;
 using uint64 = unsigned long long;
 
 int n;
-vector<vector<int>> triangle;
-vector<vector<int>> cache;
+unordered_map<char, pair<char, char>> tree;
 
-int Search(int y, int x)
+void PrintPreorder(char node)
 {
-	if (y == n || x >= 2 * n - 1)
-		return 0;
+	if (node == '.')
+		return;
+	auto t = tree[node];
+	cout << node;
+	PrintPreorder(t.first);
+	PrintPreorder(t.second);
+}
 
-	int& ret = cache[y][x];
-	if (ret != -1)
-		return ret;
+void PrintInorder(char node)
+{
+	if (node == '.')
+		return;
+	auto t = tree[node];
+	PrintInorder(t.first);
+	cout << node;
+	PrintInorder(t.second);
+}
 
-	return ret = triangle[y][x] + max(Search(y + 1, x - 1), Search(y + 1, x + 1));
+void PrintPostorder(char node)
+{
+	if (node == '.')
+		return;
+	auto t = tree[node];
+	PrintPostorder(t.first);
+	PrintPostorder(t.second);
+	cout << node;
 }
 
 int main()
@@ -38,22 +55,19 @@ int main()
 	Init;
 
 	cin >> n;
-	triangle = vector<vector<int>>(n, vector<int>(2 * n - 1, -1));
-	cache = vector<vector<int>>(n, vector<int>(2 * n - 1, -1));
 
 	for (int i = 0; i < n; i++)
 	{
-		int idx = n - i - 1;
-		for (int j = 0; j <= i; j++)
-		{
-			int num;
-			cin >> num;
-			triangle[i][idx] = num;
-			idx += 2;
-		}
+		char key, left, right;
+		cin >> key >> left >> right;
+
+		tree[key] = { left, right };
 	}
 
-	cout << Search(0, n - 1);
-
+	PrintPreorder('A');
+	cout << endl;
+	PrintInorder('A');
+	cout << endl;
+	PrintPostorder('A');
 	return 0;
 }
