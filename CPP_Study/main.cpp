@@ -17,57 +17,51 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
+int dx[] = { 0,1,0,-1 };
+int dy[] = { 1,0,-1,0 };
 int n;
-unordered_map<char, pair<char, char>> tree;
 
-void PrintPreorder(char node)
-{
-	if (node == '.')
-		return;
-	auto t = tree[node];
-	cout << node;
-	PrintPreorder(t.first);
-	PrintPreorder(t.second);
-}
+vector<vector<int>> stickers;
+vector<vector<int>> cache;
 
-void PrintInorder(char node)
+int DP()
 {
-	if (node == '.')
-		return;
-	auto t = tree[node];
-	PrintInorder(t.first);
-	cout << node;
-	PrintInorder(t.second);
-}
+	cache[0][0] = stickers[0][0];
+	cache[1][1] = stickers[1][1] + cache[0][0];
 
-void PrintPostorder(char node)
-{
-	if (node == '.')
-		return;
-	auto t = tree[node];
-	PrintPostorder(t.first);
-	PrintPostorder(t.second);
-	cout << node;
+	cache[1][0] = stickers[1][0];
+	cache[0][1] = stickers[0][1] + cache[1][0];
+
+	for (int i = 2; i < n; i++) {
+		cache[0][i] = stickers[0][i] + max(cache[1][i - 1], cache[1][i - 2]);
+		cache[1][i] = stickers[1][i] + max(cache[0][i - 1], cache[0][i - 2]);
+	}
+
+	return max(cache[0][n - 1], cache[1][n - 1]);
 }
 
 int main()
 {
 	Init;
 
-	cin >> n;
+	int T;
+	cin >> T;
 
-	for (int i = 0; i < n; i++)
+	for (int i = 0; i < T; i++)
 	{
-		char key, left, right;
-		cin >> key >> left >> right;
+		cin >> n;
+		stickers = vector<vector<int>>(2, vector<int>(n));
+		cache = vector<vector<int>>(2, vector<int>(n, -1));
+		for (int k = 0; k < 2; k++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				cin >> stickers[k][j];
+			}
+		}
 
-		tree[key] = { left, right };
+		cout << DP() << endl;
 	}
-
-	PrintPreorder('A');
-	cout << endl;
-	PrintInorder('A');
-	cout << endl;
-	PrintPostorder('A');
+	
 	return 0;
 }
