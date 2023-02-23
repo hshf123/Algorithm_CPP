@@ -17,65 +17,32 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int N, M;
-vector<vector<int>> board;
-vector<vector<int>> cache;
-
-int SectionSum(int y, int x)
+int LCS(string& str1, string& str2)
 {
-	if (y < 0 || x < 0)
-		return 0;
+	int str1Len = str1.length();
+	int str2Len = str2.length();
+	vector<vector<int>> lcs(str1Len + 1, vector<int>(str2Len + 1, 0));
 
-	int& ret = cache[y][x];
-	if (ret != -1)
-		return ret;
-
-	int sum = 0;
-	int yi = 0;
-	int xi = 0;
-	while (yi <= y)
+	for (int i = 1; i < str1Len + 1; i++)
 	{
-		sum += board[yi][xi];
-
-		if (yi == 0)
-			cache[yi][xi] = sum;
-
-		if (yi > 0)
-			cache[yi][xi] = sum - cache[yi - 1][x] + cache[yi - 1][xi];
-
-		xi++;
-		if (xi > x)
+		for (int j = 1; j < str2Len + 1; j++)
 		{
-			cache[yi][xi - 1] = sum;
-
-			xi = 0;
-			yi++;
+			if (str1[i - 1] == str2[j - 1])
+				lcs[i][j] = lcs[i - 1][j - 1] + 1;
+			else
+				lcs[i][j] = max(lcs[i][j - 1], lcs[i - 1][j]);
 		}
 	}
 
-	return ret = sum;
+	return lcs[str1Len][str2Len];
 }
 
 int main()
 {
 	Init;
 
-	cin >> N >> M;
-	board = vector<vector<int>>(N, vector<int>(N));
-	cache = vector<vector<int>>(N, vector<int>(N, -1));
-	for (int y = 0; y < N; y++)
-	{
-		for (int x = 0; x < N; x++)
-		{
-			cin >> board[y][x];
-		}
-	}
-	for (int i = 0; i < M; i++)
-	{
-		int x1, y1, x2, y2;
-		cin >> y1 >> x1 >> y2 >> x2;
-		cout << SectionSum(y2 - 1, x2 - 1) - SectionSum(y2 - 1, x1 - 2) - SectionSum(y1 - 2, x2 - 1) + SectionSum(y1 - 2, x1 - 2) << endl;
-	}
-	
+	string str1, str2;
+	cin >> str1 >> str2;
+	cout << LCS(str1, str2);
 	return 0;
 }
