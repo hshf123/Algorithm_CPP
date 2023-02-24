@@ -17,32 +17,45 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int LCS(string& str1, string& str2)
-{
-	int str1Len = str1.length();
-	int str2Len = str2.length();
-	vector<vector<int>> lcs(str1Len + 1, vector<int>(str2Len + 1, 0));
+int N, K;
+unordered_map<int, pair<int, int>> backpack;
+vector<vector<int>> cache;
 
-	for (int i = 1; i < str1Len + 1; i++)
+int DP()
+{
+	for (int y = 1; y < N + 1; y++)
 	{
-		for (int j = 1; j < str2Len + 1; j++)
+		for (int x = 1; x < K + 1; x++)
 		{
-			if (str1[i - 1] == str2[j - 1])
-				lcs[i][j] = lcs[i - 1][j - 1] + 1;
+			cache[y][x] = max(cache[y - 1][x], cache[y][x - 1]);
+			if (x - backpack[y].first >= 0)
+			{
+				cache[y][x] = max(cache[y - 1][x], cache[y - 1][x - backpack[y].first] + backpack[y].second);
+			}
 			else
-				lcs[i][j] = max(lcs[i][j - 1], lcs[i - 1][j]);
+			{
+				cache[y][x] = cache[y - 1][x];
+			}
 		}
 	}
 
-	return lcs[str1Len][str2Len];
+	return cache[N][K];
 }
 
 int main()
 {
 	Init;
 
-	string str1, str2;
-	cin >> str1 >> str2;
-	cout << LCS(str1, str2);
+	cin >> N >> K;
+	cache = vector<vector<int>>(N + 1, vector<int>(K + 1, 0));
+	for (int i = 0; i < N; i++)
+	{
+		int W, V;
+		cin >> W >> V;
+		backpack[i + 1] = { W,V };
+	}
+
+	cout << DP();
+
 	return 0;
 }
