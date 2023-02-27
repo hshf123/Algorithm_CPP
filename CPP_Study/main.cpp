@@ -18,28 +18,45 @@ using int64 = long long;
 using uint64 = unsigned long long;
 
 int N, K;
-unordered_map<int, pair<int, int>> backpack;
-vector<vector<int>> cache;
+int _size;
+vector<bool> visited;
 
-int DP()
+void Position()
 {
-	for (int y = 1; y < N + 1; y++)
+	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> q;
+	q.push({ 0, N });
+	visited[N] = true;
+
+	while (q.empty() == false)
 	{
-		for (int x = 1; x < K + 1; x++)
+		int count = q.top().first;
+		int x = q.top().second;
+		q.pop();
+
+		if (x == K)
 		{
-			cache[y][x] = max(cache[y - 1][x], cache[y][x - 1]);
-			if (x - backpack[y].first >= 0)
-			{
-				cache[y][x] = max(cache[y - 1][x], cache[y - 1][x - backpack[y].first] + backpack[y].second);
-			}
-			else
-			{
-				cache[y][x] = cache[y - 1][x];
-			}
+			cout << count;
+			return;
+		}
+
+		if (x - 1 >= 0 && visited[x - 1] == false)
+		{
+			q.push({ count + 1, x - 1 });
+			visited[x - 1] = true;
+		}
+
+		if (x * 2 < _size && visited[x * 2] == false)
+		{
+			q.push({ count, x * 2 });
+			visited[x * 2] = true;
+		}
+
+		if (x + 1 < _size && visited[x + 1] == false)
+		{
+			q.push({ count + 1, x + 1 });
+			visited[x + 1] = true;
 		}
 	}
-
-	return cache[N][K];
 }
 
 int main()
@@ -47,15 +64,9 @@ int main()
 	Init;
 
 	cin >> N >> K;
-	cache = vector<vector<int>>(N + 1, vector<int>(K + 1, 0));
-	for (int i = 0; i < N; i++)
-	{
-		int W, V;
-		cin >> W >> V;
-		backpack[i + 1] = { W,V };
-	}
-
-	cout << DP();
+	_size = 10'0001;
+	visited = vector<bool>(_size, false);
+	Position();
 
 	return 0;
 }
