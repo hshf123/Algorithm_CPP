@@ -18,65 +18,73 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int n, m;
-vector<pair<int, int>> road[100];
+int TC;
+int N, M, W;
+vector<pair<pair<int, int>, int>> roads;
 
-void BFS(int now)
+void BellmanFord()
 {
-	vector<int> best(n, INT32_MAX);
-	priority_queue<pair<int, int>> q;
-	best[now] = 0;
-	q.push({ 0, now });
+	bool flag = false;
+	vector<int> best(N + 1, INT32_HALF / 2);
+	best[1] = 0;
 
-	while (q.empty() == false)
+	for (int i = 1; i < N; i++)
 	{
-		int dist = q.top().first;
-		now = q.top().second;
-		q.pop();
-
-		if (best[now] < dist)
-			continue;
-
-		for (pair<int, int> p : road[now])
+		for (pair<pair<int, int>, int> p : roads)
 		{
-			int width = p.first;
-			int next = p.second;
-			
-			if (best[next] > dist + width)
+			int now = p.first.first;
+			int next = p.first.second;
+			int width = p.second;
+
+			if (best[next] > best[now] + width)
 			{
-				best[next] = dist + width;
-				q.push({ dist + width, next });
+				best[next] = best[now] + width;
 			}
 		}
 	}
 
-	for (int i = 0; i < n; i++)
+	for (pair<pair<int, int>, int> p : roads)
 	{
-		if (best[i] == INT32_MAX)
-			cout << 0 << " ";
-		else
-			cout << best[i] << " ";
+		int now = p.first.first;
+		int next = p.first.second;
+		int width = p.second;
+
+		if (best[next] > best[now] + width)
+			flag = true;
 	}
-	cout << endl;
+
+	if (flag)
+		cout << "YES" << endl;
+	else
+		cout << "NO" << endl;
 }
 
 int main()
 {
 	Init;
 
-	cin >> n >> m;
-
-	for (int i = 0; i < m; i++)
+	cin >> TC;
+	for (int i = 0; i < TC; i++)
 	{
-		int a, b, c;
-		cin >> a >> b >> c;
-		--a;
-		--b;
-		road[a].push_back({ c,b });
-	}
+		cin >> N >> M >> W;
+		roads.clear();
+		for (int j = 0; j < M; j++)
+		{
+			int S, E, T;
+			cin >> S >> E >> T;
+			roads.push_back({ {S,E},T });
+			roads.push_back({ {E,S},T });
+		}
 
-	for (int i = 0; i < n; i++)
-		BFS(i);
+		for (int j = 0; j < W; j++)
+		{
+			int S, E, T;
+			cin >> S >> E >> T;
+			roads.push_back({ {S,E},-T });
+		}
+
+		BellmanFord();
+	}
 
 	return 0;
 }
