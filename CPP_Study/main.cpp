@@ -18,73 +18,87 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int TC;
-int N, M, W;
-vector<pair<pair<int, int>, int>> roads;
-
-void BellmanFord()
+struct Pos
 {
-	bool flag = false;
-	vector<int> best(N + 1, INT32_HALF / 2);
-	best[1] = 0;
+	int y, x, crash;
+};
 
-	for (int i = 1; i < N; i++)
+int dx[] = { 0, 1, 0, -1 };
+int dy[] = { -1, 0, 1, 0 };
+int visited[1000][1000][2];
+
+int N, M;
+vector<vector<int>> matrix;
+
+bool CheckDir(int y, int x)
+{
+	if (y < 0 || x < 0 || y >= N || x >= M)
+		return false;
+
+	return true;
+}
+
+int BFS(int y, int x)
+{
+	queue<Pos> q;
+	q.push({ y,x,1 });
+	visited[y][x][1] = true;
+
+	while (q.empty() == false)
 	{
-		for (pair<pair<int, int>, int> p : roads)
-		{
-			int now = p.first.first;
-			int next = p.first.second;
-			int width = p.second;
+		int nowY = q.front().y;
+		int nowX = q.front().x;
+		int crash = q.front().crash;
 
-			if (best[next] > best[now] + width)
+		q.pop();
+
+		if (nowY == N - 1 && nowX == M - 1)
+		{
+			return visited[nowY][nowX][crash];
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			int nextY = nowY + dy[i];
+			int nextX = nowX + dx[i];
+
+			if (CheckDir(nextY, nextX))
 			{
-				best[next] = best[now] + width;
+				if (matrix[nextY][nextX] == 1 && crash == 1)
+				{
+					q.push({ nextY, nextX, 0 });
+					visited[nextY][nextX][0] = visited[nowY][nowX][crash] + 1;
+				}
+				else if (matrix[nextY][nextX] == 0 && visited[nextY][nextX][crash] == 0)
+				{
+					q.push({ nextY, nextX, crash });
+					visited[nextY][nextX][crash] = visited[nowY][nowX][crash] + 1;
+				}
 			}
 		}
 	}
 
-	for (pair<pair<int, int>, int> p : roads)
-	{
-		int now = p.first.first;
-		int next = p.first.second;
-		int width = p.second;
-
-		if (best[next] > best[now] + width)
-			flag = true;
-	}
-
-	if (flag)
-		cout << "YES" << endl;
-	else
-		cout << "NO" << endl;
+	return -1;
 }
 
 int main()
 {
 	Init;
 
-	cin >> TC;
-	for (int i = 0; i < TC; i++)
+	cin >> N >> M;
+	matrix = vector<vector<int>>(N, vector<int>(M));
+	for (int y = 0; y < N; y++)
 	{
-		cin >> N >> M >> W;
-		roads.clear();
-		for (int j = 0; j < M; j++)
+		string num;
+		cin >> num;
+		for (int x = 0; x < M; x++)
 		{
-			int S, E, T;
-			cin >> S >> E >> T;
-			roads.push_back({ {S,E},T });
-			roads.push_back({ {E,S},T });
+			matrix[y][x] = num[x] - '0';
 		}
-
-		for (int j = 0; j < W; j++)
-		{
-			int S, E, T;
-			cin >> S >> E >> T;
-			roads.push_back({ {S,E},-T });
-		}
-
-		BellmanFord();
 	}
+
+	
+	cout << BFS(0, 0);
 
 	return 0;
 }
