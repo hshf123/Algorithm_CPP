@@ -10,6 +10,7 @@
 #include <string>
 #include <algorithm>
 #include <cmath>
+#include <memory.h>
 #define endl "\n"
 #define INT32_HALF (2147483647 / 2)
 #define Init cin.tie(NULL); cout.tie(NULL); ios::sync_with_stdio(false);
@@ -17,56 +18,65 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int N, K;
-int _size;
-vector<bool> visited;
+int n, m;
+vector<pair<int, int>> road[100];
 
-void Position()
+void BFS(int now)
 {
-	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> q;
-	q.push({ 0, N });
-	visited[N] = true;
+	vector<int> best(n, INT32_MAX);
+	priority_queue<pair<int, int>> q;
+	best[now] = 0;
+	q.push({ 0, now });
 
 	while (q.empty() == false)
 	{
-		int count = q.top().first;
-		int x = q.top().second;
+		int dist = q.top().first;
+		now = q.top().second;
 		q.pop();
 
-		if (x == K)
-		{
-			cout << count;
-			return;
-		}
+		if (best[now] < dist)
+			continue;
 
-		if (x - 1 >= 0 && visited[x - 1] == false)
+		for (pair<int, int> p : road[now])
 		{
-			q.push({ count + 1, x - 1 });
-			visited[x - 1] = true;
-		}
-
-		if (x * 2 < _size && visited[x * 2] == false)
-		{
-			q.push({ count, x * 2 });
-			visited[x * 2] = true;
-		}
-
-		if (x + 1 < _size && visited[x + 1] == false)
-		{
-			q.push({ count + 1, x + 1 });
-			visited[x + 1] = true;
+			int width = p.first;
+			int next = p.second;
+			
+			if (best[next] > dist + width)
+			{
+				best[next] = dist + width;
+				q.push({ dist + width, next });
+			}
 		}
 	}
+
+	for (int i = 0; i < n; i++)
+	{
+		if (best[i] == INT32_MAX)
+			cout << 0 << " ";
+		else
+			cout << best[i] << " ";
+	}
+	cout << endl;
 }
 
 int main()
 {
 	Init;
 
-	cin >> N >> K;
-	_size = 10'0001;
-	visited = vector<bool>(_size, false);
-	Position();
+	cin >> n >> m;
+
+	for (int i = 0; i < m; i++)
+	{
+		int a, b, c;
+		cin >> a >> b >> c;
+		--a;
+		--b;
+		road[a].push_back({ c,b });
+	}
+
+	for (int i = 0; i < n; i++)
+		BFS(i);
 
 	return 0;
 }
