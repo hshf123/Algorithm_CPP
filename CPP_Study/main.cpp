@@ -18,69 +18,77 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-void PostOrder(string& str)
+struct Node
 {
-	stack<char> s;
-	auto it = str.begin();
+	Node* left;
+	int key;
+	Node* right;
+};
 
-	while (it != str.end())
-	{
-		char now = *it;
+int n;
+vector<int> order[2];
 
-		if (now == '(')
-		{
-			s.push(now);
-		}
-		else if (now == '*' || now == '/')
-		{
-			while (s.empty() == false && (s.top() == '/' || s.top() == '*'))
-			{
-				cout << s.top();
-				s.pop();
-			}
-			s.push(now);
-		}
-		else if (now == '+' || now == '-')
-		{
-			while (s.empty() == false && s.top() != '(')
-			{
-				cout << s.top();
-				s.pop();
-			}
-			s.push(now);
-		}
-		else if (now == ')')
-		{
-			while (s.top() != '(')
-			{
-				cout << s.top();
-				s.pop();
-			}
-			s.pop();
-		}
-		else
-		{
-			cout << now;
-		}
+Node* FindTree(int inStart, int inEnd, int postStart, int postEnd)
+{
+	if (inStart > inEnd || postStart > postEnd)
+		return nullptr;
 
-		++it;
-	}
+	Node* root = new Node();
+	int key = order[1][postEnd];
+	root->key = key;
 
-	while (s.empty() == false)
-	{
-		cout << s.top();
-		s.pop();
-	}
+	int nextInStart;
+	int nextInEnd;
+	int nextPostStart;
+	int nextPostEnd;
+
+	auto findIt = ::find(order[0].begin(), order[0].end(), key);
+	int idx = findIt - order[0].begin();
+	nextInStart = inStart;
+	nextInEnd = idx - 1;
+	nextPostStart = postStart;
+	nextPostEnd = postStart + idx - inStart - 1;
+	Node* left = FindTree(nextInStart, nextInEnd, nextPostStart, nextPostEnd);
+
+	nextInStart = idx + 1;
+	nextInEnd = inEnd;
+	nextPostStart = postStart + idx - inStart;
+	nextPostEnd = postEnd - 1;
+	Node* right = FindTree(nextInStart, nextInEnd, nextPostStart, nextPostEnd);
+
+	root->left = left;
+	root->right = right;
+
+	return root;
+}
+
+void PrintPreorder(Node* node)
+{
+	if (node == nullptr)
+		return;
+
+	cout << node->key << " ";
+	PrintPreorder(node->left);
+	PrintPreorder(node->right);
 }
 
 int main()
 {
 	Init;
 
-	string str = "A+(B*C)-(D/E)";
-	//cin >> str;
+	cin >> n;
+	postOrder = vector<int>(n);
+	for (int i = 0; i < 2; i++)
+	{
+		order[i] = vector<int>(n);
+		for (int j = 0; j < n; j++)
+		{
+			cin >> order[i][j];
+		}
+	}
 
-	PostOrder(str);
+	Node* root = FindTree(0, n - 1, 0, n - 1);
+	PrintPreorder(root);
 
 	return 0;
 }
