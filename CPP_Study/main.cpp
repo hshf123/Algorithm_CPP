@@ -18,77 +18,43 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-struct Node
-{
-	Node* left;
-	int key;
-	Node* right;
-};
-
 int n;
-vector<int> order[2];
+const int MOD = 1000000007;
 
-Node* FindTree(int inStart, int inEnd, int postStart, int postEnd)
+vector<vector<int64>> MulMat(const vector<vector<int64>>& a, const vector<vector<int64>>& b)
 {
-	if (inStart > inEnd || postStart > postEnd)
-		return nullptr;
-
-	Node* root = new Node();
-	int key = order[1][postEnd];
-	root->key = key;
-
-	int nextInStart;
-	int nextInEnd;
-	int nextPostStart;
-	int nextPostEnd;
-
-	auto findIt = ::find(order[0].begin(), order[0].end(), key);
-	int idx = findIt - order[0].begin();
-	nextInStart = inStart;
-	nextInEnd = idx - 1;
-	nextPostStart = postStart;
-	nextPostEnd = postStart + idx - inStart - 1;
-	Node* left = FindTree(nextInStart, nextInEnd, nextPostStart, nextPostEnd);
-
-	nextInStart = idx + 1;
-	nextInEnd = inEnd;
-	nextPostStart = postStart + idx - inStart;
-	nextPostEnd = postEnd - 1;
-	Node* right = FindTree(nextInStart, nextInEnd, nextPostStart, nextPostEnd);
-
-	root->left = left;
-	root->right = right;
-
-	return root;
+	vector<vector<int64>> ret(2, vector<int64>(2));
+	ret[0][0] = (a[0][0] * b[0][0] % MOD + a[0][1] * b[1][0] % MOD) % MOD;
+	ret[1][0] = (a[0][0] * b[0][1] % MOD + a[0][1] * b[1][1] % MOD) % MOD;
+	ret[0][1] = (a[1][0] * b[0][0] % MOD + a[1][1] * b[1][0] % MOD) % MOD;
+	ret[1][1] = (a[1][0] * b[0][1] % MOD + a[1][1] * b[1][1] % MOD) % MOD;
+	return ret;
 }
 
-void PrintPreorder(Node* node)
+vector<vector<int64>> Fibonacci(int64 n)
 {
-	if (node == nullptr)
-		return;
-
-	cout << node->key << " ";
-	PrintPreorder(node->left);
-	PrintPreorder(node->right);
+	if (n == 1) 
+	{
+		vector<vector<int64>> arr = { {1,1},{1,0} };
+		return arr;
+	}
+	vector<vector<int64>> tmp = Fibonacci(n / 2);
+	if (n % 2 == 1) {
+		return MulMat(MulMat(tmp, tmp), Fibonacci(1));
+	}
+	else {
+		return MulMat(tmp, tmp);
+	}
 }
 
 int main()
 {
 	Init;
 
+	int64 n;
 	cin >> n;
-	postOrder = vector<int>(n);
-	for (int i = 0; i < 2; i++)
-	{
-		order[i] = vector<int>(n);
-		for (int j = 0; j < n; j++)
-		{
-			cin >> order[i][j];
-		}
-	}
-
-	Node* root = FindTree(0, n - 1, 0, n - 1);
-	PrintPreorder(root);
+	vector<vector<int64>> arr =  Fibonacci(n);
+	cout << arr[0][1];
 
 	return 0;
 }
