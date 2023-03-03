@@ -18,43 +18,60 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int n;
-const int MOD = 1000000007;
+int N, M;
+vector<pair<int, int>> bus[1001];
+int best[1001];
 
-vector<vector<int64>> MulMat(const vector<vector<int64>>& a, const vector<vector<int64>>& b)
+void Dijkstra(int start, int end)
 {
-	vector<vector<int64>> ret(2, vector<int64>(2));
-	ret[0][0] = (a[0][0] * b[0][0] % MOD + a[0][1] * b[1][0] % MOD) % MOD;
-	ret[1][0] = (a[0][0] * b[0][1] % MOD + a[0][1] * b[1][1] % MOD) % MOD;
-	ret[0][1] = (a[1][0] * b[0][0] % MOD + a[1][1] * b[1][0] % MOD) % MOD;
-	ret[1][1] = (a[1][0] * b[0][1] % MOD + a[1][1] * b[1][1] % MOD) % MOD;
-	return ret;
-}
+	for (int i = 1; i <= N; i++)
+		best[i] = INT32_MAX;
 
-vector<vector<int64>> Fibonacci(int64 n)
-{
-	if (n == 1) 
+	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> q;
+	best[start] = 0;
+	q.push({ 0, start });
+	
+	while (q.empty() == false)
 	{
-		vector<vector<int64>> arr = { {1,1},{1,0} };
-		return arr;
+		int weight = q.top().first;
+		int now = q.top().second;
+		q.pop();
+
+		if (best[now] < weight)
+			continue;
+
+		for (pair<int,int>& p : bus[now])
+		{
+			int next = p.first;
+			int nextWeight = best[now] + p.second;
+
+			if (nextWeight > best[next])
+				continue;
+
+			best[next] = nextWeight;
+			q.push({ nextWeight, next });
+		}
 	}
-	vector<vector<int64>> tmp = Fibonacci(n / 2);
-	if (n % 2 == 1) {
-		return MulMat(MulMat(tmp, tmp), Fibonacci(1));
-	}
-	else {
-		return MulMat(tmp, tmp);
-	}
+
+	cout << best[end];
 }
 
 int main()
 {
 	Init;
 
-	int64 n;
-	cin >> n;
-	vector<vector<int64>> arr =  Fibonacci(n);
-	cout << arr[0][1];
+	cin >> N >> M;
+	for (int i = 0; i < M; i++)
+	{
+		int start, end, weight;
+		cin >> start >> end >> weight;
+
+		bus[start].push_back({ end,weight });
+	}
+
+	int start, end;
+	cin >> start >> end;
+	Dijkstra(start, end);
 
 	return 0;
 }
