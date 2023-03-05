@@ -10,7 +10,8 @@
 #include <string>
 #include <algorithm>
 #include <cmath>
-#include <memory.h>
+#include <cstring>
+
 #define endl "\n"
 #define INT32_HALF (2147483647 / 2)
 #define Init cin.tie(NULL); cout.tie(NULL); ios::sync_with_stdio(false);
@@ -18,60 +19,85 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int N, M;
-vector<pair<int, int>> bus[1001];
-int best[1001];
+int N;
+vector<vector<int>> table;
+int cache[3];
 
-void Dijkstra(int start, int end)
+int GetMax()
 {
-	for (int i = 1; i <= N; i++)
-		best[i] = INT32_MAX;
-
-	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> q;
-	best[start] = 0;
-	q.push({ 0, start });
-	
-	while (q.empty() == false)
+	int floor = 0;
+	while (floor != N)
 	{
-		int weight = q.top().first;
-		int now = q.top().second;
-		q.pop();
-
-		if (best[now] < weight)
-			continue;
-
-		for (pair<int,int>& p : bus[now])
+		if (floor == 0)
 		{
-			int next = p.first;
-			int nextWeight = best[now] + p.second;
-
-			if (nextWeight > best[next])
-				continue;
-
-			best[next] = nextWeight;
-			q.push({ nextWeight, next });
+			cache[0] = table[0][floor];
+			cache[1] = table[1][floor];
+			cache[2] = table[2][floor];
+			floor++;
+			continue;
 		}
+
+		int temp[3];
+		::memcpy(temp, cache, sizeof(cache));
+		cache[0] = max(temp[0], temp[1]) + table[0][floor];
+		cache[1] = max(max(temp[0], temp[1]), temp[2]) + table[1][floor];
+		cache[2] = max(temp[1], temp[2]) + table[2][floor];
+
+		floor++;
 	}
 
-	cout << best[end];
+	return max(max(cache[0], cache[1]), cache[2]);
 }
+
+int GetMin()
+{
+	int floor = 0;
+	while (floor != N)
+	{
+		if (floor == 0)
+		{
+			cache[0] = table[0][floor];
+			cache[1] = table[1][floor];
+			cache[2] = table[2][floor];
+			floor++;
+			continue;
+		}
+
+		int temp[3];
+		::memcpy(temp, cache, sizeof(cache));
+		cache[0] = min(temp[0], temp[1]) + table[0][floor];
+		cache[1] = min(min(temp[0], temp[1]), temp[2]) + table[1][floor];
+		cache[2] = min(temp[1], temp[2]) + table[2][floor];
+
+		floor++;
+	}
+	
+	return min(min(cache[0], cache[1]), cache[2]);
+}
+
+
 
 int main()
 {
 	Init;
 
-	cin >> N >> M;
-	for (int i = 0; i < M; i++)
-	{
-		int start, end, weight;
-		cin >> start >> end >> weight;
+	cin >> N;
 
-		bus[start].push_back({ end,weight });
+	table = vector<vector<int>>(3);
+
+	for (int i = 0; i < N; i++)
+	{
+		int n1, n2, n3;
+		cin >> n1 >> n2 >> n3;
+
+		table[0].push_back(n1);
+		table[1].push_back(n2);
+		table[2].push_back(n3);
 	}
 
-	int start, end;
-	cin >> start >> end;
-	Dijkstra(start, end);
+	cout << GetMax() << " ";
+
+	cout << GetMin();
 
 	return 0;
 }
