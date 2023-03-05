@@ -19,85 +19,50 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int N;
-vector<vector<int>> table;
-int cache[3];
-
-int GetMax()
+struct Node
 {
-	int floor = 0;
-	while (floor != N)
+	Node* left;
+	int key;
+	Node* right;
+};
+
+void Insert(Node*& root, int value)
+{
+	if (root == nullptr)
 	{
-		if (floor == 0)
-		{
-			cache[0] = table[0][floor];
-			cache[1] = table[1][floor];
-			cache[2] = table[2][floor];
-			floor++;
-			continue;
-		}
-
-		int temp[3];
-		::memcpy(temp, cache, sizeof(cache));
-		cache[0] = max(temp[0], temp[1]) + table[0][floor];
-		cache[1] = max(max(temp[0], temp[1]), temp[2]) + table[1][floor];
-		cache[2] = max(temp[1], temp[2]) + table[2][floor];
-
-		floor++;
+		root = new Node();
+		root->key = value;
+		return;
 	}
 
-	return max(max(cache[0], cache[1]), cache[2]);
+	if (root->key > value)
+		Insert(root->left, value);
+	else
+		Insert(root->right, value);
 }
 
-int GetMin()
+void PrintPostOrder(Node* node)
 {
-	int floor = 0;
-	while (floor != N)
-	{
-		if (floor == 0)
-		{
-			cache[0] = table[0][floor];
-			cache[1] = table[1][floor];
-			cache[2] = table[2][floor];
-			floor++;
-			continue;
-		}
+	if (node == nullptr)
+		return;
 
-		int temp[3];
-		::memcpy(temp, cache, sizeof(cache));
-		cache[0] = min(temp[0], temp[1]) + table[0][floor];
-		cache[1] = min(min(temp[0], temp[1]), temp[2]) + table[1][floor];
-		cache[2] = min(temp[1], temp[2]) + table[2][floor];
-
-		floor++;
-	}
-	
-	return min(min(cache[0], cache[1]), cache[2]);
+	PrintPostOrder(node->left);
+	PrintPostOrder(node->right);
+	cout << node->key << endl;
 }
-
-
 
 int main()
 {
 	Init;
 
-	cin >> N;
+	Node* root = nullptr;
 
-	table = vector<vector<int>>(3);
-
-	for (int i = 0; i < N; i++)
+	int n;
+	while (cin >> n)
 	{
-		int n1, n2, n3;
-		cin >> n1 >> n2 >> n3;
-
-		table[0].push_back(n1);
-		table[1].push_back(n2);
-		table[2].push_back(n3);
+		Insert(root, n);
 	}
-
-	cout << GetMax() << " ";
-
-	cout << GetMin();
+	PrintPostOrder(root);
 
 	return 0;
 }
