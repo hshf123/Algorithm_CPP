@@ -19,103 +19,106 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int N, M;
-vector<vector<int>> _map;
-vector<pair<int, int>> city;
+int N;
+vector<vector<int>> grid;
 
-vector<pair<int, int>> chicken;
-vector<pair<int, int>> output;
-vector<bool> visited;
+enum STATE
+{
+	WIDTH,
+	HEIGHT,
+	DIAGONAL
+};
 
-int dy[] = { 1,0,-1,0 };
-int dx[] = { 0,1,0,-1 };
-
-int ans = INT32_MAX;
+struct Pos 
+{
+	int y;
+	int x;
+	STATE state;
+};
 
 bool CheckDir(int y, int x)
 {
 	if (y < 0 || x < 0 || y >= N || x >= N)
 		return false;
+
 	return true;
 }
 
-int FindChickenPath2(int y, int x)
+int _count = 0;
+void MovePipe(int y, int x)
 {
-	int ret = INT32_MAX;
-	for (pair<int, int> p : output)
-	{
-		int cy = p.first;
-		int cx = p.second;
-
-		ret = min(ret, abs(y - cy) + abs(x - cx));
-	}
-
-	return ret;
-}
-
-int FindChickenPath(int y, int x)
-{
-	bool mapVisited[50][50];
-	::memset(mapVisited, false, sizeof(mapVisited));
-	priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<pair<int, pair<int, int>>>> q;
-	q.push({ 0, {y,x} });
-	mapVisited[y][x] = true;
+	queue<Pos> q;
+	q.push({ y,x,WIDTH });
 
 	while (q.empty() == false)
 	{
-		int dist = q.top().first;
-		int nowY = q.top().second.first;
-		int nowX = q.top().second.second;
+		int nowY = q.front().y;
+		int nowX = q.front().x;
+		STATE nowState = q.front().state;
 		q.pop();
 
-		for (pair<int,int> p : output)
-		{
-			int cy = p.first;
-			int cx = p.second;
+		if (CheckDir(nowY, nowX) == false)
+			continue;
 
-			if (cy == nowY && cx == nowX)
-			{
-				return dist;
-			}
+		if (nowState == WIDTH || nowState == HEIGHT)
+		{
+			if (grid[nowY][nowX] == 1)
+				continue;
+		}
+		else
+		{
+			if (grid[nowY - 1][nowX] == 1 || grid[nowY][nowX - 1] == 1 || grid[nowY][nowX] == 1)
+				continue;
 		}
 
-		for (int i = 0; i < 4; i++)
-		{
-			int nextY = nowY + dy[i];
-			int nextX = nowX + dx[i];
+		if (nowY == N - 1 && nowX == N - 1)
+			_count++;
 
-			if (CheckDir(nextY, nextX) && mapVisited[nextY][nextX] == false)
-			{
-				mapVisited[nextY][nextX] = true;
-				q.push({ dist + 1, {nextY, nextX} });
-			}
+		int nextY;
+		int nextX;
+		STATE nextState;
+		switch (nowState)
+		{
+		case STATE::WIDTH:
+		{
+			nextY = nowY;
+			nextX = nowX + 1;
+			nextState = WIDTH;
+			q.push({ nextY, nextX, nextState });
+			nextY = nowY + 1;
+			nextX = nowX + 1;
+			nextState = DIAGONAL;
+			q.push({ nextY, nextX, nextState });
+			break;
 		}
-	}
-}
-
-void BackTracking(int n, int count)
-{
-	if (count == M)
-	{
-		int sum = 0;
-		for (pair<int, int> p : city)
+		case STATE::HEIGHT:
 		{
-			int y = p.first;
-			int x = p.second;
-			sum += FindChickenPath2(y, x);
+			nextY = nowY + 1;
+			nextX = nowX;
+			nextState = HEIGHT;
+			q.push({ nextY, nextX, nextState });
+			nextY = nowY + 1;
+			nextX = nowX + 1;
+			nextState = DIAGONAL;
+			q.push({ nextY, nextX, nextState });
+			break;
 		}
-		ans = min(ans, sum);
-		return;
-	}
-
-	for (int i = n; i < chicken.size(); i++)
-	{
-		if (visited[i] == false)
+		case STATE::DIAGONAL:
 		{
-			visited[i] = true;
-			output[count] = chicken[i];
-			BackTracking(i, count + 1);
-			visited[i] = false;
+			nextY = nowY;
+			nextX = nowX + 1;
+			nextState = WIDTH;
+			q.push({ nextY, nextX, nextState });
+			nextY = nowY + 1;
+			nextX = nowX;
+			nextState = HEIGHT;
+			q.push({ nextY, nextX, nextState });
+			nextY = nowY + 1;
+			nextX = nowX + 1;
+			nextState = DIAGONAL;
+			q.push({ nextY, nextX, nextState });
+			break;
+		}
 		}
 	}
 }
@@ -124,25 +127,18 @@ int main()
 {
 	Init;
 
-	cin >> N >> M;
-	_map = vector<vector<int>>(N, vector<int>(N));
-	output = vector<pair<int, int>>(M);
+	cin >> N;
+	grid = vector<vector<int>>(N, vector<int>(N));
 	for (int y = 0; y < N; y++)
 	{
 		for (int x = 0; x < N; x++)
 		{
-			cin >> _map[y][x];
-			if (_map[y][x] == 2)
-				chicken.push_back({ y,x });
-			else if (_map[y][x] == 1)
-				city.push_back({ y,x });
+			cin >> grid[y][x];
 		}
 	}
 
-	visited = vector<bool>(chicken.size(), false);
-	BackTracking(0, 0);
-
-	cout << ans;
+	MovePipe(0, 1);
+	cout << _count;
 
 	return 0;
 }
