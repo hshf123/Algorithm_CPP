@@ -20,107 +20,29 @@ using int64 = long long;
 using uint64 = unsigned long long;
 
 int N;
-vector<vector<int>> grid;
 
-enum STATE
+char board[3072][6144];
+
+void Draw(int y, int x)
 {
-	WIDTH,
-	HEIGHT,
-	DIAGONAL
-};
-
-struct Pos 
-{
-	int y;
-	int x;
-	STATE state;
-};
-
-bool CheckDir(int y, int x)
-{
-	if (y < 0 || x < 0 || y >= N || x >= N)
-		return false;
-
-	return true;
+	board[y][x] = '*';
+	board[y + 1][x - 1] = '*';
+	board[y + 1][x + 1] = '*';
+	for (int i = x - 2; i <= x + 2; i++)
+		board[y + 2][i] = '*';
 }
 
-int _count = 0;
-void MovePipe(int y, int x)
+void CheckTriangle(int height, int y, int x)
 {
-	queue<Pos> q;
-	q.push({ y,x,WIDTH });
-
-	while (q.empty() == false)
+	if (height == 3)
 	{
-		int nowY = q.front().y;
-		int nowX = q.front().x;
-		STATE nowState = q.front().state;
-		q.pop();
-
-		if (CheckDir(nowY, nowX) == false)
-			continue;
-
-		if (nowState == WIDTH || nowState == HEIGHT)
-		{
-			if (grid[nowY][nowX] == 1)
-				continue;
-		}
-		else
-		{
-			if (grid[nowY - 1][nowX] == 1 || grid[nowY][nowX - 1] == 1 || grid[nowY][nowX] == 1)
-				continue;
-		}
-
-		if (nowY == N - 1 && nowX == N - 1)
-			_count++;
-
-		int nextY;
-		int nextX;
-		STATE nextState;
-		switch (nowState)
-		{
-		case STATE::WIDTH:
-		{
-			nextY = nowY;
-			nextX = nowX + 1;
-			nextState = WIDTH;
-			q.push({ nextY, nextX, nextState });
-			nextY = nowY + 1;
-			nextX = nowX + 1;
-			nextState = DIAGONAL;
-			q.push({ nextY, nextX, nextState });
-			break;
-		}
-		case STATE::HEIGHT:
-		{
-			nextY = nowY + 1;
-			nextX = nowX;
-			nextState = HEIGHT;
-			q.push({ nextY, nextX, nextState });
-			nextY = nowY + 1;
-			nextX = nowX + 1;
-			nextState = DIAGONAL;
-			q.push({ nextY, nextX, nextState });
-			break;
-		}
-		case STATE::DIAGONAL:
-		{
-			nextY = nowY;
-			nextX = nowX + 1;
-			nextState = WIDTH;
-			q.push({ nextY, nextX, nextState });
-			nextY = nowY + 1;
-			nextX = nowX;
-			nextState = HEIGHT;
-			q.push({ nextY, nextX, nextState });
-			nextY = nowY + 1;
-			nextX = nowX + 1;
-			nextState = DIAGONAL;
-			q.push({ nextY, nextX, nextState });
-			break;
-		}
-		}
+		Draw(y, x);
+		return;
 	}
+
+	CheckTriangle(height / 2, y, x);
+	CheckTriangle(height / 2, y + height / 2, x - height / 2);
+	CheckTriangle(height / 2, y + height / 2, x + height / 2);
 }
 
 int main()
@@ -128,17 +50,16 @@ int main()
 	Init;
 
 	cin >> N;
-	grid = vector<vector<int>>(N, vector<int>(N));
+	::memset(board, ' ', sizeof(board));
+	CheckTriangle(N, 0, N - 1);
 	for (int y = 0; y < N; y++)
 	{
-		for (int x = 0; x < N; x++)
+		for (int x = 0; x < 2 * N; x++)
 		{
-			cin >> grid[y][x];
+			cout << board[y][x];
 		}
+		cout << endl;
 	}
-
-	MovePipe(0, 1);
-	cout << _count;
 
 	return 0;
 }
