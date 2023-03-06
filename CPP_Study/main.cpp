@@ -19,46 +19,56 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int N;
-
-char board[3072][6144];
-
-void Draw(int y, int x)
-{
-	board[y][x] = '*';
-	board[y + 1][x - 1] = '*';
-	board[y + 1][x + 1] = '*';
-	for (int i = x - 2; i <= x + 2; i++)
-		board[y + 2][i] = '*';
-}
-
-void CheckTriangle(int height, int y, int x)
-{
-	if (height == 3)
-	{
-		Draw(y, x);
-		return;
-	}
-
-	CheckTriangle(height / 2, y, x);
-	CheckTriangle(height / 2, y + height / 2, x - height / 2);
-	CheckTriangle(height / 2, y + height / 2, x + height / 2);
-}
-
 int main()
 {
 	Init;
 
-	cin >> N;
-	::memset(board, ' ', sizeof(board));
-	CheckTriangle(N, 0, N - 1);
-	for (int y = 0; y < N; y++)
+	string str, boom;
+	cin >> str >> boom;
+
+	deque<char> s;
+	const char* p = str.c_str();
+	char lastWord = boom[boom.length() - 1];
+	int boom_len = boom.length();
+	int idx = 0;
+	while (idx != str.length())
 	{
-		for (int x = 0; x < 2 * N; x++)
+		s.push_back(*p++);
+		
+		if (s.back() == lastWord && s.size() >= boom_len)
 		{
-			cout << board[y][x];
+			string temp;
+			for (int i = boom_len - 1; i >= 0; i--)
+			{
+				char c = s.back();
+				if (c == boom[i])
+				{
+					temp += c;
+					s.pop_back();
+				}
+				else
+				{
+					for (int tempIdx = temp.length() - 1; tempIdx >= 0; tempIdx--)
+					{
+						s.push_back(temp[tempIdx]);
+					}
+					temp = "";
+					break;
+				}
+			}
 		}
-		cout << endl;
+		idx++;
+	}
+
+	if (s.empty())
+		cout << "FRULA";
+	else
+	{
+		while (s.empty() == false)
+		{
+			cout << s.front();
+			s.pop_front();
+		}
 	}
 
 	return 0;
