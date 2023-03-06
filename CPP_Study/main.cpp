@@ -13,62 +13,103 @@
 #include <cstring>
 
 #define endl "\n"
-#define INT32_HALF (2147483647 / 2)
+#define INT32_HALF (INT32_MAX / 2)
 #define Init cin.tie(NULL); cout.tie(NULL); ios::sync_with_stdio(false);
 using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
+int N;
+int64 B;
+
+vector<vector<int>> vec;
+unordered_map<int64, vector<vector<int>>> cache;
+
+vector<vector<int>> MatrixSquare(const vector<vector<int>>& input)
+{
+	vector<vector<int>> ret(N, vector<int>(N, 0));
+	for (int y = 0; y < N; y++)
+	{
+		for (int x = 0; x < N; x++)
+		{
+			for (int i = 0; i < N; i++)
+			{
+				ret[y][x] += input[y][i] * input[i][x];
+			}
+			ret[y][x] %= 1000;
+		}
+	}
+
+	return ret;
+}
+
+vector<vector<int>> MatrixMultiple(const vector<vector<int>>& input, const vector<vector<int>>& input2)
+{
+	vector<vector<int>> ret(N, vector<int>(N, 0));
+	for (int y = 0; y < N; y++)
+	{
+		for (int x = 0; x < N; x++)
+		{
+			for (int i = 0; i < N; i++)
+			{
+				ret[y][x] += input[y][i] * input2[i][x];
+			}
+			ret[y][x] %= 1000;
+		}
+	}
+
+	return ret;
+}
+
+vector<vector<int>> Func(int64 n)
+{
+	if (n == 1)
+	{
+		return cache[1];
+	}
+
+	if (n == 2)
+	{
+		return cache[2] = MatrixSquare(cache[1]);
+	}
+	
+	if (cache.find(n) != cache.end())
+	{
+		return cache[n];
+	}
+
+	if (n % 2 == 0)
+		return cache[n] = MatrixSquare(Func(n / 2));
+	else
+	{
+		cache[n - 1] = Func(n - 1);
+		return cache[n] = MatrixMultiple((cache[n - 1]), cache[1]);
+	}
+}
+
 int main()
 {
 	Init;
 
-	string str, boom;
-	cin >> str >> boom;
-
-	deque<char> s;
-	const char* p = str.c_str();
-	char lastWord = boom[boom.length() - 1];
-	int boom_len = boom.length();
-	int idx = 0;
-	while (idx != str.length())
+	cin >> N >> B;
+	vec = vector<vector<int>>(N, vector<int>(N));
+	for (int y = 0; y < N; y++)
 	{
-		s.push_back(*p++);
-		
-		if (s.back() == lastWord && s.size() >= boom_len)
+		for (int x = 0; x < N; x++)
 		{
-			string temp;
-			for (int i = boom_len - 1; i >= 0; i--)
-			{
-				char c = s.back();
-				if (c == boom[i])
-				{
-					temp += c;
-					s.pop_back();
-				}
-				else
-				{
-					for (int tempIdx = temp.length() - 1; tempIdx >= 0; tempIdx--)
-					{
-						s.push_back(temp[tempIdx]);
-					}
-					temp = "";
-					break;
-				}
-			}
+			cin >> vec[y][x];
+			vec[y][x] %= 1000;
 		}
-		idx++;
 	}
-
-	if (s.empty())
-		cout << "FRULA";
-	else
+	cache[1] = vec;
+	Func(B);
+	for (vector<int> y : cache[B])
 	{
-		while (s.empty() == false)
+		for (int x : y)
 		{
-			cout << s.front();
-			s.pop_front();
+			cout << x << " ";
 		}
+		cout << endl;
 	}
 
 	return 0;
