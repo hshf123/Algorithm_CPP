@@ -20,97 +20,54 @@ using int64 = long long;
 using uint64 = unsigned long long;
 
 int N;
-int64 B;
+int seq[1000];
+int maxCache[1000];
+int minCache[1000];
 
-vector<vector<int>> vec;
-unordered_map<int64, vector<vector<int>>> cache;
-
-vector<vector<int>> MatrixSquare(const vector<vector<int>>& input)
+void Bitonic()
 {
-	vector<vector<int>> ret(N, vector<int>(N, 0));
-	for (int y = 0; y < N; y++)
+	for (int i = 0; i < N; i++)
 	{
-		for (int x = 0; x < N; x++)
+		maxCache[i] = 1;
+		for (int j = 0; j <= i; j++)
 		{
-			for (int i = 0; i < N; i++)
+			if (seq[j] < seq[i] && maxCache[i] < maxCache[j] + 1)
 			{
-				ret[y][x] += input[y][i] * input[i][x];
+				maxCache[i] = maxCache[j] + 1;
 			}
-			ret[y][x] %= 1000;
 		}
 	}
 
-	return ret;
-}
-
-vector<vector<int>> MatrixMultiple(const vector<vector<int>>& input, const vector<vector<int>>& input2)
-{
-	vector<vector<int>> ret(N, vector<int>(N, 0));
-	for (int y = 0; y < N; y++)
+	for (int i = N - 1; i >= 0; i--)
 	{
-		for (int x = 0; x < N; x++)
+		minCache[i] = 1;
+		for (int j = N - 1; j >= i; j--)
 		{
-			for (int i = 0; i < N; i++)
+			if (seq[i] > seq[j] && minCache[i] < minCache[j] + 1)
 			{
-				ret[y][x] += input[y][i] * input2[i][x];
+				minCache[i] = minCache[j] + 1;
 			}
-			ret[y][x] %= 1000;
 		}
 	}
 
-	return ret;
-}
-
-vector<vector<int>> Func(int64 n)
-{
-	if (n == 1)
+	int ans = 0;
+	for (int i = 0; i < N; i++)
 	{
-		return cache[1];
+		ans = max(ans, maxCache[i] + minCache[i] - 1);
 	}
-
-	if (n == 2)
-	{
-		return cache[2] = MatrixSquare(cache[1]);
-	}
-	
-	if (cache.find(n) != cache.end())
-	{
-		return cache[n];
-	}
-
-	if (n % 2 == 0)
-		return cache[n] = MatrixSquare(Func(n / 2));
-	else
-	{
-		cache[n - 1] = Func(n - 1);
-		return cache[n] = MatrixMultiple((cache[n - 1]), cache[1]);
-	}
+	cout << ans;
 }
 
 int main()
 {
 	Init;
 
-	cin >> N >> B;
-	vec = vector<vector<int>>(N, vector<int>(N));
-	for (int y = 0; y < N; y++)
+	cin >> N;
+	for (int i = 0; i < N; i++)
 	{
-		for (int x = 0; x < N; x++)
-		{
-			cin >> vec[y][x];
-			vec[y][x] %= 1000;
-		}
+		cin >> seq[i];
 	}
-	cache[1] = vec;
-	Func(B);
-	for (vector<int> y : cache[B])
-	{
-		for (int x : y)
-		{
-			cout << x << " ";
-		}
-		cout << endl;
-	}
-
+	Bitonic();
+	
 	return 0;
 }
