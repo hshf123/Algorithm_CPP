@@ -19,55 +19,64 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int N;
-int seq[1000];
-int maxCache[1000];
-int minCache[1000];
+int N, K;
+int firstArrive = -1;
+int arriveCount = 0;
 
-void Bitonic()
+void HideAndSeek(int n)
 {
-	for (int i = 0; i < N; i++)
-	{
-		maxCache[i] = 1;
-		for (int j = 0; j <= i; j++)
-		{
-			if (seq[j] < seq[i] && maxCache[i] < maxCache[j] + 1)
-			{
-				maxCache[i] = maxCache[j] + 1;
-			}
-		}
-	}
+	vector<int> visited(100001, -1);
+	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> q;
+	q.push({ 0, n });
 
-	for (int i = N - 1; i >= 0; i--)
+	while (q.empty() == false)
 	{
-		minCache[i] = 1;
-		for (int j = N - 1; j >= i; j--)
-		{
-			if (seq[i] > seq[j] && minCache[i] < minCache[j] + 1)
-			{
-				minCache[i] = minCache[j] + 1;
-			}
-		}
-	}
+		int time = q.top().first;
+		int now = q.top().second;
+		q.pop();
 
-	int ans = 0;
-	for (int i = 0; i < N; i++)
-	{
-		ans = max(ans, maxCache[i] + minCache[i] - 1);
+		if (time < 0)
+			continue;
+		if (now < 0 || now > 100000)
+			continue;
+
+		if (visited[now] == -1)
+			visited[now] = time;
+		else if (visited[now] < time)
+			continue;
+
+		visited[now] = time;
+
+		if (now == K)
+		{
+			if (firstArrive == -1)
+			{
+				firstArrive = time;
+				arriveCount++;
+				continue;
+			}
+			else if (firstArrive == time)
+			{
+				arriveCount++;
+			}
+			else
+				break;
+		}
+
+		q.push({ time + 1, now - 1 });
+		q.push({ time + 1, now + 1 });
+		q.push({ time + 1, now * 2 });
 	}
-	cout << ans;
 }
 
 int main()
 {
 	Init;
 
-	cin >> N;
-	for (int i = 0; i < N; i++)
-	{
-		cin >> seq[i];
-	}
-	Bitonic();
+	cin >> N >> K;
+	HideAndSeek(N);
+	cout << firstArrive << endl;
+	cout << arriveCount;
 	
 	return 0;
 }
