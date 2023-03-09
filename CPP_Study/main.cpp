@@ -19,64 +19,31 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int N, K;
-int firstArrive = -1;
-int arriveCount = 0;
-
-void HideAndSeek(int n)
-{
-	vector<int> visited(100001, -1);
-	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> q;
-	q.push({ 0, n });
-
-	while (q.empty() == false)
-	{
-		int time = q.top().first;
-		int now = q.top().second;
-		q.pop();
-
-		if (time < 0)
-			continue;
-		if (now < 0 || now > 100000)
-			continue;
-
-		if (visited[now] == -1)
-			visited[now] = time;
-		else if (visited[now] < time)
-			continue;
-
-		visited[now] = time;
-
-		if (now == K)
-		{
-			if (firstArrive == -1)
-			{
-				firstArrive = time;
-				arriveCount++;
-				continue;
-			}
-			else if (firstArrive == time)
-			{
-				arriveCount++;
-			}
-			else
-				break;
-		}
-
-		q.push({ time + 1, now - 1 });
-		q.push({ time + 1, now + 1 });
-		q.push({ time + 1, now * 2 });
-	}
-}
-
 int main()
 {
 	Init;
 
-	cin >> N >> K;
-	HideAndSeek(N);
-	cout << firstArrive << endl;
-	cout << arriveCount;
+	int N;
+	cin >> N;
+	vector<bool> vec(N + 1, false);
+	vec[0] = true;
+	vec[1] = true;
+
+	for (int i = 2; i <= N; i++)
+	{
+		if (vec[i] == false)
+		{
+			for (int j = i + i; j <= N; j += i)
+			{
+				vec[j] = true;
+			}
+		}
+	}
+
+	if (vec[N] == false)
+		cout << "소수";
+	else
+		cout << "소수 아님";
 	
 	return 0;
 }
