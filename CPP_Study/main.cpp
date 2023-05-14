@@ -19,85 +19,164 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-vector<pair<int, int>> city[1001];
-int parent[1001];
-int64 best[1001];
+int dy[] = { 1, 0, -1, 0 };
+int dx[] = { 0, 1, 0, -1 };
 
-void Dijkstra(int n, int end)
+int R, C, T;
+vector<vector<int>> grid;
+vector<vector<int>> tempVec;
+pair<int, int> air;
+
+bool CanGo(int y, int x)
 {
-	for (int i = 0; i < 1001; i++)
-		best[i] = INT32_HALF;
-	priority_queue<pair<int64, int>, vector<pair<int64, int>>, greater<pair<int64, int>>> q;
-	q.push({ 0, n });
-	parent[n] = n;
-	best[n] = 0;
+	if (y < 0 || x < 0)
+		return false;
 
-	while (q.empty() == false)
+	if (y >= R || x >= C)
+		return false;
+
+	return true;
+}
+
+void Diffusion(int y, int x)
+{
+	if (grid[y][x] == -1 || grid[y][x] == 0 || grid[y][x] < 5)
+		return;
+
+	int value = grid[y][x];
+	int diffuse = value / 5;
+
+	for (int i = 0; i < 4; i++)
 	{
-		int64 cost = q.top().first;
-		int now = q.top().second;
-		q.pop();
+		int nextY = y + dy[i];
+		int nextX = x + dx[i];
 
-		if (best[now] < cost)
-			continue;
-
-		for (auto& p : city[now])
+		if (CanGo(nextY, nextX) && grid[nextY][nextX] != -1)
 		{
-			int64 nextCost = p.second + best[now];
-			int next = p.first;
+			tempVec[y][x] -= diffuse;
+			tempVec[nextY][nextX] += diffuse;
+;		}
+	}
+}
 
-			if (best[next] <= nextCost)
-				continue;
+void AirCleaner()
+{
+	{
+		int airY = air.first;
 
-			q.push({ nextCost, next });
-			best[next] = nextCost;
-			parent[next] = now;
+		grid[airY].insert(grid[airY].begin() + 1, 0);
+		int value = grid[airY].back();
+		grid[airY].pop_back();
+
+		for (int y = airY - 1; y > 0; y--)
+		{
+			int temp = grid[y][C - 1]; 
+			grid[y][C - 1] = value;
+			value = temp;
+		}
+
+		grid[0].push_back(value);
+		value = grid[0].front();
+		grid[0].erase(grid[0].begin());
+
+		for (int y = 1; y < airY; y++)
+		{
+			int temp = grid[y][0];
+			grid[y][0] = value;
+			value = temp;
 		}
 	}
+	{
+		int airY = air.second;
 
-	int a = 0;
+		grid[airY].insert(grid[airY].begin() + 1, 0);
+		int value = grid[airY].back();
+		grid[airY].pop_back();
+
+		for (int y = airY + 1; y < R - 1; y++)
+		{
+			int temp = grid[y][C - 1];
+			grid[y][C - 1] = value;
+			value = temp;
+		}
+
+		grid[R - 1].push_back(value);
+		value = grid[R - 1][0];
+		grid[R - 1].erase(grid[R - 1].begin());
+
+		for (int y = R - 2; y >= airY + 1; y--)
+		{
+			int temp = grid[y][0];
+			grid[y][0] = value;
+			value = temp;
+		}
+	}
 }
 
 int main()
 {
 	Init;
 
-	int n, m;
-	cin >> n >> m;
-	for (int i = 0; i < m; i++)
+	cin >> R >> C >> T;
+
+	grid = vector<vector<int>>(R, vector<int>(C));
+
+	for (int y = 0; y < R; y++)
 	{
-		int start, end, cost;
-		cin >> start >> end >> cost;
-		city[start].push_back({ end,cost });
+		for (int x = 0; x < C; x++)
+		{
+			cin >> grid[y][x];
+
+			if (grid[y][x] == -1)
+			{
+				air.first = y - 1;
+				air.second = y;
+			}
+		}
 	}
 
-	int start, end;
-	cin >> start >> end;
-	Dijkstra(start, end);
-	cout << best[end] << endl;
-
-	stack<int> s;
-	int prev = end;
-	while (true)
+	for (int i = 0; i < T; i++)
 	{
-		s.push(prev);
-		prev = parent[prev];
+		tempVec = grid;
+		for (int y = 0; y < R; y++)
+		{
+			for (int x = 0; x < C; x++)
+			{
+				Diffusion(y, x);
+			}
+		}
+		grid = tempVec;
+		AirCleaner();
 
-		if (prev == parent[prev])
-			break;
+		// cout << endl;
+		// cout << i + 1 << "¹øÂ°";
+		// cout << endl;
+		// for (int y = 0; y < R; y++)
+		// {
+		// 	for (int x = 0; x < C; x++)
+		// 	{
+		// 		cout << tempVec[y][x] << " ";
+		// 	}
+		// 	cout << "                    ";
+		// 	for (int x = 0; x < C; x++)
+		// 	{
+		// 		cout << grid[y][x] << " ";
+		// 	}
+		// 	cout << endl;
+		// }
+	}
+	
+
+	int sum = 0;
+	for (int y = 0; y < R; y++)
+	{
+		for (int x = 0; x < C; x++)
+		{
+			sum += grid[y][x];
+		}
 	}
 
-	if (start == prev && prev != end)
-	{
-		s.push(prev);
-	}
-
-	cout << s.size() << endl;
-	while (s.empty() == false)
-	{
-		cout << s.top() << " ";
-		s.pop();
-	}
+	cout << sum + 2;
 
 	return 0;
 }

@@ -3,19 +3,19 @@
 #include <atomic>
 using namespace std;
 
-template<class T>
+template<class C>
 class LockFreeStack
 {
 	struct Node
 	{
-		Node(const T& value) : data(value), next(nullptr) {	}
+		Node(const C& value) : data(value), next(nullptr) {	}
 
-		T data;
+		C data;
 		Node* next;
 	};
 
 public:
-	void Push(const T& value)
+	void Push(const C& value)
 	{
 		Node* node = new Node(value);
 
@@ -36,7 +36,7 @@ public:
 		}
 	}
 
-	bool TryPop(T& value)
+	bool TryPop(C& value)
 	{
 		++_popCount;
 		Node* prevHead = _head;
