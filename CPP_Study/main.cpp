@@ -20,37 +20,27 @@ using int64 = long long;
 using uint64 = unsigned long long;
 
 int N, M;
-vector<vector<int>> MAP;
-vector<vector<int>> SIM;
-int maxCount = -1;
-stack<pair<int, int>> parent;
+vector<vector<int>> paper;
 
 int dy[] = { -1, 0, 1, 0 };
-int dx[] = { 0, 1, 0, -1 };
+int dx[] = { 0,1,0,-1 };
 
-bool CanGo(int y, int x)
+bool Cango(int y, int x)
 {
-	if (y < 0 || x < 0 || y >= N || x >= M)
+	if (y < 0 || x < 0)
+		return false;
+
+	if (y >= N || x >= M)
 		return false;
 
 	return true;
 }
 
-int Simulation()
+void BFS(int y, int x)
 {
-	SIM = MAP;
-
+	vector<vector<bool>> bfsFlag(N, vector<bool>(M, false));
 	queue<pair<int, int>> q;
-	for (int y = 0; y < N; y++)
-	{
-		for (int x = 0; x < M; x++)
-		{
-			if (SIM[y][x] == 2)
-			{
-				q.push({ y,x });
-			}
-		}
-	}
+	q.push({ y,x });
 
 	while (q.empty() == false)
 	{
@@ -58,51 +48,60 @@ int Simulation()
 		int nowY = p.first;
 		int nowX = p.second;
 		q.pop();
-		SIM[nowY][nowX] = 2;
 
 		for (int i = 0; i < 4; i++)
 		{
 			int nextY = nowY + dy[i];
 			int nextX = nowX + dx[i];
 
-			if (CanGo(nextY, nextX) && SIM[nextY][nextX] == 0)
+			if (Cango(nextY, nextX))
 			{
-				q.push({ nextY, nextX });
+				int next = paper[nextY][nextX];
+
+				switch (next)
+				{
+				case -1:
+				case 0:
+					if (bfsFlag[nextY][nextX] == false)
+					{
+						bfsFlag[nextY][nextX] = true;
+						paper[nextY][nextX] = -1;
+						q.push({ nextY, nextX });
+					}
+					break;
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+					paper[nextY][nextX]++;
+					break;
+				}
 			}
 		}
 	}
 
-	int count = 0;
-	for (int y = 0; y < N; y++)
-	{
-		for (int x = 0; x < M; x++)
-		{
-			count += (SIM[y][x] == 0 ? 1 : 0);
-		}
-	}
-	return count;
+	return;
 }
 
-void SetWall(int count)
+bool Check()
 {
-	if (count == 3)
+	bool flag = false;
+	for (int y = 1; y < N - 1; y++)
 	{
-		maxCount = max(maxCount, Simulation());
-		return;
-	}
-
-	for (int y = 0; y < N; y++)
-	{
-		for (int x = 0; x < M; x++)
+		for (int x = 1; x < M - 1; x++)
 		{
-			if (MAP[y][x] == 0)
+			if (paper[y][x] >= 3)
 			{
-				MAP[y][x] = 1;
-				SetWall(count + 1);
-				MAP[y][x] = 0;
+				paper[y][x] = 0;
+				flag = true;
+			}
+			else if (paper[y][x] == 2)
+			{
+				paper[y][x] = 1;
 			}
 		}
 	}
+	return flag;
 }
 
 int main()
@@ -110,19 +109,25 @@ int main()
 	Init;
 
 	cin >> N >> M;
-
-	MAP = vector<vector<int>>(N, vector<int>(M));
+	paper = vector<vector<int>>(N, vector<int>(M));
 	for (int y = 0; y < N; y++)
 	{
 		for (int x = 0; x < M; x++)
 		{
-			cin >> MAP[y][x];
+			cin >> paper[y][x];
 		}
 	}
 
-	SetWall(0);
-	
-	cout << maxCount;
+	int time = 0;
+	while (true)
+	{
+		BFS(0, 0);
+		if (Check() == false)
+			break;
+		time++;
+	}
+
+	cout << time;
 
 	return 0;
 }
