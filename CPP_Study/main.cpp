@@ -19,115 +19,81 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int N, M;
-vector<vector<int>> paper;
+int n, m, r;
+vector<int> t;
+vector<vector<int>> road;
 
-int dy[] = { -1, 0, 1, 0 };
-int dx[] = { 0,1,0,-1 };
-
-bool Cango(int y, int x)
+int Dijikstra(int pos)
 {
-	if (y < 0 || x < 0)
-		return false;
-
-	if (y >= N || x >= M)
-		return false;
-
-	return true;
-}
-
-void BFS(int y, int x)
-{
-	vector<vector<bool>> bfsFlag(N, vector<bool>(M, false));
-	queue<pair<int, int>> q;
-	q.push({ y,x });
+	vector<int> best(n, INT32_MAX);
+	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> q;
+	q.push({ 0, pos });
+	best[pos] = 0;
 
 	while (q.empty() == false)
 	{
-		auto& p = q.front();
-		int nowY = p.first;
-		int nowX = p.second;
+		auto& p = q.top();
+		int cost = p.first;
+		int now = p.second;
 		q.pop();
 
-		for (int i = 0; i < 4; i++)
+		if (cost < best[now])
+			best[now] = cost;
+
+		if (best[now] < cost)
+			continue;
+
+		for (int next = 0; next < n; next++)
 		{
-			int nextY = nowY + dy[i];
-			int nextX = nowX + dx[i];
+			if (road[now][next] == -1)
+				continue;
 
-			if (Cango(nextY, nextX))
-			{
-				int next = paper[nextY][nextX];
+			int nextCost = best[now] + road[now][next];
+			if (nextCost >= best[next])
+				continue;
 
-				switch (next)
-				{
-				case -1:
-				case 0:
-					if (bfsFlag[nextY][nextX] == false)
-					{
-						bfsFlag[nextY][nextX] = true;
-						paper[nextY][nextX] = -1;
-						q.push({ nextY, nextX });
-					}
-					break;
-				case 1:
-				case 2:
-				case 3:
-				case 4:
-					paper[nextY][nextX]++;
-					break;
-				}
-			}
+			best[next] = nextCost;
+			q.push({ nextCost, next });
 		}
 	}
 
-	return;
-}
-
-bool Check()
-{
-	bool flag = false;
-	for (int y = 1; y < N - 1; y++)
+	int res = 0;
+	for (int i = 0; i < n; i++)
 	{
-		for (int x = 1; x < M - 1; x++)
+		if (best[i] <= m)
 		{
-			if (paper[y][x] >= 3)
-			{
-				paper[y][x] = 0;
-				flag = true;
-			}
-			else if (paper[y][x] == 2)
-			{
-				paper[y][x] = 1;
-			}
+			res += t[i];
 		}
 	}
-	return flag;
+
+	return res;
 }
 
 int main()
 {
 	Init;
 
-	cin >> N >> M;
-	paper = vector<vector<int>>(N, vector<int>(M));
-	for (int y = 0; y < N; y++)
+	cin >> n >> m >> r;
+	t.resize(n);
+	road = vector<vector<int>>(n, vector<int>(n, -1));
+	for (int i = 0; i < n; i++)
+		cin >> t[i];
+	for (int i = 0; i < r; i++)
 	{
-		for (int x = 0; x < M; x++)
-		{
-			cin >> paper[y][x];
-		}
+		int a, b, l;
+		cin >> a >> b >> l;
+
+		road[a - 1][b - 1] = l;
+		road[b - 1][a - 1] = l;
 	}
 
-	int time = 0;
-	while (true)
+	int res = INT32_MIN;
+	for (int i = 0; i < n; i++)
 	{
-		BFS(0, 0);
-		if (Check() == false)
-			break;
-		time++;
+		res = max(Dijikstra(i), res);
 	}
 
-	cout << time;
+	cout << res;
 
 	return 0;
 }
