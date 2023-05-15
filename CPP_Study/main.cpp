@@ -19,96 +19,88 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int dy[] = { 1, 0, -1, 0 };
-int dx[] = { 0, 1, 0, -1 };
+int N, M;
+vector<vector<int>> MAP;
+vector<vector<int>> SIM;
+int maxCount = -1;
+stack<pair<int, int>> parent;
 
-int R, C, T;
-vector<vector<int>> grid;
-vector<vector<int>> tempVec;
-pair<int, int> air;
+int dy[] = { -1, 0, 1, 0 };
+int dx[] = { 0, 1, 0, -1 };
 
 bool CanGo(int y, int x)
 {
-	if (y < 0 || x < 0)
-		return false;
-
-	if (y >= R || x >= C)
+	if (y < 0 || x < 0 || y >= N || x >= M)
 		return false;
 
 	return true;
 }
 
-void Diffusion(int y, int x)
+int Simulation()
 {
-	if (grid[y][x] == -1 || grid[y][x] == 0 || grid[y][x] < 5)
-		return;
+	SIM = MAP;
 
-	int value = grid[y][x];
-	int diffuse = value / 5;
-
-	for (int i = 0; i < 4; i++)
+	queue<pair<int, int>> q;
+	for (int y = 0; y < N; y++)
 	{
-		int nextY = y + dy[i];
-		int nextX = x + dx[i];
-
-		if (CanGo(nextY, nextX) && grid[nextY][nextX] != -1)
+		for (int x = 0; x < M; x++)
 		{
-			tempVec[y][x] -= diffuse;
-			tempVec[nextY][nextX] += diffuse;
-;		}
+			if (SIM[y][x] == 2)
+			{
+				q.push({ y,x });
+			}
+		}
 	}
+
+	while (q.empty() == false)
+	{
+		auto& p = q.front();
+		int nowY = p.first;
+		int nowX = p.second;
+		q.pop();
+		SIM[nowY][nowX] = 2;
+
+		for (int i = 0; i < 4; i++)
+		{
+			int nextY = nowY + dy[i];
+			int nextX = nowX + dx[i];
+
+			if (CanGo(nextY, nextX) && SIM[nextY][nextX] == 0)
+			{
+				q.push({ nextY, nextX });
+			}
+		}
+	}
+
+	int count = 0;
+	for (int y = 0; y < N; y++)
+	{
+		for (int x = 0; x < M; x++)
+		{
+			count += (SIM[y][x] == 0 ? 1 : 0);
+		}
+	}
+	return count;
 }
 
-void AirCleaner()
+void SetWall(int count)
 {
+	if (count == 3)
 	{
-		int airY = air.first;
-
-		grid[airY].insert(grid[airY].begin() + 1, 0);
-		int value = grid[airY].back();
-		grid[airY].pop_back();
-
-		for (int y = airY - 1; y > 0; y--)
-		{
-			int temp = grid[y][C - 1]; 
-			grid[y][C - 1] = value;
-			value = temp;
-		}
-
-		grid[0].push_back(value);
-		value = grid[0].front();
-		grid[0].erase(grid[0].begin());
-
-		for (int y = 1; y < airY; y++)
-		{
-			int temp = grid[y][0];
-			grid[y][0] = value;
-			value = temp;
-		}
+		maxCount = max(maxCount, Simulation());
+		return;
 	}
+
+	for (int y = 0; y < N; y++)
 	{
-		int airY = air.second;
-
-		grid[airY].insert(grid[airY].begin() + 1, 0);
-		int value = grid[airY].back();
-		grid[airY].pop_back();
-
-		for (int y = airY + 1; y < R - 1; y++)
+		for (int x = 0; x < M; x++)
 		{
-			int temp = grid[y][C - 1];
-			grid[y][C - 1] = value;
-			value = temp;
-		}
-
-		grid[R - 1].push_back(value);
-		value = grid[R - 1][0];
-		grid[R - 1].erase(grid[R - 1].begin());
-
-		for (int y = R - 2; y >= airY + 1; y--)
-		{
-			int temp = grid[y][0];
-			grid[y][0] = value;
-			value = temp;
+			if (MAP[y][x] == 0)
+			{
+				MAP[y][x] = 1;
+				SetWall(count + 1);
+				MAP[y][x] = 0;
+			}
 		}
 	}
 }
@@ -117,66 +109,20 @@ int main()
 {
 	Init;
 
-	cin >> R >> C >> T;
+	cin >> N >> M;
 
-	grid = vector<vector<int>>(R, vector<int>(C));
-
-	for (int y = 0; y < R; y++)
+	MAP = vector<vector<int>>(N, vector<int>(M));
+	for (int y = 0; y < N; y++)
 	{
-		for (int x = 0; x < C; x++)
+		for (int x = 0; x < M; x++)
 		{
-			cin >> grid[y][x];
-
-			if (grid[y][x] == -1)
-			{
-				air.first = y - 1;
-				air.second = y;
-			}
+			cin >> MAP[y][x];
 		}
 	}
 
-	for (int i = 0; i < T; i++)
-	{
-		tempVec = grid;
-		for (int y = 0; y < R; y++)
-		{
-			for (int x = 0; x < C; x++)
-			{
-				Diffusion(y, x);
-			}
-		}
-		grid = tempVec;
-		AirCleaner();
-
-		// cout << endl;
-		// cout << i + 1 << "¹øÂ°";
-		// cout << endl;
-		// for (int y = 0; y < R; y++)
-		// {
-		// 	for (int x = 0; x < C; x++)
-		// 	{
-		// 		cout << tempVec[y][x] << " ";
-		// 	}
-		// 	cout << "                    ";
-		// 	for (int x = 0; x < C; x++)
-		// 	{
-		// 		cout << grid[y][x] << " ";
-		// 	}
-		// 	cout << endl;
-		// }
-	}
+	SetWall(0);
 	
-
-	int sum = 0;
-	for (int y = 0; y < R; y++)
-	{
-		for (int x = 0; x < C; x++)
-		{
-			sum += grid[y][x];
-		}
-	}
-
-	cout << sum + 2;
+	cout << maxCount;
 
 	return 0;
 }
