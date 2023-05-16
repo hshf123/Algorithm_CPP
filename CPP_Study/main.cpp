@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
+#include <numeric>
 
 #define endl "\n"
 #define INT32_HALF (INT32_MAX / 2)
@@ -19,81 +20,39 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int n, m, r;
-vector<int> t;
-vector<vector<int>> road;
+int64 M;
+const int64 MOD = 1'000'000'007;
 
-int Dijikstra(int pos)
+int64 f(int64 x, int64 y)
 {
-	vector<int> best(n, INT32_MAX);
-	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> q;
-	q.push({ 0, pos });
-	best[pos] = 0;
-
-	while (q.empty() == false)
-	{
-		auto& p = q.top();
-		int cost = p.first;
-		int now = p.second;
-		q.pop();
-
-		if (cost < best[now])
-			best[now] = cost;
-
-		if (best[now] < cost)
-			continue;
-
-		for (int next = 0; next < n; next++)
-		{
-			if (road[now][next] == -1)
-				continue;
-
-			int nextCost = best[now] + road[now][next];
-			if (nextCost >= best[next])
-				continue;
-
-			best[next] = nextCost;
-			q.push({ nextCost, next });
-		}
-	}
-
-	int res = 0;
-	for (int i = 0; i < n; i++)
-	{
-		if (best[i] <= m)
-		{
-			res += t[i];
-		}
-	}
-
-	return res;
+	if (y == 1) 
+		return x;
+	if (y % 2 == 1) 
+		return x * f(x, y - 1) % MOD;
+	int64 p = f(x, y / 2);
+	return p * p % MOD;
 }
 
 int main()
 {
 	Init;
 
-	cin >> n >> m >> r;
-	t.resize(n);
-	road = vector<vector<int>>(n, vector<int>(n, -1));
-	for (int i = 0; i < n; i++)
-		cin >> t[i];
-	for (int i = 0; i < r; i++)
+	cin >> M;
+	int64 ans = 0;
+	for (int i = 0; i < M; i++)
 	{
-		int a, b, l;
-		cin >> a >> b >> l;
+		int64 N, S;
+		cin >> N >> S;
 
-		road[a - 1][b - 1] = l;
-		road[b - 1][a - 1] = l;
+		int64 g = ::gcd(N, S);
+
+		N /= g;
+		S /= g;
+		ans += S * f(N, MOD - 2) % MOD;
+		ans %= MOD;
 	}
 
-	int res = INT32_MIN;
-	for (int i = 0; i < n; i++)
-	{
-		res = max(Dijikstra(i), res);
-	}
-
-	cout << res;
+	cout << ans;
 
 	return 0;
 }
