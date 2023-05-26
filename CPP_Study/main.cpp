@@ -21,47 +21,64 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-template<class T, class Container = deque<T>>
-class Queue
+struct Craft
 {
-public:
-	void push(T data)
-	{
-		container.push_back(data);
-	}
-	T front()
-	{
-		return container.front();
-	}
-
-	bool empty()
-	{
-		return container.empty();
-	}
-	void pop()
-	{
-		container.pop_front();
-	}
-
-
-private:
-	Container container;
+	vector<int> prevCraft; // 이전에 완료되어야 하는 것들
+	int time; // 이 건물을 짓는데 걸리는 시간
 };
+int T, N, K;
+vector<Craft> vec;
+vector<int> cache;
+
+int MinTime(int craft)
+{
+	Craft& c = vec[craft];
+	vector<int>& prevCraft = c.prevCraft;
+	// 기저 사례
+	if (prevCraft.size() == 0)
+		return c.time;
+
+	// 캐시 확인
+	int& ret = cache[craft];
+	if (ret != -1)
+		return ret;
+
+	for (int& n : prevCraft)
+		ret = max(c.time + MinTime(n), ret);
+	return ret;
+}
 
 int main()
 {
-	Queue<int> q;
-	for (int i = 0; i < 100; i++)
+	cin >> T;
+	for (int i = 0; i < T; i++)
 	{
-		q.push(i + 1);
-	}
+		cin >> N >> K;
 
-	while (q.empty() == false)
-	{
-		cout << q.front() << endl;
-		q.pop();
-	}
+		vec = vector<Craft>(N);
+		cache = vector<int>(N, -1);
 
+		for (int j = 0; j < N; j++)
+		{
+			int D;
+			cin >> D;
+
+			vec[j] = { vector<int>(), D};
+		}
+
+		for (int j = 0; j < K; j++)
+		{
+			int X, Y;
+			cin >> X >> Y;
+
+			vec[Y - 1].prevCraft.push_back(X - 1);
+		}
+
+		int W;
+		cin >> W;
+
+		cout << MinTime(W - 1) << endl;
+	}
 
 	return 0;
 }
