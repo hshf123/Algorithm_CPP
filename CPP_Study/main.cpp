@@ -21,63 +21,77 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-struct Craft
-{
-	vector<int> prevCraft; // 이전에 완료되어야 하는 것들
-	int time; // 이 건물을 짓는데 걸리는 시간
-};
-int T, N, K;
-vector<Craft> vec;
 vector<int> cache;
+vector<int> parent;
+int N;
 
-int MinTime(int craft)
+int MakeOne(int n)
 {
-	Craft& c = vec[craft];
-	vector<int>& prevCraft = c.prevCraft;
 	// 기저 사례
-	if (prevCraft.size() == 0)
-		return c.time;
+	if (n == N)
+		return 0;
+	if (n > N)
+		return INT32_MAX;
 
 	// 캐시 확인
-	int& ret = cache[craft];
+	int& ret = cache[n];
 	if (ret != -1)
 		return ret;
 
-	for (int& n : prevCraft)
-		ret = max(c.time + MinTime(n), ret);
-	return ret;
+	int a = MakeOne(n * 3);
+	int b = MakeOne(n * 2);
+	int c = MakeOne(n + 1);
+
+	ret = min(a, min(b, c));
+	if (ret == a)
+	{
+		parent[n] = n * 3;
+	}
+	else if (ret == b)
+	{
+		parent[n] = n * 2;
+	}
+	else if (ret == c)
+	{
+		parent[n] = n + 1;
+	}
+
+	return ret += 1;
 }
 
 int main()
 {
-	cin >> T;
-	for (int i = 0; i < T; i++)
+	cin >> N;
+
+	if (N == 1)
 	{
-		cin >> N >> K;
+		cout << 0 << endl << 1;
+		return 0;
+	}
 
-		vec = vector<Craft>(N);
-		cache = vector<int>(N, -1);
+	cache = vector<int>(N + 1, -1);
+	parent = vector<int>(N + 1, -1);
 
-		for (int j = 0; j < N; j++)
+	parent[N] = N;
+	cout << MakeOne(1) << endl;
+
+	stack<int> s;
+	int n = 1;
+	while (true)
+	{
+		s.push(n);
+		n = parent[n];
+		if (n == parent[n])
 		{
-			int D;
-			cin >> D;
-
-			vec[j] = { vector<int>(), D};
+			s.push(n);
+			break;
 		}
+	}
 
-		for (int j = 0; j < K; j++)
-		{
-			int X, Y;
-			cin >> X >> Y;
-
-			vec[Y - 1].prevCraft.push_back(X - 1);
-		}
-
-		int W;
-		cin >> W;
-
-		cout << MinTime(W - 1) << endl;
+	while (s.empty() == false)
+	{
+		cout << s.top() << " ";
+		s.pop();
 	}
 
 	return 0;
