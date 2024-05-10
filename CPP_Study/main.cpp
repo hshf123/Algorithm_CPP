@@ -21,78 +21,54 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-vector<int> cache;
-vector<int> parent;
-int N;
-
-int MakeOne(int n)
+int HalfUp(const float& val)
 {
-	// 기저 사례
-	if (n == N)
-		return 0;
-	if (n > N)
-		return INT32_MAX;
+	int t = static_cast<int>(val * 10) % 10;
+	if (t >= 5)
+		t = static_cast<int>(val) + 1;
+	else
+		t = static_cast<int>(val);
 
-	// 캐시 확인
-	int& ret = cache[n];
-	if (ret != -1)
-		return ret;
+	return t;
+}
 
-	int a = MakeOne(n * 3);
-	int b = MakeOne(n * 2);
-	int c = MakeOne(n + 1);
-
-	ret = min(a, min(b, c));
-	if (ret == a)
-	{
-		parent[n] = n * 3;
-	}
-	else if (ret == b)
-	{
-		parent[n] = n * 2;
-	}
-	else if (ret == c)
-	{
-		parent[n] = n + 1;
-	}
-
-	return ret += 1;
+int TrimmedMean(const int& n)
+{
+	return HalfUp(static_cast<float>(n) * 0.15f);
 }
 
 int main()
 {
+	int N = 0;
 	cin >> N;
-
-	if (N == 1)
+	if (N == 0)
 	{
-		cout << 0 << endl << 1;
+		cout << 0;
 		return 0;
 	}
 
-	cache = vector<int>(N + 1, -1);
-	parent = vector<int>(N + 1, -1);
-
-	parent[N] = N;
-	cout << MakeOne(1) << endl;
-
-	stack<int> s;
-	int n = 1;
-	while (true)
+	std::multiset<int> opList;
+	for (int i = 0; i < N; i++)
 	{
-		s.push(n);
-		n = parent[n];
-		if (n == parent[n])
+		int op;
+		cin >> op;
+		opList.insert(op);
+	}
+
+	int tm = TrimmedMean(N);
+	int i = 0;
+	int opSum = 0;
+	for (const int& n : opList)
+	{
+		if (i < tm || i >= N - tm)
 		{
-			s.push(n);
-			break;
+			++i;
+			continue;
 		}
+
+		opSum += n;
+		++i;
 	}
 
-	while (s.empty() == false)
-	{
-		cout << s.top() << " ";
-		s.pop();
-	}
-
-	return 0;
+	cout << HalfUp(static_cast<float>(opSum) / static_cast<float>(N - tm - tm));
 }
