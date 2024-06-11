@@ -23,13 +23,27 @@ using uint64 = unsigned long long;
 
 int main()
 {
-	int A, B, C;
+	int N, T, P;
+	cin >> N;
+	vector<int> sizeList;
+	sizeList.reserve(6);
+	for (int i = 0; i < 6; i++)
+	{
+		int size;
+		cin >> size;
+		sizeList.push_back(size);
+	}
+	cin >> T;
+	cin >> P;
 
-	cin >> A;
-	cin >> B;
-	cin >> C;
+	int totalBundle = 0;
+	for (const int& size : sizeList)
+	{
+		totalBundle += size / T + 1;
+		if (size % T == 0)
+			totalBundle -= 1;
+	}
 
-	
-	cout << A + B - C << endl;
-	cout << stoi(to_string(A).append(to_string(B))) - C;
+	cout << totalBundle << endl;
+	cout << N / P << " " << N % P << endl;
 }
