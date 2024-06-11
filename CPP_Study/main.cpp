@@ -13,6 +13,7 @@
 #include <cstring>
 #include <numeric>
 #include <sstream>
+#include <array>
 
 #define endl "\n"
 #define INT32_HALF (INT32_MAX / 2)
@@ -21,29 +22,59 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
+string FizzBuzz = "FizzBuzz";
+string Fizz = "Fizz";
+string Buzz = "Buzz";
+
+bool IsFizzOrBuzz(const string& str)
+{
+	if (str == FizzBuzz || str == Fizz || str == Buzz)
+		return true;
+
+	return false;
+}
+
 int main()
 {
-	int N, T, P;
-	cin >> N;
-	vector<int> sizeList;
-	sizeList.reserve(6);
-	for (int i = 0; i < 6; i++)
+	array<int, 3> num = { 0, };
+	for (int i = 0; i < 3; i++)
 	{
-		int size;
-		cin >> size;
-		sizeList.push_back(size);
-	}
-	cin >> T;
-	cin >> P;
+		string str;
+		cin >> str;
 
-	int totalBundle = 0;
-	for (const int& size : sizeList)
-	{
-		totalBundle += size / T + 1;
-		if (size % T == 0)
-			totalBundle -= 1;
+		if (IsFizzOrBuzz(str) == false)
+		{
+			if (i == 0)
+			{
+				num[i] = stoi(str);
+				num[i + 1] = num[i] + 1;
+				num[i + 2] = num[i] + 2;
+			}
+			if (i == 1)
+			{
+				num[i] = stoi(str);
+				num[i - 1] = num[i] - 1;
+				num[i + 1] = num[i] + 1;
+			}
+			if (i == 2)
+			{
+				num[i] = stoi(str);
+				num[i - 2] = num[i] - 2;
+				num[i - 1] = num[i] - 1;
+			}
+		}
 	}
 
-	cout << totalBundle << endl;
-	cout << N / P << " " << N % P << endl;
+	int nextNum = num[2] + 1;
+	
+	int fizz = nextNum % 3;
+	int buzz = nextNum % 5;
+	if (fizz == 0 && buzz == 0)
+		cout << FizzBuzz << endl;
+	else if (fizz == 0)
+		cout << Fizz << endl;
+	else if (buzz == 0)
+		cout << Buzz << endl;
+	else
+		cout << nextNum << endl;
 }
