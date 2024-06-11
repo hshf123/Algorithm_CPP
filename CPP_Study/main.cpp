@@ -21,54 +21,15 @@ using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 
-int HalfUp(const float& val)
-{
-	int t = static_cast<int>(val * 10) % 10;
-	if (t >= 5)
-		t = static_cast<int>(val) + 1;
-	else
-		t = static_cast<int>(val);
-
-	return t;
-}
-
-int TrimmedMean(const int& n)
-{
-	return HalfUp(static_cast<float>(n) * 0.15f);
-}
-
 int main()
 {
-	int N = 0;
-	cin >> N;
-	if (N == 0)
-	{
-		cout << 0;
-		return 0;
-	}
+	int A, B, C;
 
-	std::multiset<int> opList;
-	for (int i = 0; i < N; i++)
-	{
-		int op;
-		cin >> op;
-		opList.insert(op);
-	}
+	cin >> A;
+	cin >> B;
+	cin >> C;
 
-	int tm = TrimmedMean(N);
-	int i = 0;
-	int opSum = 0;
-	for (const int& n : opList)
-	{
-		if (i < tm || i >= N - tm)
-		{
-			++i;
-			continue;
-		}
-
-		opSum += n;
-		++i;
-	}
-
-	cout << HalfUp(static_cast<float>(opSum) / static_cast<float>(N - tm - tm));
+	
+	cout << A + B - C << endl;
+	cout << stoi(to_string(A).append(to_string(B))) - C;
 }
