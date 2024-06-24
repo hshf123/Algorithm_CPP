@@ -24,54 +24,30 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-
+int N, M;
 
 struct Pos
 {
-	Pos& operator+=(const Pos& pos)
+	Pos operator+(const Pos& other)
 	{
-		Y += pos.Y;
-		X += pos.X;
-	}
-	Pos operator+(const Pos& pos)
-	{
-		return { Y + pos.Y, X + pos.X };
-	}
-	bool operator==(const Pos& pos)
-	{
-		return Y == pos.Y && X == pos.X;
-	}
-	bool operator!=(const Pos& pos)
-	{
-		return (*this == pos) == false;
-	}
-	bool operator<(const Pos& pos) const
-	{
-		if (pos.Y != Y)
-			return Y < pos.Y;
-		return X < pos.X;
+		return { y + other.y , x + other.x };
 	}
 
-	int Y;
-	int X;
+	int y = 0;
+	int x = 0;
 };
 
-array<Pos, 4> distList =
+array<Pos, 4> dir =
 {
 	Pos{1,0},
 	Pos{0,1},
 	Pos{-1,0},
-	Pos{0,-1},
+	Pos{0,-1}
 };
 
-int n, m;
-
-bool CanGo(vector<vector<int>>& map, const Pos& pos)
+bool CanGo(Pos pos)
 {
-	if (pos.Y < 0 || pos.X < 0 || pos.Y >= n || pos.X >= m)
-		return false;
-
-	if (map[pos.Y][pos.X] == 0)
+	if (pos.y < 0 || pos.x < 0 || pos.y >= N || pos.x >= M)
 		return false;
 
 	return true;
@@ -79,59 +55,53 @@ bool CanGo(vector<vector<int>>& map, const Pos& pos)
 
 int main()
 {
-	cin >> n >> m;
-	vector<vector<int>> map(n, vector<int>(m));
+	cin >> N >> M;
+
+	vector<vector<char>> m(N, vector<char>(M));
+	vector<vector<bool>> discovered(N, vector<bool>(M, false));
+
 	queue<Pos> q;
-	vector<vector<int>> ans(n, vector<int>(m, -1));
-	vector<vector<bool>> discovered(n, vector<bool>(m, false));
-	for (int y = 0; y < n; y++)
+
+	for (int y = 0; y < N; y++)
 	{
-		for (int x = 0; x < m; x++)
+		string str;
+		cin >> str;
+		for (int x = 0; x < M; x++)
 		{
-			cin >> map[y][x];
-			if (map[y][x] == 2)
+			m[y][x] = str[x];
+			if (m[y][x] == 'I')
 			{
 				q.push({ y,x });
-				ans[y][x] = 0;
 				discovered[y][x] = true;
 			}
 		}
 	}
 
+	int count = 0;
 	while (q.empty() == false)
 	{
 		Pos p = q.front();
 		q.pop();
-		
 
-		for (Pos dir : distList)
+		if (m[p.y][p.x] == 'P')
+			++count;
+
+		for (Pos d : dir)
 		{
-			Pos nextDir = p + dir;
-			if (CanGo(map, nextDir) == false || discovered[nextDir.Y][nextDir.X])
+			Pos nd = p + d;
+			if (CanGo(nd) == false || m[nd.y][nd.x] == 'X' || discovered[nd.y][nd.x])
 				continue;
 
-			discovered[nextDir.Y][nextDir.X] = true;
-			ans[nextDir.Y][nextDir.X] = ans[p.Y][p.X] + 1;
-			q.push({ nextDir.Y, nextDir.X });
+			discovered[nd.y][nd.x] = true;
+			q.push({ nd.y, nd.x });
 		}
 	}
 
-	for (int y = 0; y < n; y++)
+	if (count == 0)
 	{
-		for (int x = 0; x < m; x++)
-		{
-			if (map[y][x] == 0)
-				ans[y][x] = 0;
-		}
+		cout << "TT";
+		return 0;
 	}
-	
 
-	for (int y = 0; y < n; y++)
-	{
-		for (int x = 0; x < m; x++)
-		{
-			cout << ans[y][x] << " ";
-		}
-		cout << endl;
-	}
+	cout << count;
 }
