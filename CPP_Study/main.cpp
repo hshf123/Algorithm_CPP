@@ -1,3 +1,4 @@
+#pragma region Headers
 #include <iostream>
 #include <vector>
 #include <list>
@@ -21,60 +22,116 @@
 using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
+#pragma endregion
 
-string FizzBuzz = "FizzBuzz";
-string Fizz = "Fizz";
-string Buzz = "Buzz";
 
-bool IsFizzOrBuzz(const string& str)
+
+struct Pos
 {
-	if (str == FizzBuzz || str == Fizz || str == Buzz)
-		return true;
+	Pos& operator+=(const Pos& pos)
+	{
+		Y += pos.Y;
+		X += pos.X;
+	}
+	Pos operator+(const Pos& pos)
+	{
+		return { Y + pos.Y, X + pos.X };
+	}
+	bool operator==(const Pos& pos)
+	{
+		return Y == pos.Y && X == pos.X;
+	}
+	bool operator!=(const Pos& pos)
+	{
+		return (*this == pos) == false;
+	}
+	bool operator<(const Pos& pos) const
+	{
+		if (pos.Y != Y)
+			return Y < pos.Y;
+		return X < pos.X;
+	}
 
-	return false;
+	int Y;
+	int X;
+};
+
+array<Pos, 4> distList =
+{
+	Pos{1,0},
+	Pos{0,1},
+	Pos{-1,0},
+	Pos{0,-1},
+};
+
+int n, m;
+
+bool CanGo(vector<vector<int>>& map, const Pos& pos)
+{
+	if (pos.Y < 0 || pos.X < 0 || pos.Y >= n || pos.X >= m)
+		return false;
+
+	if (map[pos.Y][pos.X] == 0)
+		return false;
+
+	return true;
 }
 
 int main()
 {
-	array<int, 3> num = { 0, };
-	for (int i = 0; i < 3; i++)
+	cin >> n >> m;
+	vector<vector<int>> map(n, vector<int>(m));
+	queue<Pos> q;
+	vector<vector<int>> ans(n, vector<int>(m, -1));
+	vector<vector<bool>> discovered(n, vector<bool>(m, false));
+	for (int y = 0; y < n; y++)
 	{
-		string str;
-		cin >> str;
-
-		if (IsFizzOrBuzz(str) == false)
+		for (int x = 0; x < m; x++)
 		{
-			if (i == 0)
+			cin >> map[y][x];
+			if (map[y][x] == 2)
 			{
-				num[i] = stoi(str);
-				num[i + 1] = num[i] + 1;
-				num[i + 2] = num[i] + 2;
-			}
-			if (i == 1)
-			{
-				num[i] = stoi(str);
-				num[i - 1] = num[i] - 1;
-				num[i + 1] = num[i] + 1;
-			}
-			if (i == 2)
-			{
-				num[i] = stoi(str);
-				num[i - 2] = num[i] - 2;
-				num[i - 1] = num[i] - 1;
+				q.push({ y,x });
+				ans[y][x] = 0;
+				discovered[y][x] = true;
 			}
 		}
 	}
 
-	int nextNum = num[2] + 1;
+	while (q.empty() == false)
+	{
+		Pos p = q.front();
+		q.pop();
+		
+
+		for (Pos dir : distList)
+		{
+			Pos nextDir = p + dir;
+			if (CanGo(map, nextDir) == false || discovered[nextDir.Y][nextDir.X])
+				continue;
+
+			discovered[nextDir.Y][nextDir.X] = true;
+			ans[nextDir.Y][nextDir.X] = ans[p.Y][p.X] + 1;
+			q.push({ nextDir.Y, nextDir.X });
+		}
+	}
+
+	for (int y = 0; y < n; y++)
+	{
+		for (int x = 0; x < m; x++)
+		{
+			if (map[y][x] == 0)
+				ans[y][x] = 0;
+		}
+	}
 	
-	int fizz = nextNum % 3;
-	int buzz = nextNum % 5;
-	if (fizz == 0 && buzz == 0)
-		cout << FizzBuzz << endl;
-	else if (fizz == 0)
-		cout << Fizz << endl;
-	else if (buzz == 0)
-		cout << Buzz << endl;
-	else
-		cout << nextNum << endl;
+
+	for (int y = 0; y < n; y++)
+	{
+		for (int x = 0; x < m; x++)
+		{
+			cout << ans[y][x] << " ";
+		}
+		cout << endl;
+	}
 }
