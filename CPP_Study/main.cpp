@@ -18,90 +18,51 @@
 
 #define endl "\n"
 #define INT32_HALF (INT32_MAX / 2)
-#define Init cin.tie(NULL); cout.tie(NULL); ios::sync_with_stdio(false);
+#define Init cin.tie(NULL); cout.tie(NULL); ios::sync_with_stdio(false)
 using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-int N, M;
+int N;
+vector<int> nums;
+vector<int> arr;
 
-struct Pos
+int twoPointer(int left, int right, int cnt, int kind, int m)
 {
-	Pos operator+(const Pos& other)
+	if (right >= N)
+		return m;
+
+	if (nums[arr[right]] == 0)
+		kind++;
+
+	cnt++;
+	nums[arr[right]]++;
+
+	// 만약 과일의 종류가 2개를 넘으면, 왼쪽의 포인터를 이동한다.
+	if (kind > 2)
 	{
-		return { y + other.y , x + other.x };
+		if (--nums[arr[left]] == 0)
+			kind--;
+		cnt--;
+		left++;
 	}
 
-	int y = 0;
-	int x = 0;
-};
-
-array<Pos, 4> dir =
-{
-	Pos{1,0},
-	Pos{0,1},
-	Pos{-1,0},
-	Pos{0,-1}
-};
-
-bool CanGo(Pos pos)
-{
-	if (pos.y < 0 || pos.x < 0 || pos.y >= N || pos.x >= M)
-		return false;
-
-	return true;
+	m = max(m, cnt);
+	return twoPointer(left, right + 1, cnt, kind, m);
 }
 
 int main()
 {
-	cin >> N >> M;
-
-	vector<vector<char>> m(N, vector<char>(M));
-	vector<vector<bool>> discovered(N, vector<bool>(M, false));
-
-	queue<Pos> q;
-
-	for (int y = 0; y < N; y++)
+	Init;
+	cin >> N;
+	nums.resize(10, 0);
+	for (int i = 0; i < N; i++)
 	{
-		string str;
-		cin >> str;
-		for (int x = 0; x < M; x++)
-		{
-			m[y][x] = str[x];
-			if (m[y][x] == 'I')
-			{
-				q.push({ y,x });
-				discovered[y][x] = true;
-			}
-		}
+		int t;
+		cin >> t;
+		arr.push_back(t);
 	}
 
-	int count = 0;
-	while (q.empty() == false)
-	{
-		Pos p = q.front();
-		q.pop();
-
-		if (m[p.y][p.x] == 'P')
-			++count;
-
-		for (Pos d : dir)
-		{
-			Pos nd = p + d;
-			if (CanGo(nd) == false || m[nd.y][nd.x] == 'X' || discovered[nd.y][nd.x])
-				continue;
-
-			discovered[nd.y][nd.x] = true;
-			q.push({ nd.y, nd.x });
-		}
-	}
-
-	if (count == 0)
-	{
-		cout << "TT";
-		return 0;
-	}
-
-	cout << count;
+	cout << twoPointer(0, 0, 0, 0, 0);
 }
