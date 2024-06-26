@@ -24,104 +24,70 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-class DisjointSet
+struct Jewel
 {
-public:
-	DisjointSet(const int& nodeCount) : _parent(nodeCount), _rank(nodeCount, 1)
-	{
-		for (int i = 0; i < nodeCount; i++)
-			_parent[i] = i;
-	}
-
-	int FindBoss(int u)
-	{
-		while (true)
-		{
-			if (u == _parent[u])
-				return u;
-
-			u = _parent[u];
-		}
-	}
-
-	void Merge(int u, int v)
-	{
-		u = FindBoss(u);
-		v = FindBoss(v);
-		if (u == v)
-			return;
-
-		if (_rank[u] > _rank[v])
-			::swap(u, v);
-
-		_parent[u] = v;
-		if (_rank[u] == _rank[v])
-			_rank[v]++;
-	}
-	
-private:
-	vector<int> _parent;
-	vector<int> _rank;
-};
-
-struct CostEdge
-{
-	int cost;
-	int u;
-	int v;
-
-	bool operator<(const CostEdge& other)
-	{
-		return cost < other.cost;
-	}
+	int kg = 0;
+	int cost = 0;
 };
 
 int main()
 {
 	Init;
 
-	int V, E;
-	cin >> V >> E;
+	map<int, priority_queue<int>> jewelMap;
 
-	vector<vector<pair<int, int>>> nodes(V);
-	for (int edge = 0; edge < E; edge++)
+	int N, K;
+	cin >> N >> K;
+	for (int i = 0; i < N; i++)
 	{
-		int A, B, C;
-		cin >> A >> B >> C;
-		A -= 1;
-		B -= 1;
-		nodes[A].push_back({ B, C });
-		nodes[B].push_back({ A, C });
+		int M, V;
+		cin >> M >> V;
+		jewelMap[M].push(V);
 	}
 
-	vector<CostEdge> edges;
-	for (int u = 0; u < nodes.size(); u++)
+	queue<Jewel> jewelVec;
+	for (auto p : jewelMap)
 	{
-		for (int v = 0; v < nodes[u].size(); v++)
+		while (p.second.empty() == false)
 		{
-			if (u > nodes[u][v].first)
-				continue;
-
-			int cost = nodes[u][v].second;
-			if (cost == 100'0001)
-				continue;
-
-			edges.push_back(CostEdge{ cost, u, nodes[u][v].first });
+			jewelVec.push({ p.first, p.second.top() });
+			p.second.pop();
 		}
 	}
+	jewelMap.clear();
 
-	nodes.clear();
-	std::sort(edges.begin(), edges.end());
-
-	int ans = 0;
-	DisjointSet sets(V);
-	for (CostEdge& edge : edges)
+	vector<int> pqBag;
+	for (int i = 0; i < K; i++)
 	{
-		if (sets.FindBoss(edge.u) == sets.FindBoss(edge.v))
-			continue;
+		int C;
+		cin >> C;
+		pqBag.push_back(C);
+	}
+	::sort(pqBag.begin(), pqBag.end());
 
-		sets.Merge(edge.u, edge.v);
-		ans += edge.cost;
+	int64 ans = 0;
+	priority_queue<int> jewCosts;
+	for (const int& bag : pqBag)
+	{
+		int bestCost = 0;
+		while (jewelVec.empty() == false)
+		{
+			Jewel jew = jewelVec.front();
+			// 담을게 없음
+			if (jew.kg > bag)
+				break;
+
+			// 가방에 담을 수 있는거면 일단 다 때려 늫
+			if (jew.kg <= bag)
+				jewCosts.push(jew.cost);
+			jewelVec.pop();
+		}
+
+		if (jewCosts.empty() == false)
+		{
+			ans += jewCosts.top();
+			jewCosts.pop();
+		}
 	}
 	
 	cout << ans;
