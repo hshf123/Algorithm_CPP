@@ -24,74 +24,106 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-int A, B;
+class DisjointSet
+{
+public:
+	DisjointSet(const int& nodeCount) : _parent(nodeCount), _rank(nodeCount, 1)
+	{
+		for (int i = 0; i < nodeCount; i++)
+			_parent[i] = i;
+	}
+
+	int FindBoss(int u)
+	{
+		while (true)
+		{
+			if (u == _parent[u])
+				return u;
+
+			u = _parent[u];
+		}
+	}
+
+	void Merge(int u, int v)
+	{
+		u = FindBoss(u);
+		v = FindBoss(v);
+		if (u == v)
+			return;
+
+		if (_rank[u] > _rank[v])
+			::swap(u, v);
+
+		_parent[u] = v;
+		if (_rank[u] == _rank[v])
+			_rank[v]++;
+	}
+	
+private:
+	vector<int> _parent;
+	vector<int> _rank;
+};
+
+struct CostEdge
+{
+	int cost;
+	int u;
+	int v;
+
+	bool operator<(const CostEdge& other)
+	{
+		return cost < other.cost;
+	}
+};
 
 int main()
 {
 	Init;
 
-	vector<vector<pair<int, int>>> vec(101, vector<pair<int, int>>(101, make_pair(101, 101)));
-	vector<int> seq;
-	map<int, int> idxCheck;
+	int V, E;
+	cin >> V >> E;
 
-	cin >> A;
-	for (int i = 0; i < A; i++)
+	vector<vector<pair<int, int>>> nodes(V);
+	for (int edge = 0; edge < E; edge++)
 	{
-		int n;
-		cin >> n;
-		vec[n][i + 1].first = i + 1;
-	}
-	cin >> B;
-	for (int i = 0; i < B; i++)
-	{
-		int n;
-		cin >> n;
-		vec[n][i + 1].second = i + 1;
+		int A, B, C;
+		cin >> A >> B >> C;
+		A -= 1;
+		B -= 1;
+		nodes[A].push_back({ B, C });
+		nodes[B].push_back({ A, C });
 	}
 
-	int aMinIdx = 0;
-	int bMinIdx = 0;
-	vector<int> v;
-	for (int num = 100; num >= 1; num--)
+	vector<CostEdge> edges;
+	for (int u = 0; u < nodes.size(); u++)
 	{
-		vector<int> AIdxList;
-		vector<int> BIdxList;
-		for (int idx = 1; idx < 101; idx++)
+		for (int v = 0; v < nodes[u].size(); v++)
 		{
-			if (vec[num][idx].first != 101)
-			{
-				AIdxList.push_back(vec[num][idx].first);
-				vec[num][idx].first = 101;
-			}
-			if (vec[num][idx].second != 101)
-			{
-				BIdxList.push_back(vec[num][idx].second);
-				vec[num][idx].second = 101;
-			}
-		}
+			if (u > nodes[u][v].first)
+				continue;
 
-		if (AIdxList.empty() == false && BIdxList.empty() == false)
-		{
-			for (int a = 0; a < AIdxList.size(); a++)
-			{
-				int ANum = AIdxList[a];
-				for (int b = 0; b < BIdxList.size(); b++)
-				{
-					int BNum = BIdxList[b];
-					if (ANum > aMinIdx && BNum > bMinIdx)
-					{
-						aMinIdx = ANum;
-						bMinIdx = BNum;
-						v.push_back(num);
-					}
-				}
-			}
+			int cost = nodes[u][v].second;
+			if (cost == 100'0001)
+				continue;
+
+			edges.push_back(CostEdge{ cost, u, nodes[u][v].first });
 		}
 	}
 
-	cout << v.size() << endl;
-	for (const int& n : v)
-		cout << n << " ";
+	nodes.clear();
+	std::sort(edges.begin(), edges.end());
+
+	int ans = 0;
+	DisjointSet sets(V);
+	for (CostEdge& edge : edges)
+	{
+		if (sets.FindBoss(edge.u) == sets.FindBoss(edge.v))
+			continue;
+
+		sets.Merge(edge.u, edge.v);
+		ans += edge.cost;
+	}
 	
+	cout << ans;
 	return 0;
 }
