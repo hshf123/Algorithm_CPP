@@ -24,72 +24,57 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-struct Jewel
-{
-	int kg = 0;
-	int cost = 0;
-};
-
 int main()
 {
 	Init;
 
-	map<int, priority_queue<int>> jewelMap;
+	string str;
+	cin >> str;
 
-	int N, K;
-	cin >> N >> K;
-	for (int i = 0; i < N; i++)
-	{
-		int M, V;
-		cin >> M >> V;
-		jewelMap[M].push(V);
-	}
+	vector<vector<bool>> checkPalindrome(str.size(), vector<bool>(str.size(), false));
 
-	queue<Jewel> jewelVec;
-	for (auto p : jewelMap)
+	for (int start = 0; start < str.size(); start++)
 	{
-		while (p.second.empty() == false)
+		for (int end = start; end < str.size(); end++)
 		{
-			jewelVec.push({ p.first, p.second.top() });
-			p.second.pop();
+			checkPalindrome[start][start] = true;
+			if (checkPalindrome[start][end])
+				continue;
+
+			if (str[start] == str[end] && checkPalindrome[start + 1][end - 1])
+			{
+				checkPalindrome[start][end] = true;
+				continue;
+			}
+			
+			string checkStr = str.substr(start, end - start + 1);
+			string front = checkStr.substr(0, checkStr.size() / 2);
+			string behind = checkStr.substr(checkStr.size() % 2 == 0 ? checkStr.size() / 2 : checkStr.size() / 2 + 1, checkStr.size() / 2);
+			std::reverse(behind.begin(), behind.end());
+			if (front == behind)
+				checkPalindrome[start][end] = true;
 		}
 	}
-	jewelMap.clear();
 
-	vector<int> pqBag;
-	for (int i = 0; i < K; i++)
+	vector<int> ans(str.size(), INT32_MAX);
+	for (int start = 0; start < str.size(); start++)
 	{
-		int C;
-		cin >> C;
-		pqBag.push_back(C);
-	}
-	::sort(pqBag.begin(), pqBag.end());
-
-	int64 ans = 0;
-	priority_queue<int> jewCosts;
-	for (const int& bag : pqBag)
-	{
-		int bestCost = 0;
-		while (jewelVec.empty() == false)
+		for (int end = start; end < str.size(); end++)
 		{
-			Jewel jew = jewelVec.front();
-			// 담을게 없음
-			if (jew.kg > bag)
-				break;
+			if (checkPalindrome[start][end])
+			{
+				if (start == 0)
+				{
+					ans[end] = 1;
+					continue;
+				}
 
-			// 가방에 담을 수 있는거면 일단 다 때려 늫
-			if (jew.kg <= bag)
-				jewCosts.push(jew.cost);
-			jewelVec.pop();
-		}
-
-		if (jewCosts.empty() == false)
-		{
-			ans += jewCosts.top();
-			jewCosts.pop();
+				ans[end] = min(ans[end], ans[start - 1] + 1);
+			}
 		}
 	}
+
+	cout << ans[str.size() - 1];
 	
-	cout << ans;
 	return 0;
 }
