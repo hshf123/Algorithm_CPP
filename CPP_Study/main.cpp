@@ -28,53 +28,47 @@ int main()
 {
 	Init;
 
-	string str;
-	cin >> str;
-
-	vector<vector<bool>> checkPalindrome(str.size(), vector<bool>(str.size(), false));
-
-	for (int start = 0; start < str.size(); start++)
+	int N;
+	cin >> N;
+	if (N < 10)
 	{
-		for (int end = start; end < str.size(); end++)
-		{
-			checkPalindrome[start][start] = true;
-			if (checkPalindrome[start][end])
-				continue;
-
-			if (str[start] == str[end] && checkPalindrome[start + 1][end - 1])
-			{
-				checkPalindrome[start][end] = true;
-				continue;
-			}
-			
-			string checkStr = str.substr(start, end - start + 1);
-			string front = checkStr.substr(0, checkStr.size() / 2);
-			string behind = checkStr.substr(checkStr.size() % 2 == 0 ? checkStr.size() / 2 : checkStr.size() / 2 + 1, checkStr.size() / 2);
-			std::reverse(behind.begin(), behind.end());
-			if (front == behind)
-				checkPalindrome[start][end] = true;
-		}
+		cout << 0;
+		return 0;
+	}
+	if (N == 10)
+	{
+		cout << 1;
+		return 0;
 	}
 
-	vector<int> ans(str.size(), INT32_MAX);
-	for (int start = 0; start < str.size(); start++)
-	{
-		for (int end = start; end < str.size(); end++)
-		{
-			if (checkPalindrome[start][end])
-			{
-				if (start == 0)
-				{
-					ans[end] = 1;
-					continue;
-				}
+	vector<vector<vector<int>>> cache(N, vector<vector<int>>(10, vector<int>(1024, 0)));
 
-				ans[end] = min(ans[end], ans[start - 1] + 1);
+	for (int i = 1; i < 10; i++) // 0은 제외하고
+		cache[0][i][1 << i] = 1;  // 초기 경우의 수는 1 (k를 방문함도 동시에 표시)
+
+	for (int i = 1; i < N; i++)// 각 자릿수에 대해
+	{
+		for (int k = 0; k < 10; k++)  //0에서 9까지의 숫자 방문
+		{
+			for (int bit = 0; bit < 1024; bit++) //이때, 모든 방문 기록 경우의 수를 고려
+			{
+				if (k - 1 >= 0)
+					cache[i][k][bit | (1 << k)] += cache[i - 1][k - 1][bit];
+				if (k + 1 <= 9)
+					cache[i][k][bit | (1 << k)] += cache[i - 1][k + 1][bit];
+				cache[i][k][bit | (1 << k)] %= 1'000'000'000;
 			}
 		}
 	}
 
-	cout << ans[str.size() - 1];
+	int sum = 0;
+	for (int k = 0; k < 10; k++)
+	{
+		sum += cache[N - 1][k][1023];
+		sum %= 1'000'000'000;
+	}
 	
+	cout << sum;
+
 	return 0;
 }
