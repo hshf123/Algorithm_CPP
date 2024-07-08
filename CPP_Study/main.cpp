@@ -25,48 +25,76 @@ using uint64 = unsigned long long;
 #pragma endregion
 
 /*
-금 한 돈의 값은 매일 변합니다. 금값이 낮을 때 금을 사고, 높을 때 팔면 이익을 낼 수 있습니다. 다음 규칙에 맞게 금을 사고 팔아 이익을 남기려고 합니다.
-1. 금은 여러 번 사고 팔 수 있습니다.
-2. 금을 살 때는 한 돈만 살 수 있으며 팔 때도 한 돈만 팔 수 있습니다.
-3. 금은 최대 한돈 까지만 가지고 있을 수 있습니다. (즉, 현재 가지고 있는 금을 팔기 전까지는 금을 살 수 없습니다.)
-4. 금을 판 날과 다음날에는 금을 사지 않습니다.
-5. 이익이 발생하지 않는다면 금을 사고팔지 않아도 됩니다.
-i번째 요소가 i번째 일의 금 한 돈의 값인 배열 gold_prices가 매개변수로 주어질 때, 금을 사고팔아 얻을 수 있는 최대 이윤을 출력하는 프로그램을 작성해주세요.
-제한사항
-1. 배열 gold_prices의 크기 : 100,000 이하의 자연수
-2. 금값 (배열의 원소) : 10,000 이하의 자연수
+과자를 바구니 단위로 파는 가게가 있습니다. 이 가게는 1번부터 N번까지 차례로 번호가 붙은 바구니 N개가 일렬로 나열해 놨습니다.
+철수는 두 아들에게 줄 과자를 사려합니다. 첫째 아들에게는 l번 바구니부터 m번 바구니까지, 둘째 아들에게는 m+1번 바구니부터 r번 바구니
+까지를 주려합니다. 단, 두 아들이 받을 과자 수는 같아야 합니다.(1 <= l <= m, m+1 <= r <= N) 즉, A[i]를 i번 바구니에 들어있는 과자 수
+라고 했을 때, A[l] + .. + A[m] = A[m+1]+..+A[r] 를 만족해야 합니다.
+각 바구니 안에 들은 과자 수가 차례로 들은 배열 cookie가 주어질 때, 조건에 맞게 과자를 살 경우 한 명의 아들에게 줄 수 있는 가장 많은 과
+자 수를 return 하는 프로그램을 작성해 주세요 (단, 조건에 맞게 과자를 구매할 수 없다면 0을 return 합니다)
+
+제한 사항
+cookie의 길이는 1 이상 2,000 이하 입니다.
+cookie의 각각의 원소는 1 이상 500이하인 자연수 입니다.
 */
 
-int GoldPrice(const vector<int>& gold_prices)
+int Solution(const vector<int>& cookie)
 {
-	vector<int> buy(gold_prices.size(), 0);		// n번째 날 살 때 이윤
-	vector<int> sell(gold_prices.size(), 0);	// n번째 날 팔 때 이윤
+	int ans = 0;
 
-	// 첫날 살 때와 팔 때의 이윤
-	buy[0] = -gold_prices[0];
-	sell[0] = 0;
-	// 둘째 날 
-	buy[1] = max(buy[0], -gold_prices[1]);				// 어제 산게 더 나은건지 오늘산게 더 나은건지
-	sell[1] = max(sell[0], buy[0] + gold_prices[1]);	// 어제 사서 오늘 파는게 이득임?
-	for (int i = 2; i < gold_prices.size(); i++)
+	if (cookie.size() == 1)
+		return 0;
+
+	for (int m = 0; m < cookie.size() - 1; m++)
 	{
-		buy[i] = max(buy[i - 1], sell[i - 2] - gold_prices[i]);
-		sell[i] = max(sell[i - 1], buy[i - 1] + gold_prices[i]);
+		int leftStart = m;
+		int leftEnd = m;
+		int leftSum = cookie[m];
+
+		int rightStart = m + 1;
+		int rightEnd = rightStart;
+		int rightSum = cookie[m + 1];
+
+		while (true)
+		{
+			if (rightEnd >= cookie.size() || leftStart < 0)
+				break;
+
+			if (leftSum == rightSum)
+			{
+				ans = max(ans, leftSum);
+				rightEnd += 1;
+				leftStart -= 1;
+				continue;
+			}
+
+			if (leftSum < rightSum)
+			{
+				--leftStart;
+				if (leftStart >= 0)
+					leftSum += cookie[leftStart];
+			}
+			else
+			{
+				++rightEnd;
+				if (rightEnd < cookie.size())
+					rightSum += cookie[rightSum];
+			}
+		}
 	}
 
-	return sell[gold_prices.size() - 1];
+	return ans;
 }
 
 int main()
 {
 	Init;
 
-	// 입력 예제1 Ans)4
-	vector<int> gold_prices1 = { 2,5,1,3,4 };
-	vector<int> gold_prices2 = { 7,2,5,6,1,4,2,8 };
+	vector<int> cookie1 = { 1,1,2,3 };	// ANS) 3
+	vector<int> cookie2 = { 1,2,4,5 };	// ANS) 0
 
-	cout << GoldPrice(gold_prices1) << endl;
-	cout << GoldPrice(gold_prices2) << endl;
+	cout << Solution(cookie1);
+	cout << endl;
+	cout << Solution(cookie2);
 
 	return 0;
 }
