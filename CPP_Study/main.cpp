@@ -25,60 +25,56 @@ using uint64 = unsigned long long;
 #pragma endregion
 
 /*
-과자를 바구니 단위로 파는 가게가 있습니다. 이 가게는 1번부터 N번까지 차례로 번호가 붙은 바구니 N개가 일렬로 나열해 놨습니다.
-철수는 두 아들에게 줄 과자를 사려합니다. 첫째 아들에게는 l번 바구니부터 m번 바구니까지, 둘째 아들에게는 m+1번 바구니부터 r번 바구니
-까지를 주려합니다. 단, 두 아들이 받을 과자 수는 같아야 합니다.(1 <= l <= m, m+1 <= r <= N) 즉, A[i]를 i번 바구니에 들어있는 과자 수
-라고 했을 때, A[l] + .. + A[m] = A[m+1]+..+A[r] 를 만족해야 합니다.
-각 바구니 안에 들은 과자 수가 차례로 들은 배열 cookie가 주어질 때, 조건에 맞게 과자를 살 경우 한 명의 아들에게 줄 수 있는 가장 많은 과
-자 수를 return 하는 프로그램을 작성해 주세요 (단, 조건에 맞게 과자를 구매할 수 없다면 0을 return 합니다)
+아기 돼지 삼형제가 1부터 n까지 번호가 붙어있는 음식을 먹으려고 합니다. 세 돼지 모두 식탐이 강했기 때문에 다음 규칙에 따라 음식을 먹
+기로 결정했습니다.
 
-제한 사항
-cookie의 길이는 1 이상 2,000 이하 입니다.
-cookie의 각각의 원소는 1 이상 500이하인 자연수 입니다.
+1.	첫째 돼지에게는 1번 음식부터 x번 음식까지, 둘째 돼지에게는 x+1번 음식부터 y번 음식까지, 셋째 돼지에게는 y+1번 음식부터 n번
+	음식까지 분배됩니다. (1 <= x < y < n).
+2.	모든 음식은 정수형태의 만족도 수치를 가지고 있습니다.
+3.	각 돼지의 포만도는 각자가 먹은 음식의 만족도 값의 합으로 나타낼 수 있으며, 음식을 모두 먹은 후 세 돼지의 포만도가 모두 같아야
+	합니다.
+4.	모든 돼지는 자신의 음식을 남기지 않고 다 먹습니다.
+5.	음식 중에는 만족도가 음수인 음식이 존재할 수 있으며, 만족도가 음수인 음식도 남기지 않고 모두 먹습니다.
+
+음식의 만족도가 저장된 배열 foods가 매개변수로 주어질 때, 아기 돼지 삼 형제의 포만도가 같아지게 음식을 나누어 주는 방법의 가짓수를
+return 하는 프로그램을 작성하세요.
+
+제한사항.
+foods는 음식의 만족도가 1번 음식부터 n번 음식까지 순서대로 들어있는 배열입니다.
+foods에 들어있는 만족도는 -100,000이상 100,000 이하의 정수입니다.
+foods에 들어있는 음식의 개수는 500,000개 이하입니다.
+정답이 2^31 - 1보다 작거나 같은 경우만 입력으로 주어집니다.
 */
 
-int Solution(const vector<int>& cookie)
+int Solution(const vector<int> foods)
 {
-	int ans = 0;
-
-	if (cookie.size() == 1)
+	if (foods.size() < 3)
 		return 0;
 
-	for (int m = 0; m < cookie.size() - 1; m++)
+	int ans = 0;
+
+	int firstPigSum = 0;
+	for (int x = 0; x < foods.size() - 2; x++)
 	{
-		int leftStart = m;
-		int leftEnd = m;
-		int leftSum = cookie[m];
-
-		int rightStart = m + 1;
-		int rightEnd = rightStart;
-		int rightSum = cookie[m + 1];
-
-		while (true)
+		firstPigSum += foods[x];
+		int secondPigSum = 0;
+		for (int secondPigStart = x + 1; secondPigStart < foods.size() - 1; secondPigStart++)
 		{
-			if (rightEnd >= cookie.size() || leftStart < 0)
+			secondPigSum += foods[secondPigStart];
+			if (firstPigSum == secondPigSum)
+			{
+				int thirdPigSum = 0;
+				for (int thirdPigStart = secondPigStart + 1; thirdPigStart < foods.size(); thirdPigStart++)
+				{
+					thirdPigSum += foods[thirdPigStart];
+				}
+				if (firstPigSum == thirdPigSum)
+				{
+					ans++;
+				}
+			}
+			if (firstPigSum < secondPigSum)
 				break;
-
-			if (leftSum == rightSum)
-			{
-				ans = max(ans, leftSum);
-				rightEnd += 1;
-				leftStart -= 1;
-				continue;
-			}
-
-			if (leftSum < rightSum)
-			{
-				--leftStart;
-				if (leftStart >= 0)
-					leftSum += cookie[leftStart];
-			}
-			else
-			{
-				++rightEnd;
-				if (rightEnd < cookie.size())
-					rightSum += cookie[rightSum];
-			}
 		}
 	}
 
@@ -89,12 +85,12 @@ int main()
 {
 	Init;
 
-	vector<int> cookie1 = { 1,1,2,3 };	// ANS) 3
-	vector<int> cookie2 = { 1,2,4,5 };	// ANS) 0
+	vector<int> foods1 = { 1,2,3,0,3 }; // ans)2
+	vector<int> foods2 = { 4,1 };		// ans)0
 
-	cout << Solution(cookie1);
+	cout << Solution(foods1);
 	cout << endl;
-	cout << Solution(cookie2);
+	cout << Solution(foods2);
 
 	return 0;
 }
