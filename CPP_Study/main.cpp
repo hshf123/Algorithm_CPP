@@ -24,55 +24,26 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-class DisjointSet
+struct Problem
 {
-public:
-	DisjointSet(const int& nodeCount) : _parent(nodeCount), _rank(nodeCount, 1)
+	int level = 0;
+	unordered_set<int> priorityList;
+	unordered_set<int> relationList;
+	bool solved = false;
+
+	void Relation(const int& n)
 	{
-		for (int i = 0; i < nodeCount; i++)
-			_parent[i] = i;
+		relationList.insert(n);
 	}
 
-	int Find(int u)
+	void Insert(const int& n)
 	{
-		while (true)
-		{
-			if (u == _parent[u])
-				return u;
-
-			u = _parent[u];
-		}
+		priorityList.insert(n);
 	}
 
-	void Merge(int u, int v)
+	void Erase(const int& n)
 	{
-		u = Find(u);
-		v = Find(v);
-
-		if (u == v)
-			return;
-
-		if (_rank[u] > _rank[v])
-			::swap(u, v);
-
-		_parent[u] = v;
-		if (_rank[u] == _rank[v])
-			_rank[v]++;
-	}
-
-private:
-	vector<int> _parent;
-	vector<int> _rank;
-};
-
-struct CostEdge
-{
-	int cost;
-	int u;
-	int v;
-	bool operator<(const CostEdge& other)
-	{
-		return cost < other.cost;
+		priorityList.erase(n);
 	}
 };
 
@@ -82,36 +53,46 @@ int main()
 
 	int N, M;
 	cin >> N >> M;
-
-	vector<CostEdge> edges;
-	vector<CostEdge> selected;
-	int ret = 0;
-
+	vector<Problem> problemList(N + 1);
+	for (int i = 0; i < N; i++)
+		problemList[i + 1].level = i + 1;
 	for (int i = 0; i < M; i++)
 	{
-		int A, B, C;
-		cin >> A >> B >> C;
-		edges.push_back({ C, A - 1, B - 1 });
-		edges.push_back({ C, B - 1, A - 1 });
+		int A, B;
+		cin >> A >> B;
+		problemList[B].Insert(A);
+		problemList[A].Relation(B);
 	}
 
-	std::sort(edges.begin(), edges.end());
-
-	DisjointSet ds(N);
-
-	int lastCost = 0;
-	for(CostEdge& edge : edges)
+	priority_queue<int, vector<int>, greater<int>> pq;
+	for (int i = 1; i <= N; i++)
 	{
-		if (ds.Find(edge.u) == ds.Find(edge.v))
+		if (problemList[i].priorityList.empty())
+			pq.push(i);
+	}
+
+	int solveCount = 0;
+	while (pq.empty() == false)
+	{
+		int level = pq.top();
+		pq.pop();
+
+		if (problemList[level].solved)
 			continue;
 
-		ds.Merge(edge.u, edge.v);
-		selected.push_back(edge);
-		ret += edge.cost;
-		lastCost = edge.cost;
-	}
+		cout << level << " ";
+		problemList[level].solved = true;
+		if (++solveCount == N)
+			break;
 
-	cout << ret - lastCost << endl;
+		// 얘가 풀리면 영향있는 문제들
+		for (const int& lv : problemList[level].relationList)
+		{
+			problemList[lv].Erase(level);
+			if (problemList[lv].priorityList.empty())
+				pq.push(lv);
+		}
+	}
 
 	return 0;
 }
