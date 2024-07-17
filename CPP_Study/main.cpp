@@ -24,33 +24,38 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-// 시계방향 8방
-array<int, 8> dy = { 1, 1, 0, -1, -1, -1, 0, 1 };
-array<int, 8> dx = { 0, 1, 1, 1, 0, -1, -1, -1 };
-vector<vector<char>> board(5, vector<char>(5));
-vector<string> tc;
-
-bool Search(const int& y, const int& x, const string& str)
+int Solution(const vector<vector<bool>>& friendsList, vector<bool> vec)
 {
-	// 범위를 벗어났다면 실패
-	if (y < 0 || x < 0 || y >= 5 || x >= 5)
-		return false;
-
-	const char& c = board[y][x];
-	if (str[0] != c)		// 틀린문자
-		return false;
-	if (str.size() == 1)	// 다 찾음!
-		return true;
-
-	// 다음 8방향 탐색
-	for (int i = 0; i < 8; i++)
+	int A = -1;	// 앞에서 부터 짝을 못 찾은 학생의 인덱스
+	for (int i = 0; i < vec.size(); i++)
 	{
-		// 먼저 한 번이라도 찾으면 끝
-		if (Search(y + dy[i], x + dx[i], str.substr(1)))
-			return true;
+		if (vec[i] == false)
+		{
+			A = i;
+			break;
+		}
+	}
+	if (A == -1)	// 모든 학생이 짝을 찾음
+		return 1;
+
+	int ret = 0;
+	for (int B = A + 1; B < vec.size(); B++)
+	{
+		if (vec[B])						// B는 이미 짝이 있어요
+			continue;
+		if (friendsList[A][B] == false)	// A와 B는 친구가 아님
+			continue;
+
+		// A와 B를 짝으로
+		vec[A] = true;
+		vec[B] = true;
+		ret += Solution(friendsList, vec);
+		// 다시 짝 풀어서 다음 경우의 수 탐색 가능하도록
+		vec[A] = false;
+		vec[B] = false;
 	}
 
-	return false;
+	return ret;
 }
 
 int main()
@@ -59,40 +64,27 @@ int main()
 
 	int C;
 	cin >> C;
-
-	for (int y = 0; y < 5; y++)
-		for (int x = 0; x < 5; x++)
-			cin >> board[y][x];
-
+	vector<int> ansList(C);
 	for (int c = 0; c < C; c++)
 	{
-		int N;
-		cin >> N;
-		tc.resize(N);
-		for (int i = 0; i < N; i++)
-			cin >> tc[i];
+		int n, m;
+		cin >> n >> m;
 
-		vector<bool> existList(tc.size(), false);
-		for (int y = 0; y < 5; y++)
+		vector<vector<bool>> friends(n, vector<bool>(n, false));
+		for (int i = 0; i < m; i++)
 		{
-			for (int x = 0; x < 5; x++)
-			{
-				for (int i = 0; i < tc.size(); i++)
-				{
-					if (Search(y, x, tc[i]))
-						existList[i] = true;
-				}
-			}
+			int A, B;
+			cin >> A >> B;
+			friends[A][B] = true;	// A와 B는 친구
+			friends[B][A] = true;
 		}
+		vector<bool> vec(n, false);
 
-		for (int i = 0; i < tc.size(); i++)
-		{
-			if (existList[i])
-				cout << tc[i] << " YES" << endl;
-			else
-				cout << tc[i] << " NO" << endl;
-		}
+		ansList[c] = Solution(friends, vec);
 	}
+	
+	for (const int& ans : ansList)
+		cout << ans << endl;
 	
 	return 0;
 }
