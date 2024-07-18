@@ -24,37 +24,71 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-int Solution(const vector<vector<bool>>& friendsList, vector<bool> vec)
+vector<vector<vector<int>>> blockTypeList =
 {
-	int A = -1;	// 앞에서 부터 짝을 못 찾은 학생의 인덱스
-	for (int i = 0; i < vec.size(); i++)
+	{{0,0},{1,0}, {0,1}},
+	{{0,0},{0,1}, {1,1}},
+	{{0,0},{1,0}, {1,1}},
+	{{0,0},{1,0}, {1,-1}}
+};
+
+bool Set(vector<vector<int>>& board, const int& type, const int& y, const int& x, const bool& isAdd)
+{
+	bool ret = true;
+	for (int i = 0; i < 3; i++)
 	{
-		if (vec[i] == false)
+		// 블록 좌표
+		int posY = y + blockTypeList[type][i][0];
+		int posX = x + blockTypeList[type][i][1];
+
+		// 좌표가 범위를 벗어나거나
+		// 애초에 못 놓는 곳이라거나 이미 놓아져 있으면
+		if (posY < 0 || posX < 0 || posY >= board.size() || posX >= board[0].size())
+			ret = false;
+		else
 		{
-			A = i;
-			break;
+			if (isAdd)
+				board[posY][posX] += 1;
+			else
+				board[posY][posX] -= 1;
+			if (board[posY][posX] > 1)
+				ret = false;
 		}
 	}
-	if (A == -1)	// 모든 학생이 짝을 찾음
+
+	return ret;
+}
+
+int Solution(vector<vector<int>>& board)
+{
+	// 일단 보드에서 놓을 수 있는 곳 중 왼쪽 위를 찾는다
+	int findY = -1;
+	int findX = -1;
+	for (int y = 0; y < board.size(); y++)
+	{
+		for (int x = 0; x < board[y].size(); x++)
+		{
+			if (board[y][x] != 0)	// 못 놓는 칸이거나 이미 놓아진 칸
+				continue;
+
+			findY = y;
+			findX = x;
+			break;					// 찾으면 바로 빠져나옴
+		}
+		if (findY != -1 && findX != -1) // 한번 더 빠져나와야하네..
+			break;
+	}
+	if (findY == -1 && findX == -1)	// 여기 걸리면 다 채워진거
 		return 1;
 
+	// 4개 타입 중에서 놓을 수 있는지
 	int ret = 0;
-	for (int B = A + 1; B < vec.size(); B++)
+	for (int i = 0; i < 4; i++)
 	{
-		if (vec[B])						// B는 이미 짝이 있어요
-			continue;
-		if (friendsList[A][B] == false)	// A와 B는 친구가 아님
-			continue;
-
-		// A와 B를 짝으로
-		vec[A] = true;
-		vec[B] = true;
-		ret += Solution(friendsList, vec);
-		// 다시 짝 풀어서 다음 경우의 수 탐색 가능하도록
-		vec[A] = false;
-		vec[B] = false;
+		if (Set(board, i, findY, findX, true))
+			ret += Solution(board);
+		Set(board, i, findY, findX, false);
 	}
-
 	return ret;
 }
 
@@ -67,20 +101,31 @@ int main()
 	vector<int> ansList(C);
 	for (int c = 0; c < C; c++)
 	{
-		int n, m;
-		cin >> n >> m;
-
-		vector<vector<bool>> friends(n, vector<bool>(n, false));
-		for (int i = 0; i < m; i++)
+		int H, W;
+		cin >> H >> W;
+		vector<vector<int>> board(H, vector<int>(W));
+		int count = 0;
+		for (int y = 0; y < H; y++)
 		{
-			int A, B;
-			cin >> A >> B;
-			friends[A][B] = true;	// A와 B는 친구
-			friends[B][A] = true;
+			for (int x = 0; x < W; x++)
+			{
+				char c;
+				cin >> c;
+				if (c == '.')
+				{
+					board[y][x] = 0;
+					count++;
+				}
+				else
+					board[y][x] = 1;
+			}
 		}
-		vector<bool> vec(n, false);
-
-		ansList[c] = Solution(friends, vec);
+		if (count % 3 != 0)
+		{
+			ansList[c] = 0;
+			continue;
+		}
+		ansList[c] = Solution(board);
 	}
 	
 	for (const int& ans : ansList)
