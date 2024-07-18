@@ -24,70 +24,62 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-vector<vector<vector<int>>> blockTypeList =
+#define SHIFT(x) 1 << x
+
+vector<int> switchList =
 {
-	{{0,0},{1,0}, {0,1}},
-	{{0,0},{0,1}, {1,1}},
-	{{0,0},{1,0}, {1,1}},
-	{{0,0},{1,0}, {1,-1}}
+	SHIFT(0) | SHIFT(1) | SHIFT(2),
+	SHIFT(3) | SHIFT(7) | SHIFT(9) | SHIFT(11),
+	SHIFT(4) | SHIFT(10) | SHIFT(14) | SHIFT(15),
+	SHIFT(0) | SHIFT(4) | SHIFT(5) | SHIFT(6) | SHIFT(7),
+	SHIFT(6) | SHIFT(7) | SHIFT(8) | SHIFT(10) | SHIFT(12),
+	SHIFT(0) | SHIFT(2) | SHIFT(14) | SHIFT(15),
+	SHIFT(3) | SHIFT(14) | SHIFT(15),
+	SHIFT(4) | SHIFT(5) | SHIFT(7) | SHIFT(14) | SHIFT(15),
+	SHIFT(1) | SHIFT(2) | SHIFT(3) | SHIFT(4) | SHIFT(5),
+	SHIFT(3) | SHIFT(4) | SHIFT(5) | SHIFT(9) | SHIFT(13),
 };
 
-bool Set(vector<vector<int>>& board, const int& type, const int& y, const int& x, const bool& isAdd)
+void Push(vector<int>& timeList, const int& btn)
 {
-	bool ret = true;
-	for (int i = 0; i < 3; i++)
+	int idx = 0;
+	for (int i = 1; i < SHIFT(16); i <<= 1)
 	{
-		// 블록 좌표
-		int posY = y + blockTypeList[type][i][0];
-		int posX = x + blockTypeList[type][i][1];
-
-		// 좌표가 범위를 벗어나거나
-		// 애초에 못 놓는 곳이라거나 이미 놓아져 있으면
-		if (posY < 0 || posX < 0 || posY >= board.size() || posX >= board[0].size())
-			ret = false;
-		else
+		if (switchList[btn] & i)
 		{
-			if (isAdd)
-				board[posY][posX] += 1;
-			else
-				board[posY][posX] -= 1;
-			if (board[posY][posX] > 1)
-				ret = false;
+			timeList[idx] += 3;
+			if (timeList[idx] == 15)
+				timeList[idx] = 3;
 		}
+		idx++;
 	}
-
-	return ret;
 }
 
-int Solution(vector<vector<int>>& board)
+int Solution(vector<int>& timeList, int btn)
 {
-	// 일단 보드에서 놓을 수 있는 곳 중 왼쪽 위를 찾는다
-	int findY = -1;
-	int findX = -1;
-	for (int y = 0; y < board.size(); y++)
+	// 모든 시계가 12시를 가리키고 있다면 땡
+	if (btn == 10)
 	{
-		for (int x = 0; x < board[y].size(); x++)
+		bool done = true;
+		for (const int& time : timeList)
 		{
-			if (board[y][x] != 0)	// 못 놓는 칸이거나 이미 놓아진 칸
-				continue;
-
-			findY = y;
-			findX = x;
-			break;					// 찾으면 바로 빠져나옴
+			if (time != 12)
+			{
+				done = false;
+				break;
+			}
 		}
-		if (findY != -1 && findX != -1) // 한번 더 빠져나와야하네..
-			break;
+		if (done)
+			return 0;
+		if (btn == 10)
+			return INT32_HALF;
 	}
-	if (findY == -1 && findX == -1)	// 여기 걸리면 다 채워진거
-		return 1;
 
-	// 4개 타입 중에서 놓을 수 있는지
-	int ret = 0;
+	int ret = INT32_HALF;
 	for (int i = 0; i < 4; i++)
 	{
-		if (Set(board, i, findY, findX, true))
-			ret += Solution(board);
-		Set(board, i, findY, findX, false);
+		ret = min(ret, Solution(timeList, btn + 1) + i);
+		Push(timeList, btn);
 	}
 	return ret;
 }
@@ -98,34 +90,14 @@ int main()
 
 	int C;
 	cin >> C;
-	vector<int> ansList(C);
+	vector<int> ansList(C, 0);
 	for (int c = 0; c < C; c++)
 	{
-		int H, W;
-		cin >> H >> W;
-		vector<vector<int>> board(H, vector<int>(W));
-		int count = 0;
-		for (int y = 0; y < H; y++)
-		{
-			for (int x = 0; x < W; x++)
-			{
-				char c;
-				cin >> c;
-				if (c == '.')
-				{
-					board[y][x] = 0;
-					count++;
-				}
-				else
-					board[y][x] = 1;
-			}
-		}
-		if (count % 3 != 0)
-		{
-			ansList[c] = 0;
-			continue;
-		}
-		ansList[c] = Solution(board);
+		vector<int> timeList(16);
+		for (int i = 0; i < 16; i++)
+			cin >> timeList[i];
+
+		ansList[c] = Solution(timeList, 0);
 	}
 	
 	for (const int& ans : ansList)
