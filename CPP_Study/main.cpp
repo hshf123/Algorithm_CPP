@@ -24,64 +24,21 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-#define SHIFT(x) 1 << x
-
-vector<int> switchList =
+string Solution(string::iterator& it)
 {
-	SHIFT(0) | SHIFT(1) | SHIFT(2),
-	SHIFT(3) | SHIFT(7) | SHIFT(9) | SHIFT(11),
-	SHIFT(4) | SHIFT(10) | SHIFT(14) | SHIFT(15),
-	SHIFT(0) | SHIFT(4) | SHIFT(5) | SHIFT(6) | SHIFT(7),
-	SHIFT(6) | SHIFT(7) | SHIFT(8) | SHIFT(10) | SHIFT(12),
-	SHIFT(0) | SHIFT(2) | SHIFT(14) | SHIFT(15),
-	SHIFT(3) | SHIFT(14) | SHIFT(15),
-	SHIFT(4) | SHIFT(5) | SHIFT(7) | SHIFT(14) | SHIFT(15),
-	SHIFT(1) | SHIFT(2) | SHIFT(3) | SHIFT(4) | SHIFT(5),
-	SHIFT(3) | SHIFT(4) | SHIFT(5) | SHIFT(9) | SHIFT(13),
-};
+	char head = *it;
+	++it;	// 여기서 이터레이터 증가시켜주니까 밑에 Solution 4번 호출될 때는 항상 다음걸 가리키게됨
 
-void Push(vector<int>& timeList, const int& btn)
-{
-	int idx = 0;
-	for (int i = 1; i < SHIFT(16); i <<= 1)
-	{
-		if (switchList[btn] & i)
-		{
-			timeList[idx] += 3;
-			if (timeList[idx] == 15)
-				timeList[idx] = 3;
-		}
-		idx++;
-	}
-}
+	// 분할 필요 없이 바로 리턴
+	if (head == 'b' || head == 'w')
+		return string(1, head);
 
-int Solution(vector<int>& timeList, int btn)
-{
-	// 모든 시계가 12시를 가리키고 있다면 땡
-	if (btn == 10)
-	{
-		bool done = true;
-		for (const int& time : timeList)
-		{
-			if (time != 12)
-			{
-				done = false;
-				break;
-			}
-		}
-		if (done)
-			return 0;
-		if (btn == 10)
-			return INT32_HALF;
-	}
-
-	int ret = INT32_HALF;
-	for (int i = 0; i < 4; i++)
-	{
-		ret = min(ret, Solution(timeList, btn + 1) + i);
-		Push(timeList, btn);
-	}
-	return ret;
+	// x라는 소리니까 분할, 압축순서대로 문자열 얻고 위와 아래를 뒤집으면 된다!
+	string left_up = Solution(it);
+	string right_up = Solution(it);
+	string left_down = Solution(it);
+	string right_down = Solution(it);
+	return "x" + left_down + right_down + left_up + right_up;
 }
 
 int main()
@@ -90,17 +47,16 @@ int main()
 
 	int C;
 	cin >> C;
-	vector<int> ansList(C, 0);
+	vector<string> ansList(C);
 	for (int c = 0; c < C; c++)
 	{
-		vector<int> timeList(16);
-		for (int i = 0; i < 16; i++)
-			cin >> timeList[i];
-
-		ansList[c] = Solution(timeList, 0);
+		string str;
+		cin >> str;
+		string::iterator it = str.begin();
+		ansList[c] = Solution(it);
 	}
 	
-	for (const int& ans : ansList)
+	for (const string& ans : ansList)
 		cout << ans << endl;
 	
 	return 0;
