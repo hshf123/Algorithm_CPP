@@ -24,21 +24,48 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-string Solution(string::iterator& it)
+int Solution(vector<int>& vec, int s, int e)
 {
-	char head = *it;
-	++it;	// 여기서 이터레이터 증가시켜주니까 밑에 Solution 4번 호출될 때는 항상 다음걸 가리키게됨
+	// 기저 사항
+	if (s == e)
+		return vec[s];	// 현재위치의 높이
 
-	// 분할 필요 없이 바로 리턴
-	if (head == 'b' || head == 'w')
-		return string(1, head);
+	int ret = 0;
+	int mid = (s + e) / 2;
+	// 1번 왼쪽에 답이 있다
+	ret = max(ret, Solution(vec, s, mid));
+	// 2번 오른쪽에 답이 있다
+	ret = max(ret, Solution(vec, mid + 1, e));
 
-	// x라는 소리니까 분할, 압축순서대로 문자열 얻고 위와 아래를 뒤집으면 된다!
-	string left_up = Solution(it);
-	string right_up = Solution(it);
-	string left_down = Solution(it);
-	string right_down = Solution(it);
-	return "x" + left_down + right_down + left_up + right_up;
+	// 3번 걸쳐있다
+	// 오른쪽 확장할지 왼쪽 확장할지 정할거임
+	int left = mid - 1;
+	int right = mid + 1;
+	int area = vec[mid];				// 넓이
+	int height = vec[mid];
+	int width = 2;
+	// 시작과 끝 값 안에서 놀아야함
+	while (s <= left && right <= e)
+	{
+		if (vec[left] > vec[right])
+		{
+			// 왼쪽값이 더 크다!
+			height = min(height, vec[left]);
+			area = height * width++;
+			left--;
+		}
+		else
+		{
+			// 오른쪽값이 더 크다!
+			height = min(height, vec[right]);
+			area = height * width++;
+			right++;
+		}
+
+		ret = max(ret, area);
+	}
+
+	return ret;
 }
 
 int main()
@@ -47,16 +74,18 @@ int main()
 
 	int C;
 	cin >> C;
-	vector<string> ansList(C);
+	vector<int> ansList(C);
 	for (int c = 0; c < C; c++)
 	{
-		string str;
-		cin >> str;
-		string::iterator it = str.begin();
-		ansList[c] = Solution(it);
+		int N;
+		cin >> N;
+		vector<int> vec(N);
+		for (int i = 0; i < N; i++)
+			cin >> vec[i];
+		ansList[c] = Solution(vec, 0, N - 1);
 	}
 	
-	for (const string& ans : ansList)
+	for (const int& ans : ansList)
 		cout << ans << endl;
 	
 	return 0;
