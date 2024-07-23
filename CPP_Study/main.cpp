@@ -24,46 +24,77 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-int Solution(vector<int>& vec, int s, int e)
+vector<int> multiply(const vector<int>& a, const vector<int>& b)
 {
-	// 기저 사항
-	if (s == e)
-		return vec[s];	// 현재위치의 높이
-
-	int ret = 0;
-	int mid = (s + e) / 2;
-	// 1번 왼쪽에 답이 있다
-	ret = max(ret, Solution(vec, s, mid));
-	// 2번 오른쪽에 답이 있다
-	ret = max(ret, Solution(vec, mid + 1, e));
-
-	// 3번 걸쳐있다
-	// 오른쪽 확장할지 왼쪽 확장할지 정할거임
-	int left = mid - 1;
-	int right = mid + 1;
-	int area = vec[mid];				// 넓이
-	int height = vec[mid];
-	int width = 2;
-	// 시작과 끝 값 안에서 놀아야함
-	while (s <= left && right <= e)
+	vector<int> ret(a.size() + b.size() + 1);
+	for (int i = 0; i < a.size(); i++)
 	{
-		if (vec[left] > vec[right])
+		for (int j = 0; j < b.size(); j++)
 		{
-			// 왼쪽값이 더 크다!
-			height = min(height, vec[left]);
-			area = height * width++;
-			left--;
+			ret[i + j] += a[i] * b[j];
 		}
-		else
-		{
-			// 오른쪽값이 더 크다!
-			height = min(height, vec[right]);
-			area = height * width++;
-			right++;
-		}
-
-		ret = max(ret, area);
 	}
+
+	for (int i = 0; i < ret.size() -1 ; i++)
+	{
+		ret[i + 1] += (ret[i] / 10);
+		ret[i] %= 10;
+	}
+	return ret;
+}
+
+void addTo(vector<int>& a, const vector<int>& b, int k)
+{
+	if (a.size() > b.size() + k)
+		a.resize(b.size() + k + 1);
+	for (int i = k; i < b.size() + k -1; i++)
+	{
+		a[i] += b[i - k];
+		a[i + 1] = a[i] / 10;
+	}
+}
+
+void subFrom(vector<int>& a, const vector<int>& b)
+{
+	for (int i = 0; i < b.size(); i++)
+	{
+		a[i] -= b[i];
+		if (a[i] < 0)
+		{
+			--a[i + 1];
+			a[i] += 10;
+		}
+	}
+}
+
+vector<int> karatsuba(const vector<int>& a, const vector<int>& b)
+{
+	int an = a.size();
+	int bn = b.size();
+	if (an < bn)
+		return karatsuba(b, a);
+
+	if (an == 0 || bn == 0) return vector<int>();
+	if (an <= 50) return multiply(a, b);
+	int half = an / 2;
+	vector<int> a0(a.begin(), a.begin() + half);
+	vector<int> a1(a.begin() + half, a.end());
+	vector<int> b0(b.begin(), b.begin() + min((int)b.size(), half));
+	vector<int> b1(b.begin() + min((int)b.size(), half), b.end());
+
+	vector<int> z2 = karatsuba(a1, b1);
+	vector<int> z0 = karatsuba(a0, b0);
+
+	addTo(a0, a1, 0);
+	addTo(b0, b1, 0);
+	vector<int> z1 = karatsuba(a0, b0);
+	subFrom(z1, z0);
+	subFrom(z1, z2);
+
+	vector<int> ret;
+	addTo(ret, z0, 0);
+	addTo(ret, z1, half);
+	addTo(ret, z2, an);
 
 	return ret;
 }
@@ -71,22 +102,20 @@ int Solution(vector<int>& vec, int s, int e)
 int main()
 {
 	Init;
-
-	int C;
-	cin >> C;
-	vector<int> ansList(C);
-	for (int c = 0; c < C; c++)
+	vector<int> a;
+	for (int i = 0; i < 50; i++)
 	{
-		int N;
-		cin >> N;
-		vector<int> vec(N);
-		for (int i = 0; i < N; i++)
-			cin >> vec[i];
-		ansList[c] = Solution(vec, 0, N - 1);
+		a.push_back(1);
 	}
-	
-	for (const int& ans : ansList)
-		cout << ans << endl;
+	vector<int> b;
+	for (int i = 0; i < 50; i++)
+	{
+		b.push_back(2);
+	}
+	vector<int> c = karatsuba(a, b);
+	reverse(c.begin(), c.end());
+	for (int n : c)
+		cout << n;
 	
 	return 0;
 }
