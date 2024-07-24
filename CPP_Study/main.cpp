@@ -24,79 +24,25 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-vector<int> multiply(const vector<int>& a, const vector<int>& b)
+bool cache[100][100];
+
+bool Solve(const vector<vector<int>>& board, const int& y, const int& x, const int& n)
 {
-	vector<int> ret(a.size() + b.size() + 1, 0);
-	for (int i = 0; i < a.size(); i++)
-	{
-		for (int j = 0; j < b.size(); j++)
-		{
-			ret[i + j] += (a[i] * b[j]);
-		}
-	}
+	// 목적지에 도달했으면 끝
+	if (y == n - 1 && x == n - 1)
+		return true;
+	// 맵 밖으로 나가면 끝
+	if (y < 0 || x < 0 || y >= n || x >= n)
+		return false;
 
-	//for (int i = 0; i < ret.size() -1 ; i++)
-	//{
-	//	ret[i + 1] += (ret[i] / 10);
-	//	ret[i] %= 10;
-	//}
-	return ret;
-}
+	// 캐시 확인
+	bool& ret = cache[y][x];
+	if (ret != false)
+		return ret;
 
-void addTo(vector<int>& a, const vector<int>& b, int k)
-{
-	if (a.size() < b.size() + k)
-		a.resize(b.size() + k);
-	for (int i = 0; i < b.size(); i++)
-	{
-		a[i + k] += b[i];
-	}
-}
-
-void subFrom(vector<int>& a, const vector<int>& b)
-{
-	if (a.size() < b.size())
-		a.resize(b.size() + 1);
-	for (int i = 0; i < b.size(); i++)
-	{
-		a[i] -= b[i];
-		//if (a[i] < 0)
-		//{
-		//	--a[i + 1];
-		//	a[i] += 10;
-		//}
-	}
-}
-
-vector<int> karatsuba(const vector<int>& a, const vector<int>& b)
-{
-	int an = a.size();
-	int bn = b.size();
-	if (an < bn)
-		return karatsuba(b, a);
-
-	if (an == 0 || bn == 0) return vector<int>();
-	if (an <= 50) return multiply(a, b);
-	int half = an / 2;
-	vector<int> a0(a.begin(), a.begin() + half);
-	vector<int> a1(a.begin() + half, a.end());
-	vector<int> b0(b.begin(), b.begin() + min((int)b.size(), half));
-	vector<int> b1(b.begin() + min((int)b.size(), half), b.end());
-
-	vector<int> z2 = karatsuba(a1, b1);
-	vector<int> z0 = karatsuba(a0, b0);
-
-	addTo(a0, a1, 0);
-	addTo(b0, b1, 0);
-	vector<int> z1 = karatsuba(a0, b0);
-	subFrom(z1, z0);
-	subFrom(z1, z2);
-
-	vector<int> ret;
-	addTo(ret, z0, 0);
-	addTo(ret, z1, half);
-	addTo(ret, z2, half * 2);
-	return ret;
+	// 움직여야하는 칸
+	const int& moveCount = board[y][x];
+	return ret = Solve(board, y + moveCount, x, n) || Solve(board, y, x + moveCount, n);
 }
 
 int main()
@@ -106,36 +52,23 @@ int main()
 	int C;
 	cin >> C;
 
-	vector<int> ans(C, 0);
+	vector<bool> ans(C, false);
 	for (int c = 0; c < C; c++)
 	{
-		string member;
-		cin >> member;
-		string fan;
-		cin >> fan;
+		int n;
+		cin >> n;
+		vector<vector<int>> board(n, vector<int>(n));
+		for (int y = 0; y < n; y++)
+			for (int x = 0; x < n; x++)
+				cin >> board[y][x];
 
-		vector<int> a(member.size(), 0);
-		for (int i = 0; i < a.size(); i++)
-		{
-			if (member[i] == 'M')
-				a[i] = 1;
-		}
-		vector<int> b(fan.size(), 0);
-		for (int i = 0; i < b.size(); i++)
-		{
-			if (fan[i] == 'M')
-				b[b.size() - i - 1] = 1;
-		}
-		vector<int> ret = karatsuba(b, a);
-		for (int i = member.size() - 1; i < fan.size(); i++)
-		{
-			if (ret[i] == 0)
-				ans[c]++;
-		}
+		::memset(cache, false, sizeof(cache));
+
+		ans[c] = Solve(board, 0, 0, n);
 	}
 
-	for (const int& n : ans)
-		cout << n << endl;
+	for (const bool& n : ans)
+		cout << (n ? "YES" : "NO") << endl;
 	
 	return 0;
 }
