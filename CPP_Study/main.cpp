@@ -26,44 +26,45 @@ using uint64 = unsigned long long;
 
 vector<int> multiply(const vector<int>& a, const vector<int>& b)
 {
-	vector<int> ret(a.size() + b.size() + 1);
+	vector<int> ret(a.size() + b.size() + 1, 0);
 	for (int i = 0; i < a.size(); i++)
 	{
 		for (int j = 0; j < b.size(); j++)
 		{
-			ret[i + j] += a[i] * b[j];
+			ret[i + j] += (a[i] * b[j]);
 		}
 	}
 
-	for (int i = 0; i < ret.size() -1 ; i++)
-	{
-		ret[i + 1] += (ret[i] / 10);
-		ret[i] %= 10;
-	}
+	//for (int i = 0; i < ret.size() -1 ; i++)
+	//{
+	//	ret[i + 1] += (ret[i] / 10);
+	//	ret[i] %= 10;
+	//}
 	return ret;
 }
 
 void addTo(vector<int>& a, const vector<int>& b, int k)
 {
-	if (a.size() > b.size() + k)
-		a.resize(b.size() + k + 1);
-	for (int i = k; i < b.size() + k -1; i++)
+	if (a.size() < b.size() + k)
+		a.resize(b.size() + k);
+	for (int i = 0; i < b.size(); i++)
 	{
-		a[i] += b[i - k];
-		a[i + 1] = a[i] / 10;
+		a[i + k] += b[i];
 	}
 }
 
 void subFrom(vector<int>& a, const vector<int>& b)
 {
+	if (a.size() < b.size())
+		a.resize(b.size() + 1);
 	for (int i = 0; i < b.size(); i++)
 	{
 		a[i] -= b[i];
-		if (a[i] < 0)
-		{
-			--a[i + 1];
-			a[i] += 10;
-		}
+		//if (a[i] < 0)
+		//{
+		//	--a[i + 1];
+		//	a[i] += 10;
+		//}
 	}
 }
 
@@ -94,28 +95,47 @@ vector<int> karatsuba(const vector<int>& a, const vector<int>& b)
 	vector<int> ret;
 	addTo(ret, z0, 0);
 	addTo(ret, z1, half);
-	addTo(ret, z2, an);
-
+	addTo(ret, z2, half * 2);
 	return ret;
 }
 
 int main()
 {
 	Init;
-	vector<int> a;
-	for (int i = 0; i < 50; i++)
+	
+	int C;
+	cin >> C;
+
+	vector<int> ans(C, 0);
+	for (int c = 0; c < C; c++)
 	{
-		a.push_back(1);
+		string member;
+		cin >> member;
+		string fan;
+		cin >> fan;
+
+		vector<int> a(member.size(), 0);
+		for (int i = 0; i < a.size(); i++)
+		{
+			if (member[i] == 'M')
+				a[i] = 1;
+		}
+		vector<int> b(fan.size(), 0);
+		for (int i = 0; i < b.size(); i++)
+		{
+			if (fan[i] == 'M')
+				b[b.size() - i - 1] = 1;
+		}
+		vector<int> ret = karatsuba(b, a);
+		for (int i = member.size() - 1; i < fan.size(); i++)
+		{
+			if (ret[i] == 0)
+				ans[c]++;
+		}
 	}
-	vector<int> b;
-	for (int i = 0; i < 50; i++)
-	{
-		b.push_back(2);
-	}
-	vector<int> c = karatsuba(a, b);
-	reverse(c.begin(), c.end());
-	for (int n : c)
-		cout << n;
+
+	for (const int& n : ans)
+		cout << n << endl;
 	
 	return 0;
 }
