@@ -26,36 +26,19 @@ using uint64 = unsigned long long;
 
 vector<vector<int>> cache;
 
-int Solve(const string& W, const string& S, int wPos, int sPos)
+int Solve(const vector<vector<int>>& path, const int& y, const int& x)
 {
-	int& ret = cache[wPos][sPos];
+	if (y >= path.size() || x >= y + 1)
+		return 0;
+	if (y == path.size() - 1)
+		return path[y][x];
+
+	int& ret = cache[y][x];
 	if (ret != -1)
 		return ret;
 
-	//while (sPos < S.size() && wPos < W.size() && (W[wPos] == '?' || W[wPos] == S[sPos]))
-	//{
-	//	++wPos;
-	//	++sPos;
-	//}
-
-	if (sPos < S.size() && wPos < W.size() && (W[wPos] == '?' || W[wPos] == S[sPos]))
-		return ret = Solve(W, S, wPos + 1, sPos + 1);
-
-	if (wPos == W.size())
-		return ret = sPos == S.size() ? 1 : 0;
-	if (W[wPos] == '*')
-	{
-		//for (int skip = 0; sPos + skip <= S.size(); ++skip)
-		//{
-		//	if (Solve(W, S, wPos + 1, sPos + skip) > 0)
-		//		return ret = 1;
-		//}
-
-		if(Solve(W, S, wPos + 1, sPos) > 0 || (sPos < S.size() && Solve(W, S, wPos, sPos + 1) > 0))
-			return ret = 1;
-	}
-
-	return ret = 0;
+	int add = path[y][x];
+	return ret = max(Solve(path, y + 1, x), Solve(path, y + 1, x + 1)) + add;
 }
 
 int main()
@@ -65,30 +48,27 @@ int main()
 	int C;
 	cin >> C;
 
-	vector<string> ans;
+	vector<int> ans(C);
 	for (int c = 0; c < C; c++)
 	{
-		string W;
-		cin >> W;
-
-		int N;
-		cin >> N;
-		for (int i = 0; i < N; i++)
+		int n;
+		cin >> n;
+		vector<vector<int>> path(n, vector<int>(n));
+		cache = vector<vector<int>>(n, vector<int>(n, -1));
+		for (int i = 1; i <= n; i++)
 		{
-			string fileName;
-			cin >> fileName;
-
-			cache = vector<vector<int>>(W.size() + 1, vector<int>(fileName.size() + 1, -1));
-
-			if (Solve(W, fileName, 0, 0) > 0)
-				ans.push_back(fileName);
+			for (int j = 0; j < i; j++)
+			{
+				cin >> path[i - 1][j];
+			}
 		}
+
+		ans[c] = Solve(path, 0, 0);
 	}
 
-	sort(ans.begin(), ans.end());
 	cout << endl;
-	for (const string& str : ans)
-		cout << str << endl;
+	for (const int& a : ans)
+		cout << a << endl;
 	
 	return 0;
 }
