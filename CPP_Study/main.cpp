@@ -24,25 +24,32 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-bool cache[100][100];
+vector<vector<int>> cache;
 
-bool Solve(const vector<vector<int>>& board, const int& y, const int& x, const int& n)
+int Solve(const string& W, const string& S, int wPos, int sPos)
 {
-	// 목적지에 도달했으면 끝
-	if (y == n - 1 && x == n - 1)
-		return true;
-	// 맵 밖으로 나가면 끝
-	if (y < 0 || x < 0 || y >= n || x >= n)
-		return false;
-
-	// 캐시 확인
-	bool& ret = cache[y][x];
-	if (ret != false)
+	int& ret = cache[wPos][sPos];
+	if (ret != -1)
 		return ret;
 
-	// 움직여야하는 칸
-	const int& moveCount = board[y][x];
-	return ret = Solve(board, y + moveCount, x, n) || Solve(board, y, x + moveCount, n);
+	while (sPos < S.size() && wPos < W.size() && (W[wPos] == '?' || W[wPos] == S[sPos]))
+	{
+		++wPos;
+		++sPos;
+	}
+
+	if (wPos == W.size())
+		return ret = sPos == S.size() ? 1 : 0;
+	if (W[wPos] == '*')
+	{
+		for (int skip = 0; sPos + skip <= S.size(); ++skip)
+		{
+			if (Solve(W, S, wPos + 1, sPos + skip) > 0)
+				return ret = 1;
+		}
+	}
+
+	return ret = 0;
 }
 
 int main()
@@ -52,23 +59,30 @@ int main()
 	int C;
 	cin >> C;
 
-	vector<bool> ans(C, false);
+	vector<string> ans;
 	for (int c = 0; c < C; c++)
 	{
-		int n;
-		cin >> n;
-		vector<vector<int>> board(n, vector<int>(n));
-		for (int y = 0; y < n; y++)
-			for (int x = 0; x < n; x++)
-				cin >> board[y][x];
+		string W;
+		cin >> W;
 
-		::memset(cache, false, sizeof(cache));
+		int N;
+		cin >> N;
+		for (int i = 0; i < N; i++)
+		{
+			string fileName;
+			cin >> fileName;
 
-		ans[c] = Solve(board, 0, 0, n);
+			cache = vector<vector<int>>(W.size() + 1, vector<int>(fileName.size() + 1, -1));
+
+			if (Solve(W, fileName, 0, 0) > 0)
+				ans.push_back(fileName);
+		}
 	}
 
-	for (const bool& n : ans)
-		cout << (n ? "YES" : "NO") << endl;
+	sort(ans.begin(), ans.end());
+	cout << endl;
+	for (const string& str : ans)
+		cout << str << endl;
 	
 	return 0;
 }
