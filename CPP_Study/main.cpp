@@ -32,21 +32,27 @@ int Solve(const string& W, const string& S, int wPos, int sPos)
 	if (ret != -1)
 		return ret;
 
-	while (sPos < S.size() && wPos < W.size() && (W[wPos] == '?' || W[wPos] == S[sPos]))
-	{
-		++wPos;
-		++sPos;
-	}
+	//while (sPos < S.size() && wPos < W.size() && (W[wPos] == '?' || W[wPos] == S[sPos]))
+	//{
+	//	++wPos;
+	//	++sPos;
+	//}
+
+	if (sPos < S.size() && wPos < W.size() && (W[wPos] == '?' || W[wPos] == S[sPos]))
+		return ret = Solve(W, S, wPos + 1, sPos + 1);
 
 	if (wPos == W.size())
 		return ret = sPos == S.size() ? 1 : 0;
 	if (W[wPos] == '*')
 	{
-		for (int skip = 0; sPos + skip <= S.size(); ++skip)
-		{
-			if (Solve(W, S, wPos + 1, sPos + skip) > 0)
-				return ret = 1;
-		}
+		//for (int skip = 0; sPos + skip <= S.size(); ++skip)
+		//{
+		//	if (Solve(W, S, wPos + 1, sPos + skip) > 0)
+		//		return ret = 1;
+		//}
+
+		if(Solve(W, S, wPos + 1, sPos) > 0 || (sPos < S.size() && Solve(W, S, wPos, sPos + 1) > 0))
+			return ret = 1;
 	}
 
 	return ret = 0;
