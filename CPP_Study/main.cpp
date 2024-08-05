@@ -24,21 +24,21 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-vector<vector<int>> cache;
+vector<int> cache;
 
-int Solve(const vector<vector<int>>& path, const int& y, const int& x)
+int Solve(const vector<int>& path, const int& start)
 {
-	if (y >= path.size() || x >= y + 1)
-		return 0;
-	if (y == path.size() - 1)
-		return path[y][x];
-
-	int& ret = cache[y][x];
+	int& ret = cache[start];
 	if (ret != -1)
 		return ret;
 
-	int add = path[y][x];
-	return ret = max(Solve(path, y + 1, x), Solve(path, y + 1, x + 1)) + add;
+	ret = 1;
+	for (int i = start; i < path.size(); i++)
+	{
+		if (path[start] < path[i])
+			ret = max(Solve(path, i) + 1, ret);
+	}
+	return ret;
 }
 
 int main()
@@ -51,19 +51,14 @@ int main()
 	vector<int> ans(C);
 	for (int c = 0; c < C; c++)
 	{
-		int n;
-		cin >> n;
-		vector<vector<int>> path(n, vector<int>(n));
-		cache = vector<vector<int>>(n, vector<int>(n, -1));
-		for (int i = 1; i <= n; i++)
-		{
-			for (int j = 0; j < i; j++)
-			{
-				cin >> path[i - 1][j];
-			}
-		}
+		int N;
+		cin >> N;
+		vector<int> numList(N);
+		cache = vector<int>(N, -1);
+		for (int i = 0; i < N; ++i)
+			cin >> numList[i];
 
-		ans[c] = Solve(path, 0, 0);
+		ans[c] = Solve(numList, 0);
 	}
 
 	cout << endl;
