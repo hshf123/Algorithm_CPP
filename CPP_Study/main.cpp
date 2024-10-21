@@ -24,7 +24,16 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
+bool RightCheck(const unordered_map<char, int>& um)
+{
+	for (auto& p : um)
+	{
+		if (p.second > 0)
+			return false;
+	}
 
+	return true;
+}
 
 int main()
 {
@@ -33,32 +42,38 @@ int main()
 	string str;
 	cin >> str;
 
-	int64 sum = 0;
+	string ans;
+	cin >> ans;
 
-	string num;
+	unordered_map<char, int> rightCheck;
+	for (int i = 0; i < ans.size(); i++)
+		rightCheck[ans[i]] += 1;
 
+	int res = 0;
 	for (int i = 0; i < str.size(); i++)
 	{
-		char& c = str[i];
-		if (isdigit(c))
+		if (i < ans.size())
 		{
-			num += c;
-		}
-		else
-		{
-			if (num.empty())
-				continue;
+			if (rightCheck.find(str[i]) != rightCheck.end())
+				rightCheck[str[i]]--;
 
-			sum += atoi(num.c_str());
-			num.clear();
+			continue;
 		}
-	}
 
-	if (num.empty() == false)
-	{
-		sum += atoi(num.c_str());
+		if (RightCheck(rightCheck))
+			res++;
+
+		int popIdx = i - ans.size();
+		if (rightCheck.find(str[popIdx]) != rightCheck.end())
+			rightCheck[str[popIdx]]++;
+		if (rightCheck.find(str[i]) != rightCheck.end())
+			rightCheck[str[i]]--;
 	}
-	cout << sum;
 	
+	if (RightCheck(rightCheck))
+		res++;
+
+	cout << res;
+
 	return 0;
 }
