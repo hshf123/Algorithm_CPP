@@ -28,35 +28,36 @@ int main()
 {
 	Init;
 	
-	int W, H, T, S;
-	cin >> W >> H >> T >> S;
+	int N;
+	cin >> N;
 
-	vector<int> vecx(T);
-	vector<int> vecy(T);
 
-	for (int i = 0; i < T; i++)
+	stack<int> s;
+
+	vector<int> ret(N);
+	vector<int> res(N, 0);
+	int resIdx = N - 1;
+	for (int i = 0; i < N; i++)
 	{
-		cin >> vecx[i] >> vecy[i];
+		int n;
+		cin >> n;
+		ret[i] = n;
 	}
 
-	int ret = 0;
-	int res = 0;
+	s.push(N - 1);
 
-	for (int x = 0; x < T; x++)
+	for(int i = ret.size() - 2; i >= 0; i--)
 	{
-		for (int y = 0; y < T; y++)
+		while (s.empty() == false && ret[s.top()] < ret[i])
 		{
-			ret = 0;
-			for (int i = 0; i < T; i++)
-			{
-				if (vecx[i] >= vecx[x] && vecx[i] <= vecx[x] + S && vecy[i] >= vecy[y] && vecy[i] <= vecy[y] + S)
-					ret++;
-			}
-
-			res = max(ret, res);
+			res[s.top()] = i + 1;
+			s.pop();
 		}
+		s.push(i);
 	}
-	cout << res;
+
+	for (int& n : res)
+		cout << n << " ";
 
 	return 0;
 }
