@@ -24,56 +24,52 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-bool RightCheck(const unordered_map<char, int>& um)
-{
-	for (auto& p : um)
-	{
-		if (p.second > 0)
-			return false;
-	}
-
-	return true;
-}
-
 int main()
 {
 	Init;
 	
-	string str;
-	cin >> str;
-
-	string ans;
-	cin >> ans;
-
-	unordered_map<char, int> rightCheck;
-	for (int i = 0; i < ans.size(); i++)
-		rightCheck[ans[i]] += 1;
-
-	int res = 0;
-	for (int i = 0; i < str.size(); i++)
+	int64 N;
+	cin >> N;
+	vector<int64> T(N + 1, 0);
+	vector<int64> ST(N + 1, 0);
+	for (int64 i = 1; i < N + 1; i++)
 	{
-		if (i < ans.size())
+		cin >> ST[i];
+		T[i] = ST[i];
+	}
+	sort(ST.begin(), ST.end());
+	int64 K;
+	cin >> K;
+
+	int rest = N;
+	for (int i = 1; i < N + 1; i++)
+	{
+		int loop = (ST[i] - ST[i - 1]) * rest;
+		if (K < loop)
 		{
-			if (rightCheck.find(str[i]) != rightCheck.end())
-				rightCheck[str[i]]--;
-
-			continue;
+			int idx = K % rest;
+			int cnt = 0;
+			for (int j = 1; j < N + 1; j++)
+			{
+				if (T[j] >= ST[i])
+				{
+					if(cnt == idx)
+					{
+						cout << j;
+						return 0;
+					}
+					cnt++;
+				}
+			}
 		}
+		else
+		{
 
-		if (RightCheck(rightCheck))
-			res++;
-
-		int popIdx = i - ans.size();
-		if (rightCheck.find(str[popIdx]) != rightCheck.end())
-			rightCheck[str[popIdx]]++;
-		if (rightCheck.find(str[i]) != rightCheck.end())
-			rightCheck[str[i]]--;
+			K -= loop;
+			--rest;
+		}
 	}
 	
-	if (RightCheck(rightCheck))
-		res++;
-
-	cout << res;
-
+	cout << -1;
 	return 0;
 }
