@@ -24,40 +24,40 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
+int N;
+vector<pair<int, int>> vec;
+
+int DFS(int idx, int wCount, int bCount, int wSum, int bSum)
+{
+	if (idx > N)
+		return INT32_MAX;
+
+	if (idx == N)
+		return abs(wSum - bSum);
+
+	if (wCount == N / 2)
+		return DFS(idx + 1, wCount, bCount + 1, wSum, bSum + vec[idx].second);
+	if (bCount == N / 2)
+		return DFS(idx + 1, wCount + 1, bCount, wSum + vec[idx].first, bSum);
+
+	return min(DFS(idx + 1, wCount + 1, bCount, wSum + vec[idx].first, bSum), DFS(idx + 1, wCount, bCount + 1, wSum, bSum + vec[idx].second));
+}
+
 int main()
 {
 	Init;
 	
-	int N;
 	cin >> N;
 
-
-	stack<int> s;
-
-	vector<int> ret(N);
-	vector<int> res(N, 0);
-	int resIdx = N - 1;
+	vec.resize(N);
 	for (int i = 0; i < N; i++)
 	{
-		int n;
-		cin >> n;
-		ret[i] = n;
+		int w, b;
+		cin >> w >> b;
+		vec[i] = { w, b };
 	}
 
-	s.push(N - 1);
-
-	for(int i = ret.size() - 2; i >= 0; i--)
-	{
-		while (s.empty() == false && ret[s.top()] < ret[i])
-		{
-			res[s.top()] = i + 1;
-			s.pop();
-		}
-		s.push(i);
-	}
-
-	for (int& n : res)
-		cout << n << " ";
+	cout << min(DFS(1, 1, 0, vec[0].first, 0), DFS(1, 0, 1, 0, vec[0].second));
 
 	return 0;
 }
