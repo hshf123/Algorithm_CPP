@@ -24,40 +24,60 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-int N;
-vector<pair<int, int>> vec;
-
-int DFS(int idx, int wCount, int bCount, int wSum, int bSum)
+struct Study
 {
-	if (idx > N)
-		return INT32_MAX;
+	int st = 0;
+	int et = 0;
+	int e = 0;
 
-	if (idx == N)
-		return abs(wSum - bSum);
+	bool operator<(const Study& other)
+	{
+		return et < other.et;
+	}
+};
 
-	if (wCount == N / 2)
-		return DFS(idx + 1, wCount, bCount + 1, wSum, bSum + vec[idx].second);
-	if (bCount == N / 2)
-		return DFS(idx + 1, wCount + 1, bCount, wSum + vec[idx].first, bSum);
+int N, M, R;
+vector<int> cache;  // N시간 까지 최대 효율
+vector<Study>  vec;
 
-	return min(DFS(idx + 1, wCount + 1, bCount, wSum + vec[idx].first, bSum), DFS(idx + 1, wCount, bCount + 1, wSum, bSum + vec[idx].second));
+int ans = 0;
+
+void DP()
+{
+	for (int i = 0; i < M; i++)
+	{
+		Study& study = vec[i];
+		int& ret = cache[i];
+		ret = study.e;
+		for (int j = i - 1; j >= 0; j--)
+		{
+			Study& before = vec[j];
+			if (before.et + R <= study.st)
+				ret = max(ret, cache[j] + study.e);
+		}
+
+		ans = max(ans, ret);
+	}
 }
 
 int main()
 {
 	Init;
 	
-	cin >> N;
-
-	vec.resize(N);
-	for (int i = 0; i < N; i++)
+	cin >> N >> M >> R;
+	cache.resize(M, -1);
+	vec.resize(M);
+	for (int i = 0; i < M; i++)
 	{
-		int w, b;
-		cin >> w >> b;
-		vec[i] = { w, b };
+		int st, et, e;
+		cin >> st >> et >> e;
+		vec[i] = { st, et, e };
 	}
 
-	cout << min(DFS(1, 1, 0, vec[0].first, 0), DFS(1, 0, 1, 0, vec[0].second));
+	sort(vec.begin(), vec.end());
 
+	DP();
+	
+	cout << ans;
 	return 0;
 }
