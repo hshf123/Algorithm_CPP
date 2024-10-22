@@ -24,52 +24,111 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
+struct Pos
+{
+	int y = 0;
+	int x = 0;
+	int cnt = 0;
+	int flag = 0;
+};
+
+int W, H;
+vector<vector<int>> vec;
+vector<vector<vector<int>>> visited;
+Pos startPos;
+Pos knightPos;
+vector<Pos> strawberryPosList;
+
+int dy[] = { 1,0,-1,0 };
+int dx[] = { 0,1,0,-1 };
+
+bool CanMove(const int& y, const int& x, const int& flag)
+{
+	if (y >= H || x >= W || x < 0 || y < 0)
+		return false;
+
+	if (vec[y][x] == 1)
+		return false;
+
+	if (visited[flag][y][x] != 0)
+		return false;
+
+	if (flag == 0 && vec[y][x] == 3)
+		return false;
+
+	return true;
+}
+
+void BFS()
+{
+	queue<Pos> q;
+	q.push(startPos);
+	q.push(knightPos);
+	while (q.empty() == false)
+	{
+		Pos p = q.front();
+		q.pop();
+		int y = p.y;
+		int x = p.x;
+		int cnt = p.cnt;
+		int flag = p.flag;
+
+		for (int i = 0; i < 4; i++)
+		{
+			int nextY = y + dy[i];
+			int nextX = x + dx[i];
+			if (CanMove(nextY, nextX, flag) == false)
+				continue;
+
+			// 꺼낼 때 말고 여기서 방문체크 해줘야 훨씬 빠름 (중복 방지)
+			visited[flag][nextY][nextX] = cnt + 1;
+			q.push({ nextY, nextX, cnt + 1, flag });
+		}
+	}
+}
+
 int main()
 {
 	Init;
-	
-	int64 N;
-	cin >> N;
-	vector<int64> T(N + 1, 0);
-	vector<int64> ST(N + 1, 0);
-	for (int64 i = 1; i < N + 1; i++)
-	{
-		cin >> ST[i];
-		T[i] = ST[i];
-	}
-	sort(ST.begin(), ST.end());
-	int64 K;
-	cin >> K;
 
-	int rest = N;
-	for (int i = 1; i < N + 1; i++)
+	cin >> W >> H;
+	vec = vector<vector<int>>(H, vector<int>(W));
+	visited = vector<vector<vector<int>>>(2, vector<vector<int>>(H, vector<int>(W)));
+	for (int y = 0; y < H; y++)
 	{
-		int loop = (ST[i] - ST[i - 1]) * rest;
-		if (K < loop)
+		for (int x = 0; x < W; x++)
 		{
-			int idx = K % rest;
-			int cnt = 0;
-			for (int j = 1; j < N + 1; j++)
+			int n;
+			cin >> n;
+			vec[y][x] = n;
+			switch (n)
 			{
-				if (T[j] >= ST[i])
-				{
-					if(cnt == idx)
-					{
-						cout << j;
-						return 0;
-					}
-					cnt++;
-				}
+			case 2:
+				startPos = { y,x,1,0 };
+				break;
+			case 3:
+				knightPos = { y,x,1,1 };
+				break;
+			case 4:
+				strawberryPosList.push_back({ y,x });
+				break;
+			default:
+				break;
 			}
 		}
-		else
-		{
-
-			K -= loop;
-			--rest;
-		}
 	}
-	
-	cout << -1;
+
+	BFS();
+
+	int ret = INT32_MAX;
+	for (Pos& pos : strawberryPosList)
+	{
+		if (visited[0][pos.y][pos.x] == 0 || visited[1][pos.y][pos.x] == 0)
+			continue;
+		ret = min(ret, visited[0][pos.y][pos.x] - 1 + visited[1][pos.y][pos.x] - 1);
+	}
+
+	cout << ret;
+
 	return 0;
 }
