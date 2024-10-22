@@ -24,32 +24,72 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
+struct Student
+{
+	int idx = 0;
+	char team;
+	int atk = 0;
+
+	bool operator<(const Student& other) const
+	{
+		return atk < other.atk;
+	}
+};
+
 int N;
-vector<int> vec;
+vector<Student> vec;
+vector<int> vec2;
 
 int main()
 {
 	Init;
 
 	cin >> N;
-	vec.resize(N + 1);
+	vec.resize(N);
+	vec2.resize(N, 0);
 	for (int i = 0; i < N; i++)
-		cin >> vec[i];
-	sort(vec.begin(), vec.end());
-	int res = 0;
-	int i;
-	for (i = N; i >= 4; i -= 2)
 	{
-		res += min(vec[i] + vec[2] + vec[i - 1] + vec[2], vec[2] * 2 + vec[1] + vec[i]);
+		Student s;
+		s.idx = i;
+		cin >> s.team >> s.atk;
+		vec[i] = s;
 	}
-	if (i == 3)
-		res += (vec[1] + vec[2] + vec[3]);
-	if (i == 2)
-		res += vec[2];
-	if (i == 1)
-		res += vec[1];
+	sort(vec.begin(), vec.end());
 
-	cout << res;
+	unordered_map<char, int> m;
+	unordered_set<char> s;
+
+	for (int i = 0; i < N; i++)
+	{
+		int end = i;
+		for(int j = i + 1; j < N; j++)
+		{
+			if (vec[i].atk != vec[j].atk)
+				break;
+			end = j;
+		}
+
+		for (int j = i; j <= end; j++)
+		{
+			for(const auto& p : m)
+			{
+				if (p.first != vec[j].team)
+					vec2[vec[j].idx] += p.second;
+			}
+		}
+
+		for (int j = i; j <= end; j++)
+		{
+			m[vec[j].team] += vec[j].atk;
+		}
+
+		i = end;
+	}
+
+	for (const int& n : vec2)
+	{
+		cout << n << endl;
+	}
 	
 	return 0;
 }
