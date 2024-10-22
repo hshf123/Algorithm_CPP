@@ -25,34 +25,31 @@ using uint64 = unsigned long long;
 #pragma endregion
 
 int N;
-char c;
+vector<int> vec;
 
 int main()
 {
 	Init;
 
-	cin >> N >> c;
-
-	vector<string> vec;
+	cin >> N;
+	vec.resize(N + 1);
 	for (int i = 0; i < N; i++)
+		cin >> vec[i];
+	sort(vec.begin(), vec.end());
+	int res = 0;
+	int i;
+	for (i = N; i >= 4; i -= 2)
 	{
-		string str;
-		cin >> str;
-		if (str.find(toupper(c)) == string::npos && str.find(tolower(c)) == string::npos)
-			continue;
-		string ans;
-		unordered_set<char> us;
-		for (char& s : str)
-		{
-			s = toupper(s);
-			if (us.insert(s).second)
-				ans += s;
-		}
-		vec.push_back(ans);
+		res += min(vec[i] + vec[2] + vec[i - 1] + vec[2], vec[2] * 2 + vec[1] + vec[i]);
 	}
+	if (i == 3)
+		res += (vec[1] + vec[2] + vec[3]);
+	if (i == 2)
+		res += vec[2];
+	if (i == 1)
+		res += vec[1];
 
-	for (const string& s : vec)
-		cout << s << endl;
+	cout << res;
 	
 	return 0;
 }
