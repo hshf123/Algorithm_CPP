@@ -24,71 +24,81 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-struct Student
+vector<vector<int>> sdoku(9, vector<int>(9, 0));
+vector<pair<int, int>> vec;
+
+unordered_set<int> GetEnableNumberList(const int& y, const int& x)
 {
-	int idx = 0;
-	char team;
-	int atk = 0;
-
-	bool operator<(const Student& other) const
+	unordered_set<int> ret = { 1,2,3,4,5,6,7,8,9 };
+	for (int i = 0; i < 9; i++)
+		ret.erase(sdoku[y][i]);
+	for (int i = 0; i < 9; i++)
+		ret.erase(sdoku[i][x]);
+	for (int i = 0; i < 3; i++)
 	{
-		return atk < other.atk;
+		for (int j = 0; j < 3; j++)
+		{
+			ret.erase(sdoku[y - (y % 3) + j][x - (x % 3) + i]);
+		}
 	}
-};
 
-int N;
-vector<Student> vec;
-vector<int> vec2;
+	return ret;
+}
+bool Check()
+{
+	for (int y = 0; y < 9; y++)
+	{
+		for (int x = 0; x < 9; x++)
+		{
+			if (sdoku[y][x] == 0)
+				return false;
+		}
+	}
+
+	return true;
+}
+
+bool DFS(const int& idx)
+{
+	if (idx == vec.size())
+		return true;
+
+	unordered_set<int> s = GetEnableNumberList(vec[idx].first, vec[idx].second);
+	for (const int& p : s)
+	{
+		int& n = sdoku[vec[idx].first][vec[idx].second];
+		n = p;
+		if (DFS(idx + 1))
+			return true;
+		n = 0;
+	}
+
+	return false;
+}
 
 int main()
 {
 	Init;
 
-	cin >> N;
-	vec.resize(N);
-	vec2.resize(N, 0);
-	for (int i = 0; i < N; i++)
+	for (int y = 0; y < 9; y++)
 	{
-		Student s;
-		s.idx = i;
-		cin >> s.team >> s.atk;
-		vec[i] = s;
-	}
-	sort(vec.begin(), vec.end());
-
-	unordered_map<char, int> m;
-	unordered_set<char> s;
-
-	for (int i = 0; i < N; i++)
-	{
-		int end = i;
-		for(int j = i + 1; j < N; j++)
+		for (int x = 0; x < 9; x++)
 		{
-			if (vec[i].atk != vec[j].atk)
-				break;
-			end = j;
+			cin >> sdoku[y][x];
+			if (sdoku[y][x] == 0)
+				vec.push_back({ y,x });
 		}
-
-		for (int j = i; j <= end; j++)
-		{
-			for(const auto& p : m)
-			{
-				if (p.first != vec[j].team)
-					vec2[vec[j].idx] += p.second;
-			}
-		}
-
-		for (int j = i; j <= end; j++)
-		{
-			m[vec[j].team] += vec[j].atk;
-		}
-
-		i = end;
 	}
 
-	for (const int& n : vec2)
+	DFS(0);
+
+	for (int y = 0; y < 9; y++)
 	{
-		cout << n << endl;
+		for (int x = 0; x < 9; x++)
+		{
+			cout << sdoku[y][x] << " ";
+		}
+		cout << endl;
 	}
 	
 	return 0;
