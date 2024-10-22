@@ -24,67 +24,35 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-struct Student
-{
-	int cnt = 0;
-	int flag = 0;
-};
-
-int N, D, K;
-vector<Student> vec;
-
-int GetCount(int flag)
-{
-	int ret = 0;
-	for (Student& s : vec)
-	{
-		if (s.flag == (flag & s.flag))
-			ret++;
-	}
-
-	return ret;
-}
-
-int DFS(const int& cnt, const int& idx, const int& flag)
-{
-	if (cnt == K)
-	{
-		return GetCount(flag);
-	}
-
-	int ret = 0;
-	for (int i = idx; i <= D; i++)
-	{
-		if ((flag & (1 << i)))
-			continue;
-		ret = max(ret, DFS(cnt + 1, i + 1, flag | (1 << i)));
-	}
-	return ret;
-}
+int N;
+char c;
 
 int main()
 {
 	Init;
 
-	cin >> N >> D >> K;
-	vec.resize(N);
+	cin >> N >> c;
+
+	vector<string> vec;
 	for (int i = 0; i < N; i++)
 	{
-		int cnt;
-		cin >> cnt;
-		Student s;
-		s.cnt = cnt;
-		for (int j = 0; j < cnt; j++)
+		string str;
+		cin >> str;
+		if (str.find(toupper(c)) == string::npos && str.find(tolower(c)) == string::npos)
+			continue;
+		string ans;
+		unordered_set<char> us;
+		for (char& s : str)
 		{
-			int flag;
-			cin >> flag;
-			s.flag |= (1 << flag);
+			s = toupper(s);
+			if (us.insert(s).second)
+				ans += s;
 		}
-
-		vec[i] = s;
+		vec.push_back(ans);
 	}
 
-	int ret = DFS(0, 1, 0);
-	cout << ret;
+	for (const string& s : vec)
+		cout << s << endl;
+	
 	return 0;
 }
