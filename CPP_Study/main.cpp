@@ -24,48 +24,39 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
+string str;
 int N;
-int ret = 0;
-
-void DFS(int cnt, int idx, int flag)
-{
-	if (cnt == N)
-	{
-		int n = 0;
-		string ans;
-		for (int i = 1; i < N * 2 + 1; i++)
-		{
-			if (flag & (1 << i))
-			{
-				ans += "(";
-				n++;
-			}
-			else
-			{
-				ans += ")";
-				n--;
-			}
-			if (n < 0)
-				return;
-		}
-		ret++;
-		cout << ans << endl;
-		return;
-	}
-
-	for (int i = idx + 1; i < N * 2; i++)
-	{
-		DFS(cnt + 1, i, (flag | (1 << i)));
-	}
-}
 
 int main()
 {
 	Init;
 
-	cin >> N;
-	DFS(1, 1, 2);
-	cout << ret;
+	cin >> str >> N;
+
+	string pattern = str.substr(0, 3);
+
+	for (int i = 3; i < str.size(); i++)
+	{
+		int idx = str.find(pattern, i);
+		string can = str.substr(0, idx);
+		if (can == str.substr(idx, can.size()))
+		{
+			pattern = can;
+			break;
+		}
+		i = idx;
+	}
+
+	int sum = 0;
+	for (const char& c : pattern)
+		sum += (c - '0');
+
+	sum *= (N / pattern.size());
+
+	for (int i = 0; i < (N % pattern.size()); i++)
+		sum += (pattern[i] - '0');
+
+	cout << sum;
 
 	return 0;
 }
