@@ -25,38 +25,31 @@ using uint64 = unsigned long long;
 #pragma endregion
 
 string str;
-int N;
 
 int main()
 {
 	Init;
 
-	cin >> str >> N;
+	cin >> str;
 
-	string pattern = str.substr(0, 3);
-
-	for (int i = 3; i < str.size(); i++)
+	int cnt = 1;
+	while (str.empty() == false)
 	{
-		int idx = str.find(pattern, i);
-		string can = str.substr(0, idx);
-		if (can == str.substr(idx, can.size()))
-		{
-			pattern = can;
-			break;
-		}
-		i = idx;
+		int startIdx = str.find('(');
+		int endIdx = str.find(')');
+
+		if (startIdx == 0)
+			cnt = 1;
+		else
+			cnt = stoi(str.substr(0, startIdx));
+
+		string pattern = str.substr(startIdx + 1, endIdx - startIdx - 1);
+
+		for (int i = 0; i < cnt; i++)
+			cout << pattern;
+
+		str = str.substr(endIdx + 1, str.size() - endIdx);
 	}
-
-	int sum = 0;
-	for (const char& c : pattern)
-		sum += (c - '0');
-
-	sum *= (N / pattern.size());
-
-	for (int i = 0; i < (N % pattern.size()); i++)
-		sum += (pattern[i] - '0');
-
-	cout << sum;
 
 	return 0;
 }
