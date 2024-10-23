@@ -24,32 +24,28 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-string str;
 
 int main()
 {
 	Init;
 
-	cin >> str;
+	string A;
+	string B;
+	cin >> A >> B;
+	vector<vector<int>> vec(A.size() + 1, vector<int>(B.size() + 1, 0));
 
-	int cnt = 1;
-	while (str.empty() == false)
+	for (int y = 1; y < A.size() + 1; y++)
 	{
-		int startIdx = str.find('(');
-		int endIdx = str.find(')');
-
-		if (startIdx == 0)
-			cnt = 1;
-		else
-			cnt = stoi(str.substr(0, startIdx));
-
-		string pattern = str.substr(startIdx + 1, endIdx - startIdx - 1);
-
-		for (int i = 0; i < cnt; i++)
-			cout << pattern;
-
-		str = str.substr(endIdx + 1, str.size() - endIdx);
+		for (int x = 1; x < B.size() + 1; x++)
+		{
+			if (A[y - 1] == B[x - 1])
+				vec[y][x] = vec[y - 1][x - 1] + 1;
+			else
+				vec[y][x] = max(vec[y - 1][x], vec[y][x - 1]);
+		}
 	}
+
+	cout << vec[A.size()][B.size()];
 
 	return 0;
 }
