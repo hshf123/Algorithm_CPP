@@ -24,41 +24,40 @@ using int64 = long long;
 using uint64 = unsigned long long;
 #pragma endregion
 
-int N;
-
 int main()
 {
 	Init;
 
-	int maxCnt = 0;
-	int cnt = 0;
-	bool c = false;
-	int sc = 0;
-	int ec = 0;
+	string str;
+	cin >> str;
 
 
-	cin >> N;
-	for (int i = 0; i < N; i++)
+	unordered_map<char, int> m;
+
+	for (int i = 0; i < str.size(); i++)
 	{
-		int n;
-		cin >> n;
-		if (n == 1)
-		{
-			c = true;
-			cnt = 0;
+		str[i] = toupper(str[i]);
+		m[str[i]]++;
+	}
+	
+	unordered_set<char> s;
+	string ans;
+	for (int i = 0; i < str.size(); i++)
+	{
+		char& c = str[i];
+		m[c]--;
+		if (s.find(c) != s.end())
 			continue;
+		while (ans.empty() == false && ans.back() > c && m[ans.back()] > 0)
+		{
+			s.erase(ans.back());
+			ans.pop_back();
 		}
-		if (c == false)
-			sc++;
-		cnt++;
-		maxCnt = max(cnt, maxCnt);
-		if (i == N - 1 && n == 0)
-			ec = cnt;
+		if (s.insert(c).second)
+			ans += c;
 	}
 
-	maxCnt = max(max(maxCnt / 2 + (maxCnt % 2), sc), ec);
-
-	cout << maxCnt;
+	cout << ans;
 
 	return 0;
 }
