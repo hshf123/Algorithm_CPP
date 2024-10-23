@@ -22,49 +22,67 @@
 using namespace std;
 using int64 = long long;
 using uint64 = unsigned long long;
+
+int dy[] = { 1,0,-1,0 };
+int dx[] = { 0,1,0,-1 };
 #pragma endregion
 
-vector<int> vec(9, 0);
-unordered_map<int, unordered_set<int>> team;
+int R, C;
+vector<vector<int>> vec;
+vector<vector<pair<bool, bool>>> visited;
+queue<pair<int, int>> q;
+int ans = 0;
 
-int DFS(int idx)
+void BFS()
 {
-	if (idx == 9)
+	while (q.empty() == false)
 	{
-		vector<int> sum(3, 0);
-		for (auto& p : team)
-		{
-			for (const int& p2 : p.second)
-			{
-				sum[p.first] += vec[p2];
-			}
-		}
+		int y = q.front().first;
+		int x = q.front().second;
+		q.pop();
 
-		sort(sum.begin(), sum.end());
-		return sum.back() - sum.front();
-	}
+		if (visited[y][x].second == false)
+			ans++;
 
-	int ret = INT32_MAX;
-	for (int i = 0; i < 3; i++)
-	{
-		if(team[i].size() < 3)
+		for (int i = 0; i < 4; i++)
 		{
-			team[i].insert(idx);
-			ret = min(ret, DFS(idx + 1));
-			team[i].erase(idx);
+			int ny = y + dy[i];
+			int nx = x + dx[i];
+			if (ny < 0 || nx < 0 || ny >= R || nx >= C)
+				continue;
+			if (visited[ny][nx].first || vec[ny][nx] == 0)
+				continue;
+			visited[ny][nx].first = true;
+			visited[ny][nx].second = true;
+			q.push({ ny,nx });
 		}
 	}
-	return ret;
 }
 
 int main()
 {
 	Init;
 	
-	for (int i = 0; i < 9; i++)
-		cin >> vec[i];
+	cin >> R >> C;
+	vec = vector<vector<int>>(R, vector<int>(C, 0));
+	visited = vector<vector<pair<bool, bool>>>(R, vector<pair<bool, bool>>(C, {false, false}));
 
-	cout << DFS(0);
+	for (int y = 0; y < R; y++)
+	{
+		for (int x = 0; x < C; x++)
+		{
+			char c;
+			cin >> c;
+			if (c == '#')
+			{
+				vec[y][x] = 1;
+				q.push({ y,x });
+				visited[y][x] = { false, false };
+			}
+		}
+	}
 
+	BFS();
+	cout << ans;
 	return 0;
 }
