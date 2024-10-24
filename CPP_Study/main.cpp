@@ -27,42 +27,63 @@ int dy[] = { 1,0,-1,0 };
 int dx[] = { 0,1,0,-1 };
 #pragma endregion
 
-int N;
-unordered_map<int, int> m;
-unordered_set<int> s1;
-unordered_set<int> s2;
-unordered_set<int> s3;
+int N, M;
+vector<vector<int>> vec;
+vector<vector<int>> cache;
 
 int main()
 {
 	Init;
 	
-	cin >> N;
+	cin >> N >> M;
+	vec = vector<vector<int>>(N, vector<int>(M, 0));
+	cache = vector<vector<int>>(N, vector<int>(M, 0));
+	for (int y = 0; y < N; y++)
+	{
+		string str;
+		cin >> str;
+		for (int x = 0; x < M; x++)
+		{
+			vec[y][x] = str[x] - '0';
+			int& n = vec[y][x];
+			if (n == 1)
+			{
+				int& dp = cache[y][x];
+				dp = INT32_MAX;
+				if (y > 0 && x > 0)
+					dp = min(dp, cache[y - 1][x - 1]);
+				else
+					dp = 0;
 
-	int ans = -1;
-	for (int i = 0; i < N; i++)
-	{
-		int n;
-		cin >> n;
-		if (s1.insert(n).second)
-			++m[n];
-	}
-	for (int i = 0; i < N; i++)
-	{
-		int n;
-		cin >> n;
-		if (s2.insert(n).second)
-			++m[n];
-	}
-	for (int i = 0; i < N; i++)
-	{
-		int n;
-		cin >> n;
-		if (s3.insert(n).second)
-			ans = max(ans, ++m[n] == 3 ? n : ans);
+				if (y > 0)
+					dp = min(dp, cache[y - 1][x]);
+				if (x > 0)
+					dp = min(dp, cache[y][x - 1]);
+
+				dp += 1;
+			}
+		}
 	}
 
-	cout << ans;
+	vector<int> ans(min(N, M) + 1, 0);
+	for (int y = 0; y < N; y++)
+	{
+		for (int x = 0; x < M; x++)
+		{
+			int& dp = cache[y][x];
+			for (int i = 1; i <= dp; i++)
+			{
+				ans[i]++;
+			}
+		}
+	}
+
+	for (int i = 1; i < min(N, M) + 1; i++)
+	{
+		if (ans[i] == 0)
+			continue;
+		cout << i << " " << ans[i] << endl;
+	}
 	
 	return 0;
 }
