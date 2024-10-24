@@ -27,62 +27,42 @@ int dy[] = { 1,0,-1,0 };
 int dx[] = { 0,1,0,-1 };
 #pragma endregion
 
-int R, C;
-vector<vector<int>> vec;
-vector<vector<pair<bool, bool>>> visited;
-queue<pair<int, int>> q;
-int ans = 0;
-
-void BFS()
-{
-	while (q.empty() == false)
-	{
-		int y = q.front().first;
-		int x = q.front().second;
-		q.pop();
-
-		if (visited[y][x].second == false)
-			ans++;
-
-		for (int i = 0; i < 4; i++)
-		{
-			int ny = y + dy[i];
-			int nx = x + dx[i];
-			if (ny < 0 || nx < 0 || ny >= R || nx >= C)
-				continue;
-			if (visited[ny][nx].first || vec[ny][nx] == 0)
-				continue;
-			visited[ny][nx].first = true;
-			visited[ny][nx].second = true;
-			q.push({ ny,nx });
-		}
-	}
-}
+int N;
+unordered_map<int, int> m;
+unordered_set<int> s1;
+unordered_set<int> s2;
+unordered_set<int> s3;
 
 int main()
 {
 	Init;
 	
-	cin >> R >> C;
-	vec = vector<vector<int>>(R, vector<int>(C, 0));
-	visited = vector<vector<pair<bool, bool>>>(R, vector<pair<bool, bool>>(C, {false, false}));
+	cin >> N;
 
-	for (int y = 0; y < R; y++)
+	int ans = -1;
+	for (int i = 0; i < N; i++)
 	{
-		for (int x = 0; x < C; x++)
-		{
-			char c;
-			cin >> c;
-			if (c == '#')
-			{
-				vec[y][x] = 1;
-				q.push({ y,x });
-				visited[y][x] = { false, false };
-			}
-		}
+		int n;
+		cin >> n;
+		if (s1.insert(n).second)
+			++m[n];
+	}
+	for (int i = 0; i < N; i++)
+	{
+		int n;
+		cin >> n;
+		if (s2.insert(n).second)
+			++m[n];
+	}
+	for (int i = 0; i < N; i++)
+	{
+		int n;
+		cin >> n;
+		if (s3.insert(n).second)
+			ans = max(ans, ++m[n] == 3 ? n : ans);
 	}
 
-	BFS();
 	cout << ans;
+	
 	return 0;
 }
