@@ -27,63 +27,40 @@ int dy[] = { 1,0,-1,0 };
 int dx[] = { 0,1,0,-1 };
 #pragma endregion
 
-int N, M;
-vector<vector<int>> vec;
-vector<vector<int>> cache;
+int L, N;
+vector<pair<int, int>> vec;
+
+int DP(int idx, int len, int cnt)
+{
+	if (len == L)
+		return cnt;
+	if (idx == N - 1 && len != L)
+		return -1;
+
+	int ret = 0;
+	for (int i = idx + 1; i < N; i++)
+	{
+		int nlen = len + vec[i].first;
+		if (nlen > L)
+			continue;
+
+		ret = max(ret, DP(i, nlen, min(cnt, vec[i].second)));
+	}
+	return ret;
+}
 
 int main()
 {
 	Init;
 	
-	cin >> N >> M;
-	vec = vector<vector<int>>(N, vector<int>(M, 0));
-	cache = vector<vector<int>>(N, vector<int>(M, 0));
-	for (int y = 0; y < N; y++)
+	cin >> L >> N;
+	vec = vector<pair<int, int>>(N);
+	for (int i = 0; i < N; i++)
 	{
-		string str;
-		cin >> str;
-		for (int x = 0; x < M; x++)
-		{
-			vec[y][x] = str[x] - '0';
-			int& n = vec[y][x];
-			if (n == 1)
-			{
-				int& dp = cache[y][x];
-				dp = INT32_MAX;
-				if (y > 0 && x > 0)
-					dp = min(dp, cache[y - 1][x - 1]);
-				else
-					dp = 0;
-
-				if (y > 0)
-					dp = min(dp, cache[y - 1][x]);
-				if (x > 0)
-					dp = min(dp, cache[y][x - 1]);
-
-				dp += 1;
-			}
-		}
+		cin >> vec[i].first >> vec[i].second;
 	}
 
-	vector<int> ans(min(N, M) + 1, 0);
-	for (int y = 0; y < N; y++)
-	{
-		for (int x = 0; x < M; x++)
-		{
-			int& dp = cache[y][x];
-			for (int i = 1; i <= dp; i++)
-			{
-				ans[i]++;
-			}
-		}
-	}
-
-	for (int i = 1; i < min(N, M) + 1; i++)
-	{
-		if (ans[i] == 0)
-			continue;
-		cout << i << " " << ans[i] << endl;
-	}
+	cout << DP(-1, 0, INT32_MAX);
 	
 	return 0;
 }
