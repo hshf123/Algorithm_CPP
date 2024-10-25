@@ -27,77 +27,107 @@ int dy[] = { 1,0,-1,0 };
 int dx[] = { 0,1,0,-1 };
 #pragma endregion
 
-int N, M;
-vector<vector<pair<int,int>>> bridge;
-vector<int> cache;
-int A, B;
-int val = 0;
-int ans = 0;
-
-int BFS(int maxVal)
+struct Log
 {
-	cache = vector<int>(N, -1);
-	queue<int> q;
-	q.push(A - 1);
-	cache[A - 1] = 1;
-	while (q.empty() == false)
-	{
-		int n = q.front();
-		q.pop();
+	vector<int> ABC = vector<int>(3, 0);
 
-		for (int i = 0; i < bridge[n].size(); i++)
-		{
-			int& next = bridge[n][i].second;
-			if (next == -1)
-				continue;
-			if (next < maxVal)
-				continue;
-			if (cache[bridge[n][i].first] != -1)
-				continue;
-			cache[bridge[n][i].first] = 1;
-			q.push(bridge[n][i].first);
-		}
+	int Get() const
+	{
+		if (count(ABC.begin(), ABC.end(), 0) > 0)
+			return 0;
+
+		return max(ABC[0], max(ABC[1], ABC[2]));
 	}
 
-	return cache[B - 1];
+	bool operator<(const Log& other)
+	{
+		return Get() < other.Get();
+	}
+};
+
+struct Pos
+{
+	int y = 0;
+	int x = 0;
+	int w = 0;
+	int c = 0;
+};
+
+int N;
+vector<vector<int>> vec;
+vector<vector<Log>> logs;
+
+pair<int, int> A;
+pair<int, int> B;
+pair<int, int> C;
+
+void BFS()
+{
+	queue<Pos> q;
+	q.push({ A.first - 1, A.second - 1, 0, 0 });
+	q.push({ B.first - 1, B.second - 1, 1, 0 });
+	q.push({ C.first - 1, C.second - 1, 2, 0 });
+	while (q.empty() == false)
+	{
+		Pos p =q.front();
+		q.pop();
+
+		for (int i = 0; i < 4; i++)
+		{
+			int ny = p.y + dy[i];
+			int nx = p.x + dx[i];
+			if (ny < 0 || nx < 0 || ny >= N || nx >= N)
+				continue;
+			if (vec[ny][nx] == 1)
+				continue;
+			if (logs[ny][nx].ABC[p.w] != 0)
+				continue;
+			logs[ny][nx].ABC[p.w] = p.c;
+			q.push({ ny, nx, p.w, p.c + 1 });
+		}
+	}
 }
 
 int main()
 {
 	Init;
 
-	cin >> N >> M;
-	bridge = vector<vector<pair<int,int>>>(N);
-	for (int i = 0; i < M; i++)
+	cin >> N;
+	vec = vector<vector<int>>(N, vector<int>(N, 0));
+	logs = vector<vector<Log>>(N, vector<Log>(N));
+	for (int y = 0; y < N; y++)
 	{
-		int a, b, c;
-		cin >> a >> b >> c;
-		a -= 1;
-		b -= 1;
-		bridge[a].push_back({ b, c });
-		bridge[b].push_back({ a, c });
-		val = max(val, c);
+		for (int x = 0; x < N; x++)
+		{
+			cin >> vec[y][x];
+		}
 	}
-	cin >> A >> B;
 
-	int start = 0;
-	int end = val;
-	int ans = 0;
-	while (start <= end)
+	cin >> A.first >> A.second;
+	cin >> B.first >> B.second;
+	cin >> C.first >> C.second;
+
+	BFS();
+
+	vector<int> v;
+	for (int y = 0; y < N; y++)
 	{
-		int mid = (start + end) / 2;
-		if (BFS(mid) == 1)
+		for (int x = 0; x < N; x++)
 		{
-			ans = mid;
-			start = mid + 1;
-		}
-		else
-		{
-			end = mid -1;
+			if (logs[y][x].Get() == 0)
+				continue;
+			v.push_back(logs[y][x].Get());
 		}
 	}
-	
-	cout << ans;
+	if (v.empty())
+	{
+		cout << -1;
+		return 0;
+	}
+
+	sort(v.begin(), v.end());
+	int cnt = count(v.begin(), v.end(), v.front());
+	cout << cnt;
 
 	return 0;
 }
