@@ -28,46 +28,38 @@ int dx[] = { 0,1,0,-1 };
 #pragma endregion
 
 int N, M;
-vector<int> vec;
-int ans = INT32_MAX;
-int minVal = 0;
+vector<vector<pair<int,int>>> bridge;
+vector<int> cache;
+int A, B;
+int val = 0;
+int ans = 0;
 
-
-int Solve(int maxVal)
+int BFS(int maxVal)
 {
-	if (maxVal <= minVal)
-		return minVal;
-
-	int cnt = 0;
-	int sm = 0;
-	int sum = 0;
-	for (int i = 0; i < N; i++)
+	cache = vector<int>(N, -1);
+	queue<int> q;
+	q.push(A - 1);
+	cache[A - 1] = 1;
+	while (q.empty() == false)
 	{
-		if (sum + vec[i] <= maxVal)
+		int n = q.front();
+		q.pop();
+
+		for (int i = 0; i < bridge[n].size(); i++)
 		{
-			sum += vec[i];
-		}
-		else
-		{
-			sm = max(sm, sum);
-			sum = vec[i];
-			cnt++;
+			int& next = bridge[n][i].second;
+			if (next == -1)
+				continue;
+			if (next < maxVal)
+				continue;
+			if (cache[bridge[n][i].first] != -1)
+				continue;
+			cache[bridge[n][i].first] = 1;
+			q.push(bridge[n][i].first);
 		}
 	}
-	cnt++;
-	sm = max(sm, sum);
-	
-	if (cnt > M)
-	{
-		int temp = maxVal;
-		maxVal = maxVal * 2 - minVal + (temp % 2 == 0 ? 1 : 0);
-		minVal = temp + 1;
-		sm = INT32_MAX;
-	}
-	if (cnt == M && minVal + 1 == maxVal)
-		minVal = maxVal;
 
-	return min(sm, Solve((maxVal + minVal) / 2));
+	return cache[B - 1];
 }
 
 int main()
@@ -75,16 +67,36 @@ int main()
 	Init;
 
 	cin >> N >> M;
-	vec.resize(N, 0);
-	int sum = 0;
-	for (int i = 0; i < N; i++)
+	bridge = vector<vector<pair<int,int>>>(N);
+	for (int i = 0; i < M; i++)
 	{
-		cin >> vec[i];
-		sum += vec[i];
-		minVal = max(vec[i], minVal);
+		int a, b, c;
+		cin >> a >> b >> c;
+		a -= 1;
+		b -= 1;
+		bridge[a].push_back({ b, c });
+		bridge[b].push_back({ a, c });
+		val = max(val, c);
 	}
+	cin >> A >> B;
 
-	int ans = Solve((minVal + sum) / 2);
+	int start = 0;
+	int end = val;
+	int ans = 0;
+	while (start <= end)
+	{
+		int mid = (start + end) / 2;
+		if (BFS(mid) == 1)
+		{
+			ans = mid;
+			start = mid + 1;
+		}
+		else
+		{
+			end = mid -1;
+		}
+	}
+	
 	cout << ans;
 
 	return 0;
