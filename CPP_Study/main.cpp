@@ -27,32 +27,65 @@ int dy[] = { 1,0,-1,0 };
 int dx[] = { 0,1,0,-1 };
 #pragma endregion
 
-int N;
+int N, M;
 vector<int> vec;
 int ans = INT32_MAX;
+int minVal = 0;
 
-int DP(int idx, int cnt)
+
+int Solve(int maxVal)
 {
-	if (idx >= N)
-		return cnt;
+	if (maxVal <= minVal)
+		return minVal;
 
-	int ret = INT32_MAX;
-	ret = min(DP(idx + 1, cnt + vec[idx]), ret);
-	ret = min(DP(idx + 2, cnt + vec[idx]), ret);
-	return ret;
+	int cnt = 0;
+	int sm = 0;
+	int sum = 0;
+	for (int i = 0; i < N; i++)
+	{
+		if (sum + vec[i] <= maxVal)
+		{
+			sum += vec[i];
+		}
+		else
+		{
+			sm = max(sm, sum);
+			sum = vec[i];
+			cnt++;
+		}
+	}
+	cnt++;
+	sm = max(sm, sum);
+	
+	if (cnt > M)
+	{
+		int temp = maxVal;
+		maxVal = maxVal * 2 - minVal + (temp % 2 == 0 ? 1 : 0);
+		minVal = temp + 1;
+		sm = INT32_MAX;
+	}
+	if (cnt == M && minVal + 1 == maxVal)
+		minVal = maxVal;
+
+	return min(sm, Solve((maxVal + minVal) / 2));
 }
 
 int main()
 {
 	Init;
-	
-	cin >> N;
-	vec = vector<int>(N);
-	for (int i = 0; i < N; i++)
-		cin >> vec[i];
 
-	int ret = min(DP(0, 0), DP(1, 0));
-	cout << ret;
+	cin >> N >> M;
+	vec.resize(N, 0);
+	int sum = 0;
+	for (int i = 0; i < N; i++)
+	{
+		cin >> vec[i];
+		sum += vec[i];
+		minVal = max(vec[i], minVal);
+	}
+
+	int ans = Solve((minVal + sum) / 2);
+	cout << ans;
 
 	return 0;
 }
